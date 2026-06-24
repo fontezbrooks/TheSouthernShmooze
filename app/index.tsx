@@ -1,39 +1,33 @@
-import { Text, StyleSheet, ScrollView } from 'react-native';
+import { Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useTheme } from '@/theme/ThemeProvider';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
+import { LeadForm } from '@/features/lead-form/LeadForm';
 
 /**
- * Phase 0 sandbox screen — verifies fonts, tokens, and UI primitives render (Checkpoint C0).
- * Replaced by the real LandingScreen in Phase 3.
+ * Phase 2 screen — the lead form on a branded background. The full landing layout
+ * (header, hero, cards, animated background) is built in Phase 3.
  */
 export default function Index() {
   const t = useTheme();
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: t.colors.bg }}>
       <StatusBar style="dark" />
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={t.typography.display}>The Southern Shmooze</Text>
-        <Text style={t.typography.body}>Phase 0 — design system online.</Text>
-
-        <Card>
-          <Text style={t.typography.bodyBold}>Card primitive</Text>
-          <Text style={t.typography.body}>White surface, token radius + hairline.</Text>
-        </Card>
-
-        <Button label="Submit" variant="primary" />
-        <Button label="Browse Directory" variant="secondary" />
-        <Button label="Learn more" variant="link" />
-      </ScrollView>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+          <Text style={[t.typography.display, styles.heading]}>Let&apos;s Plan Something Awesome</Text>
+          <LeadForm />
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  content: {
-    padding: 24,
-    gap: 16,
-  },
+  flex: { flex: 1 },
+  content: { padding: 24, paddingBottom: 64, gap: 20 },
+  heading: { textAlign: 'center' },
 });

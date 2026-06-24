@@ -15,14 +15,15 @@
 
 1. **Create the project** at https://supabase.com → new project. Note the **Project URL** and **anon public** key (Settings → API).
 
-2. **Configure env** — copy and fill:
+2. **Configure env** — copy and fill (Expo `EXPO_PUBLIC_*` convention):
    ```bash
    cp .env.example .env
    # edit .env:
-   # SUPABASE_URL=https://<ref>.supabase.co
-   # SUPABASE_ANON_KEY=<anon-public-key>
+   # EXPO_PUBLIC_SUPABASE_URL=https://<ref>.supabase.co
+   # EXPO_PUBLIC_SUPABASE_KEY=<anon-public-key>
    ```
    These are read by `app.config.ts` into `expo.extra` and consumed by `src/lib/supabase.ts`.
+   (Legacy `SUPABASE_URL` / `SUPABASE_ANON_KEY` names are also accepted as a fallback.)
 
 3. **Run the migrations** — either option:
    - **SQL Editor (simplest):** paste `0001_leads.sql` then `0002_storage.sql`, run in order.
