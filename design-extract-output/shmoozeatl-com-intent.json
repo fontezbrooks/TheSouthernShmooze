@@ -1,0 +1,320 @@
+{
+  "pageIntent": {
+    "type": "landing",
+    "confidence": 0.31,
+    "path": "/",
+    "title": "The Southern Shmooze | Explore Local Businesses Today",
+    "description": "Discover trusted local small businesses in Atlanta with The Southern Shmooze. Join our community, directory, or concierge service to support small businesses today.",
+    "signals": [
+      {
+        "kind": "dom",
+        "type": "blog-post",
+        "weight": 0.35,
+        "detail": "byline|min-read"
+      },
+      {
+        "kind": "url",
+        "type": "landing",
+        "weight": 0.45,
+        "detail": "root-path"
+      }
+    ],
+    "alternates": [
+      {
+        "type": "blog-post",
+        "score": 0.35
+      }
+    ],
+    "needsSmart": true
+  },
+  "sectionRoles": {
+    "sections": [
+      {
+        "index": 0,
+        "tag": "header",
+        "role": "nav",
+        "subrole": null,
+        "confidence": 0.4,
+        "heading": null,
+        "bounds": {
+          "x": 0,
+          "y": -3102,
+          "w": 1280,
+          "h": 146.40625
+        },
+        "buttonCount": 12,
+        "cardCount": 90,
+        "slots": {
+          "ctaCount": 12,
+          "lede": "Check out our sister companies Grantlanta Lawn (ATL landscaping) and Peace of Mind Recycling (ATL recycling home pickup service)"
+        },
+        "needsSmart": true
+      },
+      {
+        "index": 1,
+        "tag": "nav",
+        "role": "nav",
+        "subrole": null,
+        "confidence": 0.9,
+        "heading": null,
+        "bounds": {
+          "x": 51.1875,
+          "y": -3033.671875,
+          "w": 390.5625,
+          "h": 54.375
+        },
+        "buttonCount": 3,
+        "cardCount": 27,
+        "slots": {
+          "ctaCount": 3,
+          "lede": "Contact\nMembership\nDirectory\nResources"
+        },
+        "needsSmart": false
+      },
+      {
+        "index": 2,
+        "tag": "nav",
+        "role": "nav",
+        "subrole": null,
+        "confidence": 0.9,
+        "heading": null,
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        },
+        "buttonCount": 3,
+        "cardCount": 27,
+        "slots": {
+          "ctaCount": 3,
+          "lede": ""
+        },
+        "needsSmart": false
+      },
+      {
+        "index": 3,
+        "tag": "nav",
+        "role": "nav",
+        "subrole": null,
+        "confidence": 0.9,
+        "heading": null,
+        "bounds": {
+          "x": 0,
+          "y": 166.40625,
+          "w": 1280,
+          "h": 653.59375
+        },
+        "buttonCount": 1,
+        "cardCount": 34,
+        "slots": {
+          "ctaCount": 1
+        },
+        "needsSmart": false
+      },
+      {
+        "index": 4,
+        "tag": "main",
+        "role": "pricing-table",
+        "subrole": null,
+        "confidence": 0.9,
+        "heading": "Atlanta’s Community for Finding Trusted Local Businesses",
+        "bounds": {
+          "x": 0,
+          "y": -3102,
+          "w": 1280,
+          "h": 9214.375
+        },
+        "buttonCount": 14,
+        "cardCount": 35,
+        "slots": {
+          "heading": "Atlanta’s Community for Finding Trusted Local Businesses",
+          "subheadings": [
+            "Welcome to The Southern Shmooze",
+            "Let’s Plan Something Awesome",
+            "Businesses You Can Trust",
+            ""
+          ],
+          "ctaCount": 14
+        },
+        "needsSmart": false
+      },
+      {
+        "index": 5,
+        "tag": "section",
+        "role": "pricing-table",
+        "subrole": null,
+        "confidence": 0.9,
+        "heading": "Atlanta’s Community for Finding Trusted Local Businesses",
+        "bounds": {
+          "x": 0,
+          "y": -3102,
+          "w": 1280,
+          "h": 2723.375
+        },
+        "buttonCount": 9,
+        "cardCount": 8,
+        "slots": {
+          "heading": "Atlanta’s Community for Finding Trusted Local Businesses",
+          "subheadings": [
+            "Welcome to The Southern Shmooze",
+            "Let’s Plan Something Awesome"
+          ],
+          "ctaCount": 9
+        },
+        "needsSmart": false
+      },
+      {
+        "index": 6,
+        "tag": "section",
+        "role": "pricing",
+        "subrole": null,
+        "confidence": 0.4,
+        "heading": "Businesses You Can Trust",
+        "bounds": {
+          "x": 0,
+          "y": -378.625,
+          "w": 1280,
+          "h": 3475.625
+        },
+        "buttonCount": 3,
+        "cardCount": 26,
+        "slots": {
+          "heading": "Businesses You Can Trust",
+          "subheadings": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "ctaCount": 3
+        },
+        "needsSmart": true
+      },
+      {
+        "index": 7,
+        "tag": "section",
+        "role": "content",
+        "subrole": null,
+        "confidence": 0.3,
+        "heading": "Check out The Shmooze on the news!",
+        "bounds": {
+          "x": 0,
+          "y": 3097,
+          "w": 1280,
+          "h": 2097.9375
+        },
+        "buttonCount": 0,
+        "cardCount": 0,
+        "slots": {
+          "heading": "Check out The Shmooze on the news!",
+          "subheadings": [
+            "Check out our newsletter & podcast!",
+            "Are you a business interested in signing up?"
+          ]
+        },
+        "needsSmart": true
+      },
+      {
+        "index": 8,
+        "tag": "section",
+        "role": "testimonials",
+        "subrole": null,
+        "confidence": 0.4,
+        "heading": null,
+        "bounds": {
+          "x": 0,
+          "y": 5194.9375,
+          "w": 1280,
+          "h": 917.4375
+        },
+        "buttonCount": 2,
+        "cardCount": 0,
+        "slots": {
+          "ctaCount": 2
+        },
+        "needsSmart": true
+      },
+      {
+        "index": 9,
+        "tag": "footer",
+        "role": "footer",
+        "subrole": null,
+        "confidence": 0.95,
+        "heading": null,
+        "bounds": {
+          "x": 0,
+          "y": 6112.375,
+          "w": 1280,
+          "h": 43.1875
+        },
+        "buttonCount": 0,
+        "cardCount": 0,
+        "slots": {
+          "lede": "© 2026 The Southern Shmooze. All Rights Reserved."
+        },
+        "needsSmart": false
+      },
+      {
+        "index": 10,
+        "tag": "section",
+        "role": "content",
+        "subrole": null,
+        "confidence": 0.3,
+        "heading": null,
+        "bounds": {
+          "x": 0,
+          "y": 6112.375,
+          "w": 1280,
+          "h": 43.1875
+        },
+        "buttonCount": 0,
+        "cardCount": 0,
+        "slots": {
+          "lede": "© 2026 The Southern Shmooze. All Rights Reserved."
+        },
+        "needsSmart": true
+      },
+      {
+        "index": 11,
+        "tag": "nav",
+        "role": "nav",
+        "subrole": null,
+        "confidence": 0.9,
+        "heading": null,
+        "bounds": {
+          "x": 1041.71875,
+          "y": 6131.5625,
+          "w": 187.09375,
+          "h": 24
+        },
+        "buttonCount": 0,
+        "cardCount": 0,
+        "slots": {},
+        "needsSmart": false
+      }
+    ],
+    "counts": {
+      "nav": 5,
+      "pricing-table": 2,
+      "pricing": 1,
+      "content": 2,
+      "testimonials": 1,
+      "footer": 1
+    },
+    "readingOrder": [
+      "nav",
+      "pricing-table",
+      "pricing-table",
+      "nav",
+      "pricing",
+      "nav",
+      "nav",
+      "content",
+      "testimonials",
+      "footer",
+      "content",
+      "nav"
+    ]
+  }
+}

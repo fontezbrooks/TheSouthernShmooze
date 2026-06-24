@@ -1,0 +1,190 @@
+{
+  "url": "https://www.shmoozeatl.com/",
+  "path": "/",
+  "added": {
+    "primitive": {
+      "color": {
+        "neutral": {
+          "n600": {
+            "$value": "#a9a9a9"
+          },
+          "n700": {
+            "$value": "#cdd5df"
+          }
+        },
+        "background": {
+          "bg4": {
+            "$value": "#afafaf"
+          }
+        }
+      },
+      "spacing": {
+        "s14": {
+          "$value": "146px"
+        },
+        "s15": {
+          "$value": "274px"
+        },
+        "s16": {
+          "$value": "323px"
+        }
+      },
+      "radius": {
+        "r3": {
+          "$value": "50px"
+        },
+        "r4": {
+          "$value": "300px"
+        }
+      },
+      "shadow": {
+        "sh1": {
+          "$value": "rgb(0, 0, 0) 0px 0px 0px 0px"
+        },
+        "sh2": {
+          "$value": "rgba(0, 0, 0, 0.05) 0px 2px 1px 0px, rgba(0, 0, 0, 0.25) 0px 0px 1px 0px"
+        },
+        "sh3": {
+          "$value": "rgb(128, 128, 128) 0px 0px 5px 0px"
+        },
+        "sh4": {
+          "$value": "rgba(0, 0, 0, 0.12) 0px 18px 13.5px 0px, rgba(0, 0, 0, 0.1) 0px 7.5px 6px 0px, rgba(0, 0, 0, 0.08) 0px 4.5px 3px 0px"
+        }
+      }
+    }
+  },
+  "changed": {
+    "primitive": {
+      "color": {
+        "brand": {
+          "primary": {
+            "$value": "#0099dd"
+          },
+          "secondary": {
+            "$value": "#e1ded4"
+          }
+        },
+        "neutral": {
+          "n200": {
+            "$value": "#333333"
+          },
+          "n300": {
+            "$value": "#ffffff"
+          },
+          "n400": {
+            "$value": "#bbbbbb"
+          },
+          "n500": {
+            "$value": "#efece6"
+          }
+        },
+        "background": {
+          "bg1": {
+            "$value": "#000000"
+          },
+          "bg2": {
+            "$value": "#ffffff"
+          },
+          "bg3": {
+            "$value": "#efece6"
+          }
+        },
+        "text": {
+          "text2": {
+            "$value": "#333333"
+          },
+          "text3": {
+            "$value": "#bbbbbb"
+          },
+          "text4": {
+            "$value": "#0d121c"
+          }
+        }
+      },
+      "spacing": {
+        "s1": {
+          "$value": "4px"
+        },
+        "s2": {
+          "$value": "19px"
+        },
+        "s3": {
+          "$value": "22px"
+        },
+        "s4": {
+          "$value": "25px"
+        },
+        "s5": {
+          "$value": "30px"
+        },
+        "s6": {
+          "$value": "32px"
+        },
+        "s7": {
+          "$value": "38px"
+        },
+        "s8": {
+          "$value": "43px"
+        },
+        "s9": {
+          "$value": "48px"
+        },
+        "s10": {
+          "$value": "51px"
+        },
+        "s11": {
+          "$value": "64px"
+        },
+        "s12": {
+          "$value": "77px"
+        },
+        "s13": {
+          "$value": "84px"
+        }
+      },
+      "radius": {
+        "r0": {
+          "$value": "2px"
+        },
+        "r1": {
+          "$value": "12px"
+        },
+        "r2": {
+          "$value": "26px"
+        }
+      },
+      "shadow": {
+        "sh0": {
+          "$value": "rgba(0, 0, 0, 0) 0px 0px 0px 1px"
+        }
+      },
+      "fontFamily": {
+        "f1": {
+          "$value": "Shrikhand"
+        },
+        "f2": {
+          "$value": "SFico"
+        }
+      }
+    },
+    "semantic": {
+      "color": {
+        "action": {
+          "secondary": {
+            "$value": "{primitive.color.brand.secondary}"
+          }
+        }
+      },
+      "typography": {
+        "body": {
+          "$value": {
+            "fontFamily": "Bitter",
+            "fontSize": "62.08px",
+            "fontWeight": "400",
+            "lineHeight": "65.5565px"
+          }
+        }
+      }
+    }
+  }
+}

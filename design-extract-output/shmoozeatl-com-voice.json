@@ -1,0 +1,106 @@
+{
+  "tone": "friendly",
+  "pronoun": "you-only",
+  "headingStyle": "Title Case",
+  "headingLengthClass": "balanced",
+  "ctaVerbs": [
+    {
+      "value": "join",
+      "count": 3
+    },
+    {
+      "value": "submit",
+      "count": 3
+    },
+    {
+      "value": "business",
+      "count": 2
+    },
+    {
+      "value": "contact",
+      "count": 1
+    },
+    {
+      "value": "skip",
+      "count": 1
+    },
+    {
+      "value": "membership",
+      "count": 1
+    },
+    {
+      "value": "directory",
+      "count": 1
+    },
+    {
+      "value": "resources",
+      "count": 1
+    },
+    {
+      "value": "search",
+      "count": 1
+    },
+    {
+      "value": "more",
+      "count": 1
+    }
+  ],
+  "buttonPatterns": [
+    {
+      "value": "join our facebook community",
+      "count": 3
+    },
+    {
+      "value": "submit",
+      "count": 3
+    },
+    {
+      "value": "business directory",
+      "count": 2
+    },
+    {
+      "value": "check out our sister companies grantlanta lawn (atl landscaping) and peace of mind recycling (atl recycling home pickup service)\n\nskip to content\ncontact\nmember",
+      "count": 1
+    },
+    {
+      "value": "skip to content",
+      "count": 1
+    },
+    {
+      "value": "membership",
+      "count": 1
+    },
+    {
+      "value": "directory",
+      "count": 1
+    },
+    {
+      "value": "resources",
+      "count": 1
+    },
+    {
+      "value": "search",
+      "count": 1
+    },
+    {
+      "value": "more",
+      "count": 1
+    }
+  ],
+  "sampleHeadings": [
+    "Atlanta’s Community for Finding Trusted Local Businesses",
+    "Welcome to The Southern Shmooze",
+    "Let’s Plan Something Awesome",
+    "Businesses You Can Trust",
+    "Atlanta’s Community for Finding Trusted Local Businesses",
+    "Welcome to The Southern Shmooze",
+    "Let’s Plan Something Awesome",
+    "Businesses You Can Trust",
+    "Check out The Shmooze on the news!",
+    "Check out our newsletter & podcast!"
+  ],
+  "stats": {
+    "buttons": 15,
+    "headings": 11
+  }
+}

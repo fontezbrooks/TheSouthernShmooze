@@ -1,0 +1,133 @@
+{
+  "url": "https://www.shmoozeatl.com/membership-1",
+  "path": "/membership-1",
+  "added": {},
+  "changed": {
+    "primitive": {
+      "color": {
+        "brand": {
+          "primary": {
+            "$value": "#0099dd"
+          },
+          "secondary": {
+            "$value": "#f1694f"
+          }
+        },
+        "neutral": {
+          "n200": {
+            "$value": "#333333"
+          },
+          "n300": {
+            "$value": "#ffffff"
+          },
+          "n400": {
+            "$value": "#c1c1c1"
+          }
+        },
+        "background": {
+          "bg1": {
+            "$value": "#000000"
+          },
+          "bg2": {
+            "$value": "#ffffff"
+          }
+        },
+        "text": {
+          "text2": {
+            "$value": "#333333"
+          },
+          "text3": {
+            "$value": "#2288dd"
+          },
+          "text4": {
+            "$value": "#f1694f"
+          }
+        }
+      },
+      "spacing": {
+        "s1": {
+          "$value": "4px"
+        },
+        "s2": {
+          "$value": "23px"
+        },
+        "s3": {
+          "$value": "30px"
+        },
+        "s4": {
+          "$value": "32px"
+        },
+        "s5": {
+          "$value": "38px"
+        },
+        "s6": {
+          "$value": "40px"
+        },
+        "s7": {
+          "$value": "43px"
+        },
+        "s8": {
+          "$value": "48px"
+        },
+        "s9": {
+          "$value": "51px"
+        },
+        "s10": {
+          "$value": "64px"
+        },
+        "s11": {
+          "$value": "77px"
+        },
+        "s12": {
+          "$value": "84px"
+        },
+        "s13": {
+          "$value": "146px"
+        }
+      },
+      "radius": {
+        "r0": {
+          "$value": "2px"
+        },
+        "r1": {
+          "$value": "300px"
+        }
+      },
+      "shadow": {
+        "sh0": {
+          "$value": "rgb(128, 128, 128) 0px 0px 5px 0px"
+        }
+      },
+      "fontFamily": {
+        "f1": {
+          "$value": "Shrikhand"
+        },
+        "f2": {
+          "$value": "Times"
+        },
+        "f3": {
+          "$value": "SFico"
+        }
+      }
+    },
+    "semantic": {
+      "color": {
+        "action": {
+          "secondary": {
+            "$value": "{primitive.color.brand.secondary}"
+          }
+        }
+      },
+      "typography": {
+        "body": {
+          "$value": {
+            "fontFamily": "Bitter",
+            "fontSize": "62.08px",
+            "fontWeight": "400",
+            "lineHeight": "65.5565px"
+          }
+        }
+      }
+    }
+  }
+}

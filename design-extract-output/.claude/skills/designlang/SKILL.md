@@ -1,0 +1,35 @@
+---
+name: designlang-tokens
+description: Use when styling UI for www.shmoozeatl.com — references the extracted design system tokens instead of inventing colors, spacing, or typography.
+---
+
+# designlang tokens
+Source: https://www.shmoozeatl.com/
+Extracted by designlang v7.0.0 on 2026-06-23T18:35:30.404Z
+
+## Semantic tokens (use these)
+- color.action.primary: #e1ded4
+- color.surface.default: #e1ded4
+- color.text.body: #000000
+- radius.control: 2px
+- typography.body.fontFamily: Bitter
+
+## Regions
+- nav
+- nav
+- nav
+- nav
+- pricing
+- pricing
+- pricing
+- content
+- testimonials
+- footer
+- content
+- nav
+
+## How to use
+- Prefer `semantic.*` tokens over `primitive.*`.
+- Never invent new tokens or hex values; reuse the ones above.
+- When a value is missing, pick the closest existing semantic token and flag the gap.
+- Reference tokens by their dotted path (e.g. `semantic.color.action.primary`).

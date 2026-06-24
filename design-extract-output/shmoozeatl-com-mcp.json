@@ -1,0 +1,2108 @@
+{
+  "colors": {
+    "all": [
+      {
+        "hex": "#000000",
+        "rgb": {
+          "r": 0,
+          "g": 0,
+          "b": 0,
+          "a": 1
+        },
+        "hsl": {
+          "h": 0,
+          "s": 0,
+          "l": 0
+        },
+        "count": 19341,
+        "contexts": [
+          "text",
+          "border",
+          "background"
+        ]
+      },
+      {
+        "hex": "#333333",
+        "rgb": {
+          "r": 51,
+          "g": 51,
+          "b": 51,
+          "a": 1
+        },
+        "hsl": {
+          "h": 0,
+          "s": 0,
+          "l": 20
+        },
+        "count": 2620,
+        "contexts": [
+          "text",
+          "border"
+        ]
+      },
+      {
+        "hex": "#ffffff",
+        "rgb": {
+          "r": 255,
+          "g": 255,
+          "b": 255,
+          "a": 1
+        },
+        "hsl": {
+          "h": 0,
+          "s": 0,
+          "l": 100
+        },
+        "count": 658,
+        "contexts": [
+          "text",
+          "border",
+          "background"
+        ]
+      },
+      {
+        "hex": "#e1ded4",
+        "rgb": {
+          "r": 225,
+          "g": 222,
+          "b": 212,
+          "a": 1
+        },
+        "hsl": {
+          "h": 46,
+          "s": 18,
+          "l": 86
+        },
+        "count": 151,
+        "contexts": [
+          "background"
+        ]
+      },
+      {
+        "hex": "#efece6",
+        "rgb": {
+          "r": 239,
+          "g": 236,
+          "b": 230,
+          "a": 1
+        },
+        "hsl": {
+          "h": 40,
+          "s": 22,
+          "l": 92
+        },
+        "count": 31,
+        "contexts": [
+          "border",
+          "background"
+        ]
+      },
+      {
+        "hex": "#0099dd",
+        "rgb": {
+          "r": 0,
+          "g": 153,
+          "b": 221,
+          "a": 1
+        },
+        "hsl": {
+          "h": 198,
+          "s": 100,
+          "l": 43
+        },
+        "count": 24,
+        "contexts": [
+          "background",
+          "border"
+        ]
+      },
+      {
+        "hex": "#bbbbbb",
+        "rgb": {
+          "r": 187,
+          "g": 187,
+          "b": 187,
+          "a": 1
+        },
+        "hsl": {
+          "h": 0,
+          "s": 0,
+          "l": 73
+        },
+        "count": 11,
+        "contexts": [
+          "text",
+          "border"
+        ]
+      },
+      {
+        "hex": "#2288dd",
+        "rgb": {
+          "r": 34,
+          "g": 136,
+          "b": 221,
+          "a": 1
+        },
+        "hsl": {
+          "h": 207,
+          "s": 73,
+          "l": 50
+        },
+        "count": 10,
+        "contexts": [
+          "text",
+          "border"
+        ]
+      },
+      {
+        "hex": "#0d121c",
+        "rgb": {
+          "r": 13,
+          "g": 18,
+          "b": 28,
+          "a": 1
+        },
+        "hsl": {
+          "h": 220,
+          "s": 37,
+          "l": 8
+        },
+        "count": 6,
+        "contexts": [
+          "text",
+          "border"
+        ]
+      },
+      {
+        "hex": "#f1694f",
+        "rgb": {
+          "r": 241,
+          "g": 105,
+          "b": 79,
+          "a": 1
+        },
+        "hsl": {
+          "h": 10,
+          "s": 85,
+          "l": 63
+        },
+        "count": 4,
+        "contexts": [
+          "text",
+          "border"
+        ]
+      },
+      {
+        "hex": "#cdd5df",
+        "rgb": {
+          "r": 205,
+          "g": 213,
+          "b": 223,
+          "a": 1
+        },
+        "hsl": {
+          "h": 213,
+          "s": 22,
+          "l": 84
+        },
+        "count": 3,
+        "contexts": [
+          "border"
+        ]
+      },
+      {
+        "hex": "#a9a9a9",
+        "rgb": {
+          "r": 169,
+          "g": 169,
+          "b": 169,
+          "a": 1
+        },
+        "hsl": {
+          "h": 0,
+          "s": 0,
+          "l": 66
+        },
+        "count": 2,
+        "contexts": [
+          "border",
+          "background"
+        ]
+      },
+      {
+        "hex": "#1a73e8",
+        "rgb": {
+          "r": 26,
+          "g": 115,
+          "b": 232,
+          "a": 1
+        },
+        "hsl": {
+          "h": 214,
+          "s": 82,
+          "l": 51
+        },
+        "count": 1,
+        "contexts": [
+          "border"
+        ]
+      }
+    ]
+  },
+  "regions": [
+    {
+      "role": "nav",
+      "tag": "header",
+      "bounds": {
+        "x": 0,
+        "y": -3102,
+        "w": 1280,
+        "h": 146.40625
+      },
+      "heading": null,
+      "buttonCount": 12,
+      "cardCount": 90,
+      "className": "\n      \n        \n          white\n        \n      \n      header theme-col--primary\n    "
+    },
+    {
+      "role": "nav",
+      "tag": "nav",
+      "bounds": {
+        "x": 51.1875,
+        "y": -3033.671875,
+        "w": 390.5625,
+        "h": 54.375
+      },
+      "heading": null,
+      "buttonCount": 3,
+      "cardCount": 27,
+      "className": "header-nav-list"
+    },
+    {
+      "role": "nav",
+      "tag": "nav",
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "w": 0,
+        "h": 0
+      },
+      "heading": null,
+      "buttonCount": 3,
+      "cardCount": 27,
+      "className": "header-nav-list"
+    },
+    {
+      "role": "nav",
+      "tag": "nav",
+      "bounds": {
+        "x": 0,
+        "y": 166.40625,
+        "w": 1280,
+        "h": 653.59375
+      },
+      "heading": null,
+      "buttonCount": 1,
+      "cardCount": 34,
+      "className": "header-menu-nav-list"
+    },
+    {
+      "role": "pricing",
+      "tag": "main",
+      "bounds": {
+        "x": 0,
+        "y": -3102,
+        "w": 1280,
+        "h": 9214.375
+      },
+      "heading": "Atlanta’s Community for Finding Trusted Local Businesses",
+      "buttonCount": 14,
+      "cardCount": 35,
+      "className": "container"
+    },
+    {
+      "role": "pricing",
+      "tag": "section",
+      "bounds": {
+        "x": 0,
+        "y": -3102,
+        "w": 1280,
+        "h": 2723.375
+      },
+      "heading": "Atlanta’s Community for Finding Trusted Local Businesses",
+      "buttonCount": 9,
+      "cardCount": 8,
+      "className": "page-section has-section-divider\n    \n      full-bleed-section\n      layout-engine-section\n    \n    background-width--full-bleed\n    \n      \n        section-height--custom\n      \n    \n    \n      content-width--wide\n    \n    horizontal-alignment--center\n    vertical-alignment--middle\n    \n    \n    white"
+    },
+    {
+      "role": "pricing",
+      "tag": "section",
+      "bounds": {
+        "x": 0,
+        "y": -378.625,
+        "w": 1280,
+        "h": 3475.625
+      },
+      "heading": "Businesses You Can Trust",
+      "buttonCount": 3,
+      "cardCount": 26,
+      "className": "page-section \n    \n      full-bleed-section\n      layout-engine-section\n    \n    background-width--full-bleed\n    \n      section-height--medium\n    \n    \n      content-width--wide\n    \n    horizontal-alignment--center\n    vertical-alignment--middle\n    \n      \n    \n    \n    "
+    },
+    {
+      "role": "content",
+      "tag": "section",
+      "bounds": {
+        "x": 0,
+        "y": 3097,
+        "w": 1280,
+        "h": 2097.9375
+      },
+      "heading": "Check out The Shmooze on the news!",
+      "buttonCount": 0,
+      "cardCount": 0,
+      "className": "page-section \n    \n      full-bleed-section\n      layout-engine-section\n    \n    background-width--full-bleed\n    \n      section-height--medium\n    \n    \n      content-width--wide\n    \n    horizontal-alignment--center\n    vertical-alignment--middle\n    \n      \n    \n    \n    "
+    },
+    {
+      "role": "testimonials",
+      "tag": "section",
+      "bounds": {
+        "x": 0,
+        "y": 5194.9375,
+        "w": 1280,
+        "h": 917.4375
+      },
+      "heading": null,
+      "buttonCount": 2,
+      "cardCount": 0,
+      "className": "page-section \n    \n      full-bleed-section\n      layout-engine-section\n    \n    background-width--full-bleed\n    \n      \n        section-height--custom\n      \n    \n    \n      content-width--wide\n    \n    horizontal-alignment--center\n    vertical-alignment--middle\n    \n      \n    \n    \n    bright"
+    },
+    {
+      "role": "footer",
+      "tag": "footer",
+      "bounds": {
+        "x": 0,
+        "y": 6112.375,
+        "w": 1280,
+        "h": 43.1875
+      },
+      "heading": null,
+      "buttonCount": 0,
+      "cardCount": 0,
+      "className": "sections"
+    },
+    {
+      "role": "content",
+      "tag": "section",
+      "bounds": {
+        "x": 0,
+        "y": 6112.375,
+        "w": 1280,
+        "h": 43.1875
+      },
+      "heading": null,
+      "buttonCount": 0,
+      "cardCount": 0,
+      "className": "page-section \n    \n      full-bleed-section\n      layout-engine-section\n    \n    background-width--full-bleed\n    \n      \n        section-height--custom\n      \n    \n    \n      content-width--wide\n    \n    horizontal-alignment--center\n    vertical-alignment--middle\n    \n      \n    \n    \n    light"
+    },
+    {
+      "role": "nav",
+      "tag": "nav",
+      "bounds": {
+        "x": 1041.71875,
+        "y": 6131.5625,
+        "w": 187.09375,
+        "h": 24
+      },
+      "heading": null,
+      "buttonCount": 0,
+      "cardCount": 0,
+      "className": "sqs-svg-icon--list"
+    }
+  ],
+  "componentClusters": [
+    {
+      "kind": "button",
+      "structuralHash": "body>div>script>svg>div>script",
+      "instanceCount": 1,
+      "variants": [
+        {
+          "css": {
+            "background": "rgb(225, 222, 212)",
+            "color": "rgb(0, 0, 0)",
+            "padding": "0px 0px 0px 0px",
+            "borderRadius": "0px",
+            "border": "0px none rgb(0, 0, 0)",
+            "fontSize": "16px",
+            "fontWeight": "400"
+          },
+          "instanceCount": 1
+        }
+      ]
+    },
+    {
+      "kind": "button",
+      "structuralHash": "a",
+      "instanceCount": 6,
+      "variants": [
+        {
+          "css": {
+            "background": "rgb(0, 0, 0)",
+            "color": "rgb(255, 255, 255)",
+            "padding": "32px 48px 32px 48px",
+            "borderRadius": "300px",
+            "border": "3px solid rgb(0, 0, 0)",
+            "fontSize": "16px",
+            "fontWeight": "400"
+          },
+          "instanceCount": 4
+        },
+        {
+          "css": {
+            "background": "rgba(0, 0, 0, 0.12)",
+            "color": "rgb(255, 255, 255)",
+            "padding": "10px 10px 10px 10px",
+            "borderRadius": "0px",
+            "border": "0px none rgb(255, 255, 255)",
+            "fontSize": "14px",
+            "fontWeight": "400"
+          },
+          "instanceCount": 2
+        }
+      ]
+    },
+    {
+      "kind": "button",
+      "structuralHash": "button>span>span",
+      "instanceCount": 4,
+      "variants": [
+        {
+          "css": {
+            "background": "rgba(0, 0, 0, 0)",
+            "color": "rgb(0, 0, 0)",
+            "padding": "1.6px 0px 1.6px 0px",
+            "borderRadius": "0px",
+            "border": "0px none rgb(0, 0, 0)",
+            "fontSize": "16px",
+            "fontWeight": "400"
+          },
+          "instanceCount": 3
+        },
+        {
+          "css": {
+            "background": "rgba(0, 0, 0, 0)",
+            "color": "rgb(0, 0, 0)",
+            "padding": "32px 48px 32px 48px",
+            "borderRadius": "300px",
+            "border": "3px solid rgb(0, 0, 0)",
+            "fontSize": "16px",
+            "fontWeight": "400"
+          },
+          "instanceCount": 1
+        }
+      ]
+    },
+    {
+      "kind": "button",
+      "structuralHash": "div>div",
+      "instanceCount": 1,
+      "variants": [
+        {
+          "css": {
+            "background": "rgba(0, 0, 0, 0)",
+            "color": "rgb(0, 0, 0)",
+            "padding": "0px 0px 0px 0px",
+            "borderRadius": "0px",
+            "border": "0px none rgb(0, 0, 0)",
+            "fontSize": "16px",
+            "fontWeight": "400"
+          },
+          "instanceCount": 1
+        }
+      ]
+    },
+    {
+      "kind": "button",
+      "structuralHash": "div>a",
+      "instanceCount": 1,
+      "variants": [
+        {
+          "css": {
+            "background": "rgba(0, 0, 0, 0)",
+            "color": "rgb(0, 0, 0)",
+            "padding": "0px 0px 0px 0px",
+            "borderRadius": "0px",
+            "border": "0px none rgb(0, 0, 0)",
+            "fontSize": "16px",
+            "fontWeight": "400"
+          },
+          "instanceCount": 1
+        }
+      ]
+    },
+    {
+      "kind": "input",
+      "structuralHash": "input",
+      "instanceCount": 7,
+      "variants": [
+        {
+          "css": {
+            "background": "rgba(0, 0, 0, 0)",
+            "color": "rgb(0, 0, 0)",
+            "padding": "10px 20px 10px 20px",
+            "borderRadius": "25.84px",
+            "border": "2px solid rgba(0, 0, 0, 0)",
+            "fontSize": "16px",
+            "fontWeight": "400"
+          },
+          "instanceCount": 5
+        },
+        {
+          "css": {
+            "background": "rgb(250, 250, 250)",
+            "color": "rgb(0, 0, 0)",
+            "padding": "10px 10px 10px 10px",
+            "borderRadius": "25.84px",
+            "border": "1px solid rgb(169, 169, 169)",
+            "fontSize": "16px",
+            "fontWeight": "400"
+          },
+          "instanceCount": 2
+        }
+      ]
+    },
+    {
+      "kind": "input",
+      "structuralHash": "textarea",
+      "instanceCount": 1,
+      "variants": [
+        {
+          "css": {
+            "background": "rgba(0, 0, 0, 0)",
+            "color": "rgb(0, 0, 0)",
+            "padding": "10px 20px 10px 20px",
+            "borderRadius": "25.84px",
+            "border": "2px solid rgba(0, 0, 0, 0)",
+            "fontSize": "16px",
+            "fontWeight": "400"
+          },
+          "instanceCount": 1
+        }
+      ]
+    },
+    {
+      "kind": "button",
+      "structuralHash": "div>button",
+      "instanceCount": 1,
+      "variants": [
+        {
+          "css": {
+            "background": "rgba(0, 0, 0, 0)",
+            "color": "rgb(0, 0, 0)",
+            "padding": "0px 0px 0px 0px",
+            "borderRadius": "0px",
+            "border": "0px none rgb(0, 0, 0)",
+            "fontSize": "16px",
+            "fontWeight": "400"
+          },
+          "instanceCount": 1
+        }
+      ]
+    },
+    {
+      "kind": "button",
+      "structuralHash": "span>span>span>span",
+      "instanceCount": 1,
+      "variants": [
+        {
+          "css": {
+            "background": "rgba(0, 0, 0, 0)",
+            "color": "rgb(0, 0, 0)",
+            "padding": "0px 0px 0px 0px",
+            "borderRadius": "0px",
+            "border": "0px none rgb(0, 0, 0)",
+            "fontSize": "16px",
+            "fontWeight": "400"
+          },
+          "instanceCount": 1
+        }
+      ]
+    },
+    {
+      "kind": "button",
+      "structuralHash": "button",
+      "instanceCount": 2,
+      "variants": [
+        {
+          "css": {
+            "background": "rgb(0, 153, 221)",
+            "color": "rgb(255, 255, 255)",
+            "padding": "8.5px 22.5px 8.5px 22.5px",
+            "borderRadius": "0px",
+            "border": "0px none rgb(255, 255, 255)",
+            "fontSize": "15px",
+            "fontWeight": "700"
+          },
+          "instanceCount": 2
+        }
+      ]
+    }
+  ],
+  "accessibility": {
+    "remediation": []
+  },
+  "cssHealth": {
+    "sheets": [
+      {
+        "url": "https://assets.squarespace.com/universal/styles-compressed/user-account-core-307d50f196c01a72-min.en-US.css",
+        "totalBytes": 2301,
+        "usedBytes": 0,
+        "unusedBytes": 2301,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://fonts.googleapis.com/css2?family=Shrikhand:ital,wght@0,400&family=Bitter:ital,wght@0,400;0,700;1,400;1,700",
+        "totalBytes": 8102,
+        "usedBytes": 0,
+        "unusedBytes": 8102,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.video/50baeb28-ee36-4112-a224-a858ed33ee12_425/website.components.video.styles.css",
+        "totalBytes": 4454,
+        "usedBytes": 1158,
+        "unusedBytes": 3296,
+        "unusedPercent": 74
+      },
+      {
+        "url": "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.embed/d94bcbbf-b75c-460e-97d6-363165c48b5c_425/website.components.embed.styles.css",
+        "totalBytes": 2371,
+        "usedBytes": 1493,
+        "unusedBytes": 878,
+        "unusedPercent": 37
+      },
+      {
+        "url": "https://static1.squarespace.com/static/versioned-site-css/6a2a09a17969787be3b38e35/20/5c5a519771c10ba3470d8101/6a2a09a17969787be3b38e3d/1797/site.css?nocustom=true",
+        "totalBytes": 1265387,
+        "usedBytes": 219733,
+        "unusedBytes": 1045654,
+        "unusedPercent": 83
+      },
+      {
+        "url": "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.html/40c3f02d-25b0-46b1-bfa3-d91e0ca63b6b_680/website.components.html.styles.css",
+        "totalBytes": 118,
+        "usedBytes": 116,
+        "unusedBytes": 2,
+        "unusedPercent": 2
+      },
+      {
+        "url": "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.scrolling/663a57eb-a5ac-477e-8a07-03d48e5ad0a9_452/website.components.scrolling.styles.css",
+        "totalBytes": 2779,
+        "usedBytes": 1682,
+        "unusedBytes": 1097,
+        "unusedPercent": 39
+      },
+      {
+        "url": "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.socialLinks/f4f892c9-7182-4c0d-abcd-4e94eb0849f9_458/website.components.socialLinks.styles.css",
+        "totalBytes": 30584,
+        "usedBytes": 2757,
+        "unusedBytes": 27827,
+        "unusedPercent": 91
+      },
+      {
+        "url": "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.form/8ac88006-1306-4df2-b1f4-d6341cb38b59_852/website.components.form.styles.css",
+        "totalBytes": 14528,
+        "usedBytes": 1761,
+        "unusedBytes": 12767,
+        "unusedPercent": 88
+      },
+      {
+        "url": "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.imageFluid/ae86668b-532e-4dfb-bbb0-ba8a88a2b4a0_667/website.components.imageFluid.styles.css",
+        "totalBytes": 3034,
+        "usedBytes": 2165,
+        "unusedBytes": 869,
+        "unusedPercent": 29
+      },
+      {
+        "url": "https://definitions.sqspcdn.com/website-component-definition/static-assets/website.components.button/d797f00e-9c51-4016-a65d-a06b3e0fe88d_850/website.components.button.styles.css",
+        "totalBytes": 1341,
+        "usedBytes": 859,
+        "unusedBytes": 482,
+        "unusedPercent": 36
+      },
+      {
+        "url": "https://static1.squarespace.com/static/vta/5c5a519771c10ba3470d8101/versioned-assets/1781706603480-09QTE1KW1FL9UBTZ2CH8/static.css",
+        "totalBytes": 472464,
+        "usedBytes": 39652,
+        "unusedBytes": 432812,
+        "unusedPercent": 92
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 557,
+        "usedBytes": 549,
+        "unusedBytes": 8,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 415,
+        "usedBytes": 0,
+        "unusedBytes": 415,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 139,
+        "usedBytes": 66,
+        "unusedBytes": 73,
+        "unusedPercent": 53
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 809,
+        "usedBytes": 776,
+        "unusedBytes": 33,
+        "unusedPercent": 4
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 568,
+        "usedBytes": 560,
+        "unusedBytes": 8,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 896,
+        "usedBytes": 842,
+        "unusedBytes": 54,
+        "unusedPercent": 6
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 393,
+        "usedBytes": 0,
+        "unusedBytes": 393,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 152,
+        "usedBytes": 0,
+        "unusedBytes": 152,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 11950,
+        "usedBytes": 9173,
+        "unusedBytes": 2777,
+        "unusedPercent": 23
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 569,
+        "usedBytes": 561,
+        "unusedBytes": 8,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 809,
+        "usedBytes": 776,
+        "unusedBytes": 33,
+        "unusedPercent": 4
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 698,
+        "usedBytes": 680,
+        "unusedBytes": 18,
+        "unusedPercent": 3
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 7,
+        "usedBytes": 0,
+        "unusedBytes": 7,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 417,
+        "usedBytes": 0,
+        "unusedBytes": 417,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 568,
+        "usedBytes": 560,
+        "unusedBytes": 8,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 393,
+        "usedBytes": 0,
+        "unusedBytes": 393,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 568,
+        "usedBytes": 560,
+        "unusedBytes": 8,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 343,
+        "usedBytes": 0,
+        "unusedBytes": 343,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 569,
+        "usedBytes": 561,
+        "unusedBytes": 8,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 393,
+        "usedBytes": 0,
+        "unusedBytes": 393,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 557,
+        "usedBytes": 549,
+        "unusedBytes": 8,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 393,
+        "usedBytes": 0,
+        "unusedBytes": 393,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 891,
+        "usedBytes": 837,
+        "unusedBytes": 54,
+        "unusedPercent": 6
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 921,
+        "usedBytes": 867,
+        "unusedBytes": 54,
+        "unusedPercent": 6
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 569,
+        "usedBytes": 561,
+        "unusedBytes": 8,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 417,
+        "usedBytes": 0,
+        "unusedBytes": 417,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 393,
+        "usedBytes": 0,
+        "unusedBytes": 393,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 715,
+        "usedBytes": 682,
+        "unusedBytes": 33,
+        "unusedPercent": 5
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 703,
+        "usedBytes": 670,
+        "unusedBytes": 33,
+        "unusedPercent": 5
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 4258,
+        "usedBytes": 3108,
+        "unusedBytes": 1150,
+        "unusedPercent": 27
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 568,
+        "usedBytes": 560,
+        "unusedBytes": 8,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 809,
+        "usedBytes": 776,
+        "unusedBytes": 33,
+        "unusedPercent": 4
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 891,
+        "usedBytes": 837,
+        "unusedBytes": 54,
+        "unusedPercent": 6
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 715,
+        "usedBytes": 682,
+        "unusedBytes": 33,
+        "unusedPercent": 5
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 569,
+        "usedBytes": 561,
+        "unusedBytes": 8,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 389,
+        "usedBytes": 0,
+        "unusedBytes": 389,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 715,
+        "usedBytes": 682,
+        "unusedBytes": 33,
+        "unusedPercent": 5
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 417,
+        "usedBytes": 0,
+        "unusedBytes": 417,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 1095,
+        "usedBytes": 547,
+        "unusedBytes": 548,
+        "unusedPercent": 50
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 809,
+        "usedBytes": 776,
+        "unusedBytes": 33,
+        "unusedPercent": 4
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 715,
+        "usedBytes": 682,
+        "unusedBytes": 33,
+        "unusedPercent": 5
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 670,
+        "usedBytes": 637,
+        "unusedBytes": 33,
+        "unusedPercent": 5
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 288,
+        "usedBytes": 74,
+        "unusedBytes": 214,
+        "unusedPercent": 74
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 557,
+        "usedBytes": 549,
+        "unusedBytes": 8,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 62,
+        "usedBytes": 0,
+        "unusedBytes": 62,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 803,
+        "usedBytes": 770,
+        "unusedBytes": 33,
+        "unusedPercent": 4
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 891,
+        "usedBytes": 837,
+        "unusedBytes": 54,
+        "unusedPercent": 6
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 62,
+        "usedBytes": 0,
+        "unusedBytes": 62,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 417,
+        "usedBytes": 0,
+        "unusedBytes": 417,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 568,
+        "usedBytes": 560,
+        "unusedBytes": 8,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://cdn.membershipworks.com/all.css?_re=837",
+        "totalBytes": 155408,
+        "usedBytes": 8575,
+        "unusedBytes": 146833,
+        "unusedPercent": 94
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 809,
+        "usedBytes": 776,
+        "unusedBytes": 33,
+        "unusedPercent": 4
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 3399,
+        "usedBytes": 2534,
+        "unusedBytes": 865,
+        "unusedPercent": 25
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 809,
+        "usedBytes": 776,
+        "unusedBytes": 33,
+        "unusedPercent": 4
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 179,
+        "usedBytes": 0,
+        "unusedBytes": 179,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 557,
+        "usedBytes": 549,
+        "unusedBytes": 8,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 393,
+        "usedBytes": 0,
+        "unusedBytes": 393,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 393,
+        "usedBytes": 0,
+        "unusedBytes": 393,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 417,
+        "usedBytes": 0,
+        "unusedBytes": 417,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 737,
+        "usedBytes": 704,
+        "unusedBytes": 33,
+        "unusedPercent": 4
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 557,
+        "usedBytes": 549,
+        "unusedBytes": 8,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 557,
+        "usedBytes": 549,
+        "unusedBytes": 8,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 13597,
+        "usedBytes": 10054,
+        "unusedBytes": 3543,
+        "unusedPercent": 26
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 0,
+        "usedBytes": 0,
+        "unusedBytes": 0,
+        "unusedPercent": 0
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 737,
+        "usedBytes": 704,
+        "unusedBytes": 33,
+        "unusedPercent": 4
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 811,
+        "usedBytes": 757,
+        "unusedBytes": 54,
+        "unusedPercent": 7
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 737,
+        "usedBytes": 704,
+        "unusedBytes": 33,
+        "unusedPercent": 4
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 415,
+        "usedBytes": 0,
+        "unusedBytes": 415,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 569,
+        "usedBytes": 561,
+        "unusedBytes": 8,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 568,
+        "usedBytes": 560,
+        "unusedBytes": 8,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 670,
+        "usedBytes": 637,
+        "unusedBytes": 33,
+        "unusedPercent": 5
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 809,
+        "usedBytes": 776,
+        "unusedBytes": 33,
+        "unusedPercent": 4
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 2869,
+        "usedBytes": 2209,
+        "unusedBytes": 660,
+        "unusedPercent": 23
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 568,
+        "usedBytes": 560,
+        "unusedBytes": 8,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 417,
+        "usedBytes": 0,
+        "unusedBytes": 417,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 417,
+        "usedBytes": 0,
+        "unusedBytes": 417,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 393,
+        "usedBytes": 0,
+        "unusedBytes": 393,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 859,
+        "usedBytes": 805,
+        "unusedBytes": 54,
+        "unusedPercent": 6
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 803,
+        "usedBytes": 770,
+        "unusedBytes": 33,
+        "unusedPercent": 4
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 569,
+        "usedBytes": 561,
+        "unusedBytes": 8,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 557,
+        "usedBytes": 549,
+        "unusedBytes": 8,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 569,
+        "usedBytes": 561,
+        "unusedBytes": 8,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 855,
+        "usedBytes": 801,
+        "unusedBytes": 54,
+        "unusedPercent": 6
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 855,
+        "usedBytes": 801,
+        "unusedBytes": 54,
+        "unusedPercent": 6
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 568,
+        "usedBytes": 560,
+        "unusedBytes": 8,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 393,
+        "usedBytes": 0,
+        "unusedBytes": 393,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 569,
+        "usedBytes": 561,
+        "unusedBytes": 8,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 8,
+        "usedBytes": 0,
+        "unusedBytes": 8,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 96,
+        "usedBytes": 0,
+        "unusedBytes": 96,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 157,
+        "usedBytes": 0,
+        "unusedBytes": 157,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://assets.squarespace.com/universal/styles-compressed/7041e1ee24e47d42-min.en-US.css",
+        "totalBytes": 25339,
+        "usedBytes": 92,
+        "unusedBytes": 25247,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://assets.squarespace.com/universal/styles-compressed/d9036239517ac1a5-min.en-US.css",
+        "totalBytes": 5331,
+        "usedBytes": 0,
+        "unusedBytes": 5331,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/theme/main.5369f1b1b4826550832f.css",
+        "totalBytes": 384435,
+        "usedBytes": 384389,
+        "unusedBytes": 46,
+        "unusedPercent": 0
+      },
+      {
+        "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+        "totalBytes": 12535,
+        "usedBytes": 0,
+        "unusedBytes": 12535,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/68674.ff81cee5.css",
+        "totalBytes": 189798,
+        "usedBytes": 0,
+        "unusedBytes": 189798,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/1691.8c126550.css",
+        "totalBytes": 187433,
+        "usedBytes": 26445,
+        "unusedBytes": 160988,
+        "unusedPercent": 86
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/52822.4e2cdfaf.css",
+        "totalBytes": 42250,
+        "usedBytes": 0,
+        "unusedBytes": 42250,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/96311.ad9780ae.css",
+        "totalBytes": 16765,
+        "usedBytes": 0,
+        "unusedBytes": 16765,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/27472.b5c4cffd.css",
+        "totalBytes": 17929,
+        "usedBytes": 0,
+        "unusedBytes": 17929,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/23794.96d2c90f.css",
+        "totalBytes": 28840,
+        "usedBytes": 0,
+        "unusedBytes": 28840,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/98294.82122f36.css",
+        "totalBytes": 111338,
+        "usedBytes": 286,
+        "unusedBytes": 111052,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/23794.96d2c90f.css",
+        "totalBytes": 28840,
+        "usedBytes": 0,
+        "unusedBytes": 28840,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/1691.8c126550.css",
+        "totalBytes": 187433,
+        "usedBytes": 26445,
+        "unusedBytes": 160988,
+        "unusedPercent": 86
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/96311.ad9780ae.css",
+        "totalBytes": 16765,
+        "usedBytes": 75,
+        "unusedBytes": 16690,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/87828.7a04f79c.css",
+        "totalBytes": 19439,
+        "usedBytes": 0,
+        "unusedBytes": 19439,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://thesouthernshmooze.substack.com/embed",
+        "totalBytes": 0,
+        "usedBytes": 0,
+        "unusedBytes": 0,
+        "unusedPercent": 0
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/382.a1caea12.css",
+        "totalBytes": 172415,
+        "usedBytes": 134317,
+        "unusedBytes": 38098,
+        "unusedPercent": 22
+      },
+      {
+        "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap",
+        "totalBytes": 15042,
+        "usedBytes": 0,
+        "unusedBytes": 15042,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/14528.e847d0fe.css",
+        "totalBytes": 20867,
+        "usedBytes": 0,
+        "unusedBytes": 20867,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/98294.82122f36.css",
+        "totalBytes": 111338,
+        "usedBytes": 286,
+        "unusedBytes": 111052,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/44676.813be60f.css",
+        "totalBytes": 20628,
+        "usedBytes": 0,
+        "unusedBytes": 20628,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/18766.1dc08105.css",
+        "totalBytes": 25790,
+        "usedBytes": 1430,
+        "unusedBytes": 24360,
+        "unusedPercent": 94
+      },
+      {
+        "url": "https://thesouthernshmooze.substack.com/embed",
+        "totalBytes": 69,
+        "usedBytes": 0,
+        "unusedBytes": 69,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/30558.a34cf0d2.css",
+        "totalBytes": 39373,
+        "usedBytes": 39292,
+        "unusedBytes": 81,
+        "unusedPercent": 0
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/82434.316c9bf7.css",
+        "totalBytes": 21004,
+        "usedBytes": 0,
+        "unusedBytes": 21004,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/14528.e847d0fe.css",
+        "totalBytes": 20867,
+        "usedBytes": 0,
+        "unusedBytes": 20867,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://thesouthernshmooze.substack.com/embed",
+        "totalBytes": 3962,
+        "usedBytes": 0,
+        "unusedBytes": 3962,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+        "totalBytes": 12535,
+        "usedBytes": 0,
+        "unusedBytes": 12535,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/68674.ff81cee5.css",
+        "totalBytes": 189798,
+        "usedBytes": 0,
+        "unusedBytes": 189798,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/52822.4e2cdfaf.css",
+        "totalBytes": 42250,
+        "usedBytes": 0,
+        "unusedBytes": 42250,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://thesouthernshmooze.substack.com/embed",
+        "totalBytes": 978,
+        "usedBytes": 978,
+        "unusedBytes": 0,
+        "unusedPercent": 0
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/82434.316c9bf7.css",
+        "totalBytes": 21004,
+        "usedBytes": 0,
+        "unusedBytes": 21004,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/main.ce613d6e.css",
+        "totalBytes": 4830,
+        "usedBytes": 0,
+        "unusedBytes": 4830,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/27472.b5c4cffd.css",
+        "totalBytes": 17929,
+        "usedBytes": 0,
+        "unusedBytes": 17929,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/87828.7a04f79c.css",
+        "totalBytes": 19439,
+        "usedBytes": 0,
+        "unusedBytes": 19439,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap",
+        "totalBytes": 15042,
+        "usedBytes": 0,
+        "unusedBytes": 15042,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/theme/sessionAttributionFrame.d41d8cd98f00b204e980.css",
+        "totalBytes": 0,
+        "usedBytes": 0,
+        "unusedBytes": 0,
+        "unusedPercent": 0
+      },
+      {
+        "url": "https://substack.com/session-attribution-frame",
+        "totalBytes": 0,
+        "usedBytes": 0,
+        "unusedBytes": 0,
+        "unusedPercent": 0
+      },
+      {
+        "url": "https://substack.com/session-attribution-frame",
+        "totalBytes": 69,
+        "usedBytes": 0,
+        "unusedBytes": 69,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substack.com/session-attribution-frame",
+        "totalBytes": 3962,
+        "usedBytes": 0,
+        "unusedBytes": 3962,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/sessionAttributionFrame.601efd7f.css",
+        "totalBytes": 10968,
+        "usedBytes": 6981,
+        "unusedBytes": 3987,
+        "unusedPercent": 36
+      },
+      {
+        "url": "https://substack.com/session-attribution-frame",
+        "totalBytes": 2925,
+        "usedBytes": 0,
+        "unusedBytes": 2925,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substack.com/session-attribution-frame",
+        "totalBytes": 583,
+        "usedBytes": 583,
+        "unusedBytes": 0,
+        "unusedPercent": 0
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/async/58911.2028d23f.css",
+        "totalBytes": 766,
+        "usedBytes": 90,
+        "unusedBytes": 676,
+        "unusedPercent": 88
+      },
+      {
+        "url": "https://embedsocial.com/cdn/universal-popup.css",
+        "totalBytes": 698,
+        "usedBytes": 0,
+        "unusedBytes": 698,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://embedsocial.com/cdn/iframe-lightbox.min.css?v=2.3",
+        "totalBytes": 10751,
+        "usedBytes": 2430,
+        "unusedBytes": 8321,
+        "unusedPercent": 77
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 243,
+        "usedBytes": 0,
+        "unusedBytes": 243,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://substackcdn.com/bundle/static/css/async/90257.8db3c09e.css",
+        "totalBytes": 1120,
+        "usedBytes": 0,
+        "unusedBytes": 1120,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://embedsocial.com/api/build/assets/HeaderRatingElement-CGNAMeS5.css",
+        "totalBytes": 46,
+        "usedBytes": 45,
+        "unusedBytes": 1,
+        "unusedPercent": 2
+      },
+      {
+        "url": "https://embedsocial.com/api/build/assets/widgetviewlive-DntEziL2.css",
+        "totalBytes": 5913,
+        "usedBytes": 1659,
+        "unusedBytes": 4254,
+        "unusedPercent": 72
+      },
+      {
+        "url": "https://embedsocial.com/api/build/assets/WidgetFooter-w3Z4AFVD.css",
+        "totalBytes": 1617,
+        "usedBytes": 0,
+        "unusedBytes": 1617,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://embedsocial.com/api/pro_hashtag/a8c42b3665e16626b7b285c1550a8c445215cb13/?origin=https%3A%2F%2Fwww.shmoozeatl.com%2F",
+        "totalBytes": 0,
+        "usedBytes": 0,
+        "unusedBytes": 0,
+        "unusedPercent": 0
+      },
+      {
+        "url": "https://embedsocial.com/api/pro_hashtag/a8c42b3665e16626b7b285c1550a8c445215cb13/?origin=https%3A%2F%2Fwww.shmoozeatl.com%2F",
+        "totalBytes": 0,
+        "usedBytes": 0,
+        "unusedBytes": 0,
+        "unusedPercent": 0
+      },
+      {
+        "url": "https://embedsocial.com/cdn/fonts/roboto/stylesheet.css",
+        "totalBytes": 2420,
+        "usedBytes": 0,
+        "unusedBytes": 2420,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.youtube.com/embed/yB0SssBosvM?feature=oembed",
+        "totalBytes": 9474,
+        "usedBytes": 0,
+        "unusedBytes": 9474,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.youtube.com/embed/yB0SssBosvM?feature=oembed",
+        "totalBytes": 689,
+        "usedBytes": 229,
+        "unusedBytes": 460,
+        "unusedPercent": 67
+      },
+      {
+        "url": "https://embedsocial.com/api/build/assets/ClassicCard-DTiN0DBN.css",
+        "totalBytes": 25285,
+        "usedBytes": 1869,
+        "unusedBytes": 23416,
+        "unusedPercent": 93
+      },
+      {
+        "url": "https://embedsocial.com/api/build/assets/ReplyElement-BdwiSFui.css",
+        "totalBytes": 2127,
+        "usedBytes": 0,
+        "unusedBytes": 2127,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://embedsocial.com/api/build/assets/ProductCardsSliderContainer-CIev300V.css",
+        "totalBytes": 40547,
+        "usedBytes": 3441,
+        "unusedBytes": 37106,
+        "unusedPercent": 92
+      },
+      {
+        "url": "https://embedsocial.com/api/build/assets/StarRating-DV2eYT9s.css",
+        "totalBytes": 44,
+        "usedBytes": 43,
+        "unusedBytes": 1,
+        "unusedPercent": 2
+      },
+      {
+        "url": "https://embedsocial.com/api/build/assets/LayoutSlider-DCTP4iGS.css",
+        "totalBytes": 6471,
+        "usedBytes": 1325,
+        "unusedBytes": 5146,
+        "unusedPercent": 80
+      },
+      {
+        "url": "https://embedsocial.com/api/build/assets/ButtonElement-D2mv7jW1.css",
+        "totalBytes": 454,
+        "usedBytes": 0,
+        "unusedBytes": 454,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://embedsocial.com/api/build/assets/PictureElement-CdlVZWzO.css",
+        "totalBytes": 112,
+        "usedBytes": 111,
+        "unusedBytes": 1,
+        "unusedPercent": 1
+      },
+      {
+        "url": "https://embedsocial.com/api/build/assets/RatingElement-D0aEiYLf.css",
+        "totalBytes": 64,
+        "usedBytes": 63,
+        "unusedBytes": 1,
+        "unusedPercent": 2
+      },
+      {
+        "url": "https://www.youtube.com/s/_/ytembeds/_/ss/k=ytembeds.base.Eq5TLeFqx-Q.L.W.O/am=AAAAAAI/d=0/br=1/rs=AGKMywHoMsnbL43s--HArlUHkj-0o346Pw",
+        "totalBytes": 465882,
+        "usedBytes": 16738,
+        "unusedBytes": 449144,
+        "unusedPercent": 96
+      },
+      {
+        "url": "https://www.youtube.com/s/player/06cb0078/www-player.css",
+        "totalBytes": 520550,
+        "usedBytes": 2507,
+        "unusedBytes": 518043,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://assets.squarespace.com/universal/styles-compressed/2453151a71011900-min.en-US.css",
+        "totalBytes": 16875,
+        "usedBytes": 4648,
+        "unusedBytes": 12227,
+        "unusedPercent": 72
+      },
+      {
+        "url": "https://www.shmoozeatl.com/",
+        "totalBytes": 243,
+        "usedBytes": 215,
+        "unusedBytes": 28,
+        "unusedPercent": 12
+      },
+      {
+        "url": "https://www.google.com/recaptcha/enterprise/anchor?ar=1&k=6LdDFQwjAAAAAPigEvvPgEVbb7QBm-TkVJdDTlAv&co=aHR0cHM6Ly93d3cuc2htb296ZWF0bC5jb206NDQz&hl=en&v=MerVUtRoajKEbP7pLiGXkL28&size=invisible&anchor-ms=20000&execute-ms=30000&cb=3c9dollo02pc",
+        "totalBytes": 16160,
+        "usedBytes": 0,
+        "unusedBytes": 16160,
+        "unusedPercent": 100
+      },
+      {
+        "url": "https://www.gstatic.com/recaptcha/releases/MerVUtRoajKEbP7pLiGXkL28/styles__ltr.css",
+        "totalBytes": 82857,
+        "usedBytes": 2987,
+        "unusedBytes": 79870,
+        "unusedPercent": 96
+      },
+      {
+        "url": "https://embedsocial.com/api/pro_hashtag/a8c42b3665e16626b7b285c1550a8c445215cb13/?origin=https%3A%2F%2Fwww.shmoozeatl.com%2F",
+        "totalBytes": 0,
+        "usedBytes": 0,
+        "unusedBytes": 0,
+        "unusedPercent": 0
+      }
+    ],
+    "totalBytes": 5324922,
+    "usedBytes": 1002346,
+    "unusedBytes": 4322576,
+    "unusedPercent": 81,
+    "importantCount": 1557,
+    "duplicates": 70449,
+    "vendorPrefixes": {
+      "webkit": 6886,
+      "moz": 303,
+      "ms": 383,
+      "o": 15
+    },
+    "keyframes": [
+      {
+        "name": "loading-indicator-rotate-spinner",
+        "steps": 1
+      },
+      {
+        "name": "loading-indicator-dash",
+        "steps": 3
+      },
+      {
+        "name": "rotate",
+        "steps": 30
+      }
+    ],
+    "specificity": {
+      "max": [
+        3,
+        12,
+        13
+      ],
+      "average": [
+        0.08,
+        2.21,
+        0.24
+      ],
+      "count": 43412
+    },
+    "issues": [
+      "1557 !important rules",
+      "70449 duplicate declarations",
+      "81% unused CSS"
+    ]
+  }
+}

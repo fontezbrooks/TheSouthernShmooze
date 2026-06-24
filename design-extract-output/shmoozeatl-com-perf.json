@@ -1,0 +1,34 @@
+{
+  "vitals": {
+    "lcp": 324,
+    "cls": 0.018,
+    "inp": 16,
+    "lcpGrade": "good",
+    "clsGrade": "good"
+  },
+  "ttfbApprox": 31536,
+  "bytes": {
+    "js": 3317923,
+    "css": 287303,
+    "font": 242899,
+    "image": 4211694,
+    "document": 0,
+    "other": 1489707
+  },
+  "counts": {
+    "js": 262,
+    "css": 51,
+    "font": 11,
+    "image": 36,
+    "document": 0,
+    "other": 54
+  },
+  "thirdParty": {
+    "count": 407,
+    "bytes": 9370794
+  },
+  "requestsTotal": 414,
+  "fontLoading": {
+    "preloadCount": 0
+  }
+}

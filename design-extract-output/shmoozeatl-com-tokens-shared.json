@@ -1,0 +1,63 @@
+{
+  "primitive": {
+    "color": {
+      "neutral": {
+        "n100": {
+          "$value": "#000000"
+        }
+      },
+      "background": {
+        "bg0": {
+          "$value": "#e1ded4"
+        }
+      },
+      "text": {
+        "text0": {
+          "$value": "#000000"
+        },
+        "text1": {
+          "$value": "#ffffff"
+        }
+      }
+    },
+    "spacing": {
+      "s0": {
+        "$value": "1px"
+      }
+    },
+    "fontFamily": {
+      "f0": {
+        "$value": "Bitter"
+      }
+    }
+  },
+  "semantic": {
+    "color": {
+      "action": {
+        "primary": {
+          "$value": "{primitive.color.brand.primary}"
+        }
+      },
+      "surface": {
+        "default": {
+          "$value": "{primitive.color.background.bg0}"
+        }
+      },
+      "text": {
+        "body": {
+          "$value": "{primitive.color.text.text0}"
+        }
+      }
+    },
+    "radius": {
+      "control": {
+        "$value": "{primitive.radius.r0}"
+      }
+    },
+    "shadow": {
+      "elevated": {
+        "$value": "{primitive.shadow.sh0}"
+      }
+    }
+  }
+}

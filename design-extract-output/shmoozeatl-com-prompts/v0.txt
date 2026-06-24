@@ -1,0 +1,28 @@
+Build a landing page with this exact visual language.
+COLORS:
+  #000000
+  #333333
+  #ffffff
+  #e1ded4
+  #efece6
+  #0099dd
+  #bbbbbb
+  #2288dd
+  #0d121c
+  #f1694f
+  #cdd5df
+  #a9a9a9
+  #1a73e8
+FONTS: [object Object], [object Object], [object Object], [object Object]
+SPACING: 1, 4, 22, 30, 32, 35, 38, 40
+RADIUS: 2, 12, 26, 50, 300
+SHADOWS: rgba(0, 0, 0, 0) 0px 0px 0px 1px | rgb(0, 0, 0) 0px 0px 0px 0px | rgba(0, 0, 0, 0.05) 0px 2px 1px 0px, rgba(0, 0, 0, 0.25) 0px 0px 1px 0px
+MATERIAL LANGUAGE: flat
+VOICE: Tone: friendly · Headings: Title Case · CTA verbs: [object Object], [object Object], [object Object], [object Object], [object Object], [object Object]
+SECTIONS (in order):
+- pricing-table — heading: "Atlanta’s Community for Finding Trusted Local Businesses"
+- pricing-table — heading: "Atlanta’s Community for Finding Trusted Local Businesses"
+- pricing — heading: "Businesses You Can Trust"
+- testimonials
+- footer
+Use Tailwind. Match these tokens exactly. Keep the material language consistent.
