@@ -6,12 +6,12 @@ import * as SplashScreen from "expo-splash-screen";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useFonts, Shrikhand_400Regular } from "@expo-google-fonts/shrikhand";
-import { Bitter_400Regular, Bitter_700Bold } from "@expo-google-fonts/bitter";
 import {
-  Roboto_400Regular,
-  Roboto_500Medium,
-  Roboto_700Bold,
-} from "@expo-google-fonts/roboto";
+  Bitter_400Regular,
+  Bitter_600SemiBold,
+  Bitter_800ExtraBold,
+} from "@expo-google-fonts/bitter";
+import { OpenSans_600SemiBold } from "@expo-google-fonts/open-sans";
 import { ThemeProvider } from "@/theme/ThemeProvider";
 
 SplashScreen.preventAutoHideAsync();
@@ -20,10 +20,9 @@ export default function RootLayout() {
   const [loaded, error] = useFonts({
     Shrikhand_400Regular,
     Bitter_400Regular,
-    Bitter_700Bold,
-    Roboto_400Regular,
-    Roboto_500Medium,
-    Roboto_700Bold,
+    Bitter_600SemiBold,
+    Bitter_800ExtraBold,
+    OpenSans_600SemiBold,
   });
 
   useEffect(() => {

@@ -1,24 +1,24 @@
 import { useState } from 'react';
-import { Pressable, Text, StyleSheet, Platform } from 'react-native';
+import { Pressable, Text, Platform } from 'react-native';
 import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { Controller, type Control } from 'react-hook-form';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { LeadFormValues } from '../leadSchema';
-import { FormField } from './FormField';
+import { InputContainer } from './InputContainer';
 
 interface DateFieldProps {
   control: Control<LeadFormValues>;
   label: string;
 }
 
-/** Format as MM/DD/YYYY to match the site. */
+/** Format as MM/DD/YYYY. */
 function formatDate(d: Date): string {
   const mm = String(d.getMonth() + 1).padStart(2, '0');
   const dd = String(d.getDate()).padStart(2, '0');
   return `${mm}/${dd}/${d.getFullYear()}`;
 }
 
-/** Optional project start date with the native date picker. */
+/** Optional project start date with the native date picker (calendar icon). */
 export function DateField({ control, label }: DateFieldProps) {
   const t = useTheme();
   const [show, setShow] = useState(false);
@@ -34,19 +34,13 @@ export function DateField({ control, label }: DateFieldProps) {
           if (event.type === 'set' && date) field.onChange(date);
         };
         return (
-          <FormField label={label} error={fieldState.error?.message}>
-            <Pressable
-              onPress={() => setShow(true)}
-              accessibilityRole="button"
-              accessibilityLabel={label}
-              style={[
-                styles.input,
-                { backgroundColor: t.colors.surface, borderRadius: t.radii.input, borderColor: t.colors.line },
-              ]}
-            >
-              <Text style={[t.typography.body, { color: value ? t.colors.text : t.colors.line }]}>
-                {value ? formatDate(value) : 'mm/dd/yyyy'}
-              </Text>
+          <>
+            <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={() => setShow(true)}>
+              <InputContainer icon="calendar" error={fieldState.error?.message}>
+                <Text style={[t.typography.body, { color: value ? t.colors.text : t.colors.muted }]}>
+                  {value ? formatDate(value) : label}
+                </Text>
+              </InputContainer>
             </Pressable>
             {show ? (
               <DateTimePicker
@@ -56,19 +50,9 @@ export function DateField({ control, label }: DateFieldProps) {
                 onChange={onChange}
               />
             ) : null}
-          </FormField>
+          </>
         );
       }}
     />
   );
 }
-
-const styles = StyleSheet.create({
-  input: {
-    borderWidth: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-    minHeight: 44,
-    justifyContent: 'center',
-  },
-});

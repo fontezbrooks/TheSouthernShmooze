@@ -161,3 +161,6 @@ assets/
 .DS_Store
 **/.DS_Store
 .playwright-mcp/
+
+# Serena MCP
+.serena/

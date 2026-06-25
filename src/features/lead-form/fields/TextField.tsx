@@ -1,13 +1,18 @@
-import { TextInput, StyleSheet, type KeyboardTypeOptions } from 'react-native';
+import { TextInput, Text, StyleSheet, type KeyboardTypeOptions } from 'react-native';
 import { Controller, type Control, type FieldPath } from 'react-hook-form';
 import { useTheme } from '@/theme/ThemeProvider';
+import type { IconName } from '@/components/ui/Icon';
 import type { LeadFormValues } from '../leadSchema';
-import { FormField } from './FormField';
+import { InputContainer } from './InputContainer';
 
 interface TextFieldProps {
   control: Control<LeadFormValues>;
   name: FieldPath<LeadFormValues>;
+  /** Used as the placeholder (Figma puts the label inside the field). */
   label: string;
+  /** Small label shown above the input (multiline fields). */
+  topLabel?: string;
+  icon?: IconName;
   required?: boolean;
   keyboardType?: KeyboardTypeOptions;
   autoCapitalize?: 'none' | 'sentences' | 'words';
@@ -16,12 +21,13 @@ interface TextFieldProps {
   placeholder?: string;
 }
 
-/** Controlled text input. Used for name/email/phone/address and (multiline) details. */
+/** Controlled label-inside text input (name/email/phone/address/details). */
 export function TextField({
   control,
   name,
   label,
-  required,
+  topLabel,
+  icon,
   keyboardType,
   autoCapitalize = 'sentences',
   autoComplete = 'off',
@@ -34,7 +40,15 @@ export function TextField({
       control={control}
       name={name}
       render={({ field, fieldState }) => (
-        <FormField label={label} required={required} error={fieldState.error?.message}>
+        <InputContainer
+          icon={icon}
+          error={fieldState.error?.message}
+          align={multiline ? 'top' : 'center'}
+          minHeight={multiline ? 131 : 58}
+        >
+          {topLabel ? (
+            <Text style={[t.typography.captionSemi, { color: t.colors.muted, marginBottom: 4 }]}>{topLabel}</Text>
+          ) : null}
           <TextInput
             value={typeof field.value === 'string' ? field.value : ''}
             onChangeText={field.onChange}
@@ -43,37 +57,20 @@ export function TextField({
             autoCapitalize={autoCapitalize}
             autoComplete={autoComplete}
             multiline={multiline}
-            placeholder={placeholder}
-            placeholderTextColor={t.colors.line}
+            placeholder={placeholder ?? label}
+            placeholderTextColor={t.colors.muted}
             accessibilityLabel={label}
-            style={[
-              styles.input,
-              t.typography.body,
-              multiline && styles.multiline,
-              {
-                color: t.colors.text,
-                backgroundColor: t.colors.surface,
-                borderRadius: t.radii.input,
-                borderColor: fieldState.error ? t.colors.accent : t.colors.line,
-              },
-            ]}
+            style={[t.typography.body, multiline && styles.multiline]}
           />
-        </FormField>
+        </InputContainer>
       )}
     />
   );
 }
 
 const styles = StyleSheet.create({
-  input: {
-    borderWidth: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    minHeight: 44,
-  },
   multiline: {
-    minHeight: 110,
-    paddingTop: 12,
+    minHeight: 96,
     textAlignVertical: 'top',
   },
 });

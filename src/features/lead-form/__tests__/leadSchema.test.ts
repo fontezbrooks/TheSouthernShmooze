@@ -6,7 +6,7 @@ const valid = {
   email: "jane@example.com",
   phone: "5551234567",
   address: "123 Peachtree St",
-  budget: ["lt_1000" as const],
+  budget: "lt_1000" as const,
   projectDetails: "Need a plumber for a leak.",
   company: "",
 };
@@ -17,17 +17,18 @@ describe("leadSchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("accepts an empty budget selection", () => {
-    const result = leadSchema.safeParse({ ...valid, budget: [] });
+  it("accepts an omitted budget selection (optional)", () => {
+    const { budget: _omit, ...withoutBudget } = valid;
+    const result = leadSchema.safeParse(withoutBudget);
     expect(result.success).toBe(true);
   });
 
-  it("accepts multiple budget selections", () => {
-    const result = leadSchema.safeParse({
-      ...valid,
-      budget: ["lt_1000", "gt_5000"],
-    });
-    expect(result.success).toBe(true);
+  it("accepts each single budget value", () => {
+    for (const value of ["lt_1000", "1000_5000", "gt_5000"] as const) {
+      expect(leadSchema.safeParse({ ...valid, budget: value }).success).toBe(
+        true,
+      );
+    }
   });
 
   it.each([
@@ -53,7 +54,7 @@ describe("leadSchema", () => {
   });
 
   it("rejects an unknown budget value", () => {
-    const result = leadSchema.safeParse({ ...valid, budget: ["nope"] });
+    const result = leadSchema.safeParse({ ...valid, budget: "nope" });
     expect(result.success).toBe(false);
   });
 
@@ -72,7 +73,7 @@ describe("leadSchema", () => {
 
   it("emptyLeadForm is a valid starting shape", () => {
     // All-empty fails required checks, but the object shape must be parseable structurally.
-    expect(emptyLeadForm.budget).toEqual([]);
+    expect(emptyLeadForm.budget).toBeUndefined();
     expect(typeof emptyLeadForm.firstName).toBe("string");
   });
 });

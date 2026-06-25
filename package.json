@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@expo-google-fonts/bitter": "^0.4.1",
+    "@expo-google-fonts/open-sans": "^0.4.2",
     "@expo-google-fonts/roboto": "^0.4.3",
     "@expo-google-fonts/shrikhand": "^0.4.1",
     "@expo/metro-runtime": "~56.0.15",

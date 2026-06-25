@@ -3,9 +3,9 @@
  * `supabase/migrations/0001_leads.sql`. Keep in sync if the migration changes.
  */
 
-export type BudgetValue = 'lt_1000' | '1000_5000' | 'gt_5000';
+export type BudgetValue = "lt_1000" | "1000_5000" | "gt_5000";
 
-export type LeadStatus = 'new' | 'contacted' | 'closed';
+export type LeadStatus = "new" | "contacted" | "closed";
 
 export interface LeadRow {
   id: string;
@@ -36,6 +36,33 @@ export interface LeadInsert {
   file_path?: string | null;
 }
 
+/** A phone entry aggregated into the directory app view. */
+export interface DirectoryPhone {
+  phone_number: string;
+  normalized_phone_number: string;
+}
+
+/**
+ * Row of `directory_businesses_app_view` — clean columns + aggregated phone
+ * numbers. The app queries THIS view, never the raw tables. See migrations
+ * 0003-0005 and the `directory-backend` memory.
+ */
+export interface DirectoryBusinessRow {
+  id: string;
+  source_uid: string;
+  name: string;
+  description: string | null;
+  logo_url: string | null;
+  longitude: number | null;
+  latitude: number | null;
+  recommended_score: number | null;
+  has_coupon: boolean;
+  has_google_marker: boolean;
+  phone_numbers: DirectoryPhone[] | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -46,7 +73,12 @@ export interface Database {
         Relationships: [];
       };
     };
-    Views: Record<string, never>;
+    Views: {
+      directory_businesses_app_view: {
+        Row: DirectoryBusinessRow;
+        Relationships: [];
+      };
+    };
     Functions: Record<string, never>;
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;

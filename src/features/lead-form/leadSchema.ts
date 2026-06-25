@@ -41,7 +41,8 @@ export const leadSchema = z.object({
     .refine((v) => EMAIL_RE.test(v), "Enter a valid email"),
   phone: z.string().trim().min(7, "Enter a valid phone number"),
   address: z.string().trim().min(1, "Address is required"),
-  budget: z.array(budgetEnum),
+  // Single-select per Figma (dropdown). Stored in the DB's array column as [budget].
+  budget: budgetEnum.optional(),
   projectStartDate: z.date().optional(),
   projectDetails: z.string().trim().min(1, "Please add a few project details"),
   file: pickedFileSchema.optional(),
@@ -57,7 +58,7 @@ export const emptyLeadForm: LeadFormValues = {
   email: "",
   phone: "",
   address: "",
-  budget: [],
+  budget: undefined,
   projectDetails: "",
   company: "",
 };

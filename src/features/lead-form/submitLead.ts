@@ -49,7 +49,8 @@ export async function submitLead(
       email: values.email,
       phone: values.phone,
       address: values.address,
-      budget: values.budget,
+      // Single-select form value → DB array column (array-of-one, or empty).
+      budget: values.budget ? [values.budget] : [],
       project_start_date: values.projectStartDate
         ? toISODate(values.projectStartDate)
         : null,
