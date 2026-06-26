@@ -1,7 +1,7 @@
 import { ScrollView, ImageBackground, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/theme/ThemeProvider";
-import { daisyBackground } from "@/theme/assets";
+import { daisyBackground, bannerHelp, bannerCommunity } from "@/theme/assets";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Banner } from "@/components/ui/Banner";
 import { CertifiedProviders } from "@/features/providers/CertifiedProviders";
@@ -27,20 +27,22 @@ export function HomeScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <Banner
-          tone="rust"
+          layout="imageTop"
+          image={bannerHelp}
           title="Let us help you plan"
-          subtitle="We'll email you personalized recommendations based on your needs."
-          cta={{ label: "Contact Us", icon: "arrowRight" }}
+          subtitle="We'll email recommendations of trusted local businesses based on your specific needs."
+          cta={{ label: "Reach Out" }}
           onPress={() => router.push("/concierge")}
         />
 
         <CertifiedProviders onCallPress={callBusiness} />
 
         <Banner
-          tone="mustard"
+          layout="imageLeft"
+          image={bannerCommunity}
           title="Ask the community"
-          subtitle="Get recommendations and connect with locals in our Facebook group."
-          cta={{ label: "Join the Facebook Group", icon: "arrowRight" }}
+          subtitle="Get recommendations and connect with locals."
+          cta={{ label: "Join the Facebook Group" }}
           onPress={() => openLink(LINKS.facebook)}
         />
       </ScrollView>

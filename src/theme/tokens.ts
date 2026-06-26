@@ -36,6 +36,8 @@ export const colors = {
   imageHairline: "#EBEBEB",
   /** Error border + warning-triangle fill (Reds/Red400). */
   error: "#EE4145",
+  /** Disabled button border (Neutrals/Neutral500). */
+  neutral500: "#A09F9F",
 
   black: "#000000",
   white: "#FFFFFF",
@@ -83,6 +85,14 @@ export const shadow = {
   /** Same offset shadow in black (community banner button). */
   hardBlack: {
     shadowColor: colors.black,
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 4,
+  },
+  /** Same offset shadow in neutral grey (disabled Button Full). */
+  hardNeutral: {
+    shadowColor: colors.neutral500,
     shadowOffset: { width: 4, height: 4 },
     shadowOpacity: 1,
     shadowRadius: 0,

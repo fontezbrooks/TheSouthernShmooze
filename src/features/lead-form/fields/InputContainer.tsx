@@ -1,111 +1,124 @@
-import { type ReactNode } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { useTheme } from '@/theme/ThemeProvider';
-import { Icon, type IconName } from '@/components/ui/Icon';
+import { type ReactNode } from "react";
+import { View, StyleSheet } from "react-native";
+import { useTheme } from "@/theme/ThemeProvider";
+import { Icon, type IconName } from "@/components/ui/Icon";
+import { FloatingLabel } from "@/components/ui/FloatingLabel";
+import { PaddedErrorMessage } from "@/components/ui/PaddedErrorMessage";
 
 interface InputContainerProps {
-  /** Persistent inside-label (Figma "Label Inside") — always visible, incl. while typing. */
   label: string;
-  /** Leading icon, sits on the value row beside the input text. */
+  /** focused || hasValue → label floats up. Forced true for multiline. */
+  floated: boolean;
   icon?: IconName;
-  /** Trailing node (e.g. chevron for selects), vertically centered. */
+  /** Trailing node (chevron for selects), vertically centered. */
   trailing?: ReactNode;
-  /** Focused (text input focused / picker open) → 2px black border. */
-  focused?: boolean;
-  /** Error message → 2px red border + bottom message row. */
   error?: string;
-  /** Disabled → muted + non-interactive look. */
   disabled?: boolean;
-  /** Renders a right-aligned "Optional" hint row above the box. */
-  optional?: boolean;
-  /** Vertical alignment — 'top' for multiline. */
-  align?: 'center' | 'top';
-  minHeight?: number;
+  multiline?: boolean;
+  /** The value control (TextInput / Text), rendered in the lower slot. */
   children: ReactNode;
 }
 
 /**
- * The Figma "Label Inside" input shell (component set 8:5814). Drives the full
- * field state machine: a persistent inside-label, focus (2px black border),
- * error (2px red border + warning-triangle message), disabled, and an optional
- * "Optional" hint row. The leading icon and value share the row below the label.
+ * The Figma V3 "Label Inside" input shell: a floating label (placeholder → small
+ * top label), a leading icon + value row, and a padded error message below. The
+ * label is pinned floated for multiline fields.
  */
 export function InputContainer({
   label,
+  floated,
   icon,
   trailing,
-  focused = false,
   error,
   disabled = false,
-  optional = false,
-  align = 'center',
-  minHeight = 58,
+  multiline = false,
   children,
 }: InputContainerProps) {
   const t = useTheme();
-
-  // Border resolution (priority): error → focused → default.
-  const border = error
-    ? { borderWidth: 2, borderColor: t.colors.error }
-    : focused
-      ? { borderWidth: 2, borderColor: t.colors.black }
-      : { borderWidth: 1, borderColor: t.colors.inputBorder };
+  const isFloated = floated || multiline;
+  const borderColor = error ? t.colors.error : t.colors.inputBorder;
 
   return (
     <View style={styles.wrap}>
-      {optional ? (
-        <View style={styles.optionalRow}>
-          <Text style={[t.typography.caption, { color: t.colors.muted }]}>Optional</Text>
-        </View>
-      ) : null}
-
       <View
         style={[
           styles.box,
-          border,
+          multiline ? styles.boxMultiline : styles.boxSingle,
           {
-            minHeight,
             backgroundColor: t.colors.surface,
             borderRadius: t.radii.input,
-            alignItems: align === 'top' ? 'flex-start' : 'center',
+            borderColor,
             opacity: disabled ? 0.5 : 1,
           },
         ]}
       >
-        <View style={styles.leftContent}>
-          <Text style={[t.typography.captionSemi, { color: t.colors.muted }]} numberOfLines={1}>
-            {label}
-          </Text>
-          <View style={[styles.valueRow, align === 'top' && styles.valueRowTop]}>
-            {icon ? <Icon name={icon} size={18} color={t.colors.muted} /> : null}
-            <View style={styles.content}>{children}</View>
+        <View
+          style={[
+            styles.content,
+            multiline
+              ? styles.contentMultiline
+              : isFloated
+                ? styles.contentFloated
+                : styles.contentCenter,
+          ]}
+        >
+          <FloatingLabel
+            label={label}
+            floated={isFloated}
+            hasIcon={!!icon && !multiline}
+          />
+          {/* Icon + value share the lower row, so the floated top-left label never overlaps the icon. */}
+          <View
+            style={[styles.valueRow, multiline && styles.valueRowMultiline]}
+          >
+            {icon && !multiline ? (
+              <Icon name={icon} size={18} color={t.colors.muted} />
+            ) : null}
+            <View style={styles.valueFill}>{children}</View>
           </View>
         </View>
         {trailing}
       </View>
-
-      {error ? (
-        <View style={styles.errorRow} accessibilityLiveRegion="polite">
-          <Icon name="triangleWarning" size={12} color={t.colors.error} />
-          <Text style={[t.typography.caption, { color: t.colors.black }]}>{error}</Text>
-        </View>
-      ) : null}
+      {error ? <PaddedErrorMessage message={error} /> : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: { gap: 4, width: '100%' },
-  optionalRow: { width: '100%', flexDirection: 'row', justifyContent: 'flex-end' },
+  wrap: { gap: 4, width: "100%" },
   box: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 6,
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    borderWidth: 1,
   },
-  leftContent: { flex: 1, justifyContent: 'center', gap: 2 },
-  valueRow: { flexDirection: 'row', alignItems: 'center', gap: 6, width: '100%' },
-  valueRowTop: { alignItems: 'flex-start' },
-  content: { flex: 1, justifyContent: 'center' },
-  errorRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  boxSingle: { minHeight: 58, paddingVertical: 8, alignItems: "center" },
+  boxMultiline: {
+    minHeight: 131,
+    paddingVertical: 12,
+    alignItems: "flex-start",
+  },
+  content: {
+    flex: 1,
+    height: 42,
+    position: "relative",
+  },
+  // Empty/unfocused: value row centered (placeholder label sits over it).
+  contentCenter: { justifyContent: "center" },
+  // Floated: value row drops to the bottom so the top-left label stands clear.
+  contentFloated: { justifyContent: "flex-end" },
+  contentMultiline: {
+    height: undefined,
+    flex: 1,
+    justifyContent: "flex-start",
+  },
+  valueRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    width: "100%",
+  },
+  // Clear the floated top label on the taller multiline field.
+  valueRowMultiline: { marginTop: 18 },
+  valueFill: { flex: 1 },
 });

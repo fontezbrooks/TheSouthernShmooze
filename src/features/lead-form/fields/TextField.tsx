@@ -9,12 +9,12 @@ import { InputContainer } from './InputContainer';
 interface TextFieldProps {
   control: Control<LeadFormValues>;
   name: FieldPath<LeadFormValues>;
-  /** Persistent inside-label (shown above the value at all times). */
+  /** Floating label (placeholder when empty, small top label when filled). */
   label: string;
-  /** Optional example hint shown in the value row when empty. */
+  /** Example hint shown in the value row once the label has floated. */
   placeholder?: string;
   icon?: IconName;
-  /** When false, an "Optional" hint row is shown above the field. */
+  /** Accepted for call-site clarity; the V3 design has no "optional" affordance. */
   required?: boolean;
   keyboardType?: KeyboardTypeOptions;
   autoCapitalize?: 'none' | 'sentences' | 'words';
@@ -22,14 +22,13 @@ interface TextFieldProps {
   multiline?: boolean;
 }
 
-/** Controlled label-inside text input with focus (2px black border) + error states. */
+/** Controlled text input with a floating label (Figma V3) + padded error. */
 export function TextField({
   control,
   name,
   label,
   placeholder,
   icon,
-  required = false,
   keyboardType,
   autoCapitalize = 'sentences',
   autoComplete = 'off',
@@ -41,35 +40,37 @@ export function TextField({
     <Controller
       control={control}
       name={name}
-      render={({ field, fieldState }) => (
-        <InputContainer
-          label={label}
-          icon={icon}
-          focused={focused}
-          error={fieldState.error?.message}
-          optional={!required}
-          align={multiline ? 'top' : 'center'}
-          minHeight={multiline ? 131 : 58}
-        >
-          <TextInput
-            value={typeof field.value === 'string' ? field.value : ''}
-            onChangeText={field.onChange}
-            onFocus={() => setFocused(true)}
-            onBlur={() => {
-              setFocused(false);
-              field.onBlur();
-            }}
-            keyboardType={keyboardType}
-            autoCapitalize={autoCapitalize}
-            autoComplete={autoComplete}
+      render={({ field, fieldState }) => {
+        const value = typeof field.value === 'string' ? field.value : '';
+        const floated = multiline || focused || value.length > 0;
+        return (
+          <InputContainer
+            label={label}
+            floated={floated}
+            icon={icon}
+            error={fieldState.error?.message}
             multiline={multiline}
-            placeholder={placeholder}
-            placeholderTextColor={t.colors.muted}
-            accessibilityLabel={label}
-            style={[t.typography.body, multiline && styles.multiline]}
-          />
-        </InputContainer>
-      )}
+          >
+            <TextInput
+              value={value}
+              onChangeText={field.onChange}
+              onFocus={() => setFocused(true)}
+              onBlur={() => {
+                setFocused(false);
+                field.onBlur();
+              }}
+              keyboardType={keyboardType}
+              autoCapitalize={autoCapitalize}
+              autoComplete={autoComplete}
+              multiline={multiline}
+              placeholder={floated ? placeholder : undefined}
+              placeholderTextColor={t.colors.muted}
+              accessibilityLabel={label}
+              style={[t.typography.body, multiline && styles.multiline]}
+            />
+          </InputContainer>
+        );
+      }}
     />
   );
 }

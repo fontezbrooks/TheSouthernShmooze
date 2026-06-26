@@ -161,6 +161,9 @@ assets/*
 !assets/splash-logo.png
 !assets/splash.png
 !assets/ShmoozeLogo-Horizontal.svg
+!assets/banner-help.png
+!assets/banner-community.png
+!assets/icon.png
 
 # OS / tooling artifacts
 .DS_Store

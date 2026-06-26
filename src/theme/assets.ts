@@ -12,3 +12,8 @@ export const splashLogo = require("../../assets/splash-logo.png");
 // NOTE: the horizontal wordmark is a Figma-exported SVG
 // (assets/ShmoozeLogo-Horizontal.svg) imported directly as a component in
 // AppHeader via react-native-svg-transformer — not a require()'d raster.
+
+// Home banner photos (Figma V3) — "Let us help you plan" group photo (338×124,
+// image-on-top) and "Ask the community" Facebook screenshot (88×169, image-on-left).
+export const bannerHelp = require("../../assets/banner-help.png");
+export const bannerCommunity = require("../../assets/banner-community.png");

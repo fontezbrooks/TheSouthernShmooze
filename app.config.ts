@@ -13,6 +13,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   name: "The Southern Shmooze",
   owner: "carlhiggins",
   slug: "thesouthernshmooze",
+  icon: "./assets/icon.png",
   scheme: "shmooze",
   version: "1.0.0",
   orientation: "portrait",

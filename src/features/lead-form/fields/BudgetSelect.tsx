@@ -38,20 +38,14 @@ export function BudgetSelect({ control, label }: BudgetSelectProps) {
               <InputContainer
                 label={label}
                 icon="dollar"
-                focused={open}
-                optional
+                floated={open || !!selected}
                 error={fieldState.error?.message}
                 trailing={
                   <Icon name="chevronDown" size={18} color={t.colors.muted} />
                 }
               >
-                <Text
-                  style={[
-                    t.typography.body,
-                    { color: selected ? t.colors.text : t.colors.muted },
-                  ]}
-                >
-                  {selected ? selected.label : "Select a range"}
+                <Text style={[t.typography.body, { color: t.colors.text }]}>
+                  {selected ? selected.label : ""}
                 </Text>
               </InputContainer>
             </Pressable>
