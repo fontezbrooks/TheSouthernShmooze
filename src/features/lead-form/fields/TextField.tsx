@@ -1,4 +1,5 @@
-import { TextInput, Text, StyleSheet, type KeyboardTypeOptions } from 'react-native';
+import { useState } from 'react';
+import { TextInput, StyleSheet, type KeyboardTypeOptions } from 'react-native';
 import { Controller, type Control, type FieldPath } from 'react-hook-form';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { IconName } from '@/components/ui/Icon';
@@ -8,56 +9,61 @@ import { InputContainer } from './InputContainer';
 interface TextFieldProps {
   control: Control<LeadFormValues>;
   name: FieldPath<LeadFormValues>;
-  /** Used as the placeholder (Figma puts the label inside the field). */
+  /** Persistent inside-label (shown above the value at all times). */
   label: string;
-  /** Small label shown above the input (multiline fields). */
-  topLabel?: string;
+  /** Optional example hint shown in the value row when empty. */
+  placeholder?: string;
   icon?: IconName;
+  /** When false, an "Optional" hint row is shown above the field. */
   required?: boolean;
   keyboardType?: KeyboardTypeOptions;
   autoCapitalize?: 'none' | 'sentences' | 'words';
   autoComplete?: 'email' | 'tel' | 'name' | 'street-address' | 'off';
   multiline?: boolean;
-  placeholder?: string;
 }
 
-/** Controlled label-inside text input (name/email/phone/address/details). */
+/** Controlled label-inside text input with focus (2px black border) + error states. */
 export function TextField({
   control,
   name,
   label,
-  topLabel,
+  placeholder,
   icon,
+  required = false,
   keyboardType,
   autoCapitalize = 'sentences',
   autoComplete = 'off',
   multiline = false,
-  placeholder,
 }: TextFieldProps) {
   const t = useTheme();
+  const [focused, setFocused] = useState(false);
   return (
     <Controller
       control={control}
       name={name}
       render={({ field, fieldState }) => (
         <InputContainer
+          label={label}
           icon={icon}
+          focused={focused}
           error={fieldState.error?.message}
+          optional={!required}
           align={multiline ? 'top' : 'center'}
           minHeight={multiline ? 131 : 58}
         >
-          {topLabel ? (
-            <Text style={[t.typography.captionSemi, { color: t.colors.muted, marginBottom: 4 }]}>{topLabel}</Text>
-          ) : null}
           <TextInput
             value={typeof field.value === 'string' ? field.value : ''}
             onChangeText={field.onChange}
-            onBlur={field.onBlur}
+            onFocus={() => setFocused(true)}
+            onBlur={() => {
+              setFocused(false);
+              field.onBlur();
+            }}
             keyboardType={keyboardType}
             autoCapitalize={autoCapitalize}
             autoComplete={autoComplete}
             multiline={multiline}
-            placeholder={placeholder ?? label}
+            placeholder={placeholder}
             placeholderTextColor={t.colors.muted}
             accessibilityLabel={label}
             style={[t.typography.body, multiline && styles.multiline]}

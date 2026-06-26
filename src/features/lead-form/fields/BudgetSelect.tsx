@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { Pressable, Text, View, Modal, StyleSheet } from 'react-native';
-import { Controller, type Control } from 'react-hook-form';
-import { useTheme } from '@/theme/ThemeProvider';
-import { Icon } from '@/components/ui/Icon';
-import type { BudgetValue } from '@/lib/database';
-import type { LeadFormValues } from '../leadSchema';
-import { BUDGET_OPTIONS } from '../leadSchema';
-import { InputContainer } from './InputContainer';
+import { useState } from "react";
+import { Pressable, Text, View, Modal, StyleSheet } from "react-native";
+import { Controller, type Control } from "react-hook-form";
+import { useTheme } from "@/theme/ThemeProvider";
+import { Icon } from "@/components/ui/Icon";
+import type { BudgetValue } from "@/lib/database";
+import type { LeadFormValues } from "../leadSchema";
+import { BUDGET_OPTIONS } from "../leadSchema";
+import { InputContainer } from "./InputContainer";
 
 interface BudgetSelectProps {
   control: Control<LeadFormValues>;
@@ -36,19 +36,36 @@ export function BudgetSelect({ control, label }: BudgetSelectProps) {
               onPress={() => setOpen(true)}
             >
               <InputContainer
+                label={label}
                 icon="dollar"
+                focused={open}
+                optional
                 error={fieldState.error?.message}
-                trailing={<Icon name="chevronDown" size={18} color={t.colors.muted} />}
+                trailing={
+                  <Icon name="chevronDown" size={18} color={t.colors.muted} />
+                }
               >
-                <Text style={[t.typography.body, { color: selected ? t.colors.text : t.colors.muted }]}>
-                  {selected ? selected.label : label}
+                <Text
+                  style={[
+                    t.typography.body,
+                    { color: selected ? t.colors.text : t.colors.muted },
+                  ]}
+                >
+                  {selected ? selected.label : "Select a range"}
                 </Text>
               </InputContainer>
             </Pressable>
 
-            <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
+            <Modal
+              visible={open}
+              transparent
+              animationType="fade"
+              onRequestClose={() => setOpen(false)}
+            >
               <Pressable style={styles.backdrop} onPress={() => setOpen(false)}>
-                <View style={[styles.sheet, { backgroundColor: t.colors.surface }]}>
+                <View
+                  style={[styles.sheet, { backgroundColor: t.colors.surface }]}
+                >
                   {BUDGET_OPTIONS.map((opt) => {
                     const isSel = opt.value === field.value;
                     return (
@@ -59,7 +76,14 @@ export function BudgetSelect({ control, label }: BudgetSelectProps) {
                         onPress={() => choose(opt.value)}
                         style={styles.option}
                       >
-                        <Text style={[t.typography.body, isSel && { color: t.colors.rust }]}>{opt.label}</Text>
+                        <Text
+                          style={[
+                            t.typography.body,
+                            isSel && { color: t.colors.rust },
+                          ]}
+                        >
+                          {opt.label}
+                        </Text>
                       </Pressable>
                     );
                   })}
@@ -76,8 +100,8 @@ export function BudgetSelect({ control, label }: BudgetSelectProps) {
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'center',
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
     paddingHorizontal: 24,
   },
   sheet: {

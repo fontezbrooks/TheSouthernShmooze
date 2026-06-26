@@ -1,20 +1,18 @@
 import {
   ScrollView,
   ImageBackground,
-  Text,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { useTheme } from "@/theme/ThemeProvider";
 import { daisyBackground } from "@/theme/assets";
 import { AppHeader } from "@/components/ui/AppHeader";
+import { StrokedHeading } from "@/components/ui/StrokedHeading";
 import { LeadForm } from "@/features/lead-form/LeadForm";
 
 /** Concierge screen — "Let's Plan Something Awesome" + the lead form. */
 export function ConciergeScreen() {
-  const t = useTheme();
   const router = useRouter();
 
   return (
@@ -37,9 +35,9 @@ export function ConciergeScreen() {
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
         >
-          <Text style={t.typography.displayL}>
+          <StrokedHeading variant="displayL">
             Let&apos;s Plan Something Awesome
-          </Text>
+          </StrokedHeading>
           <LeadForm />
         </ScrollView>
       </KeyboardAvoidingView>

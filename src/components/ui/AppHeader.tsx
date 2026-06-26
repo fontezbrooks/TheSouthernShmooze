@@ -1,7 +1,10 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Pressable, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "@/theme/ThemeProvider";
 import { Icon } from "./Icon";
+// Figma-exported wordmark (source of truth) — transparent vector, imported as a
+// component via react-native-svg-transformer.
+import ShmoozeLogo from "../../../assets/ShmoozeLogo-Horizontal.svg";
 
 interface AppHeaderProps {
   /** Show the back arrow (Concierge); hidden on Home. */
@@ -9,10 +12,16 @@ interface AppHeaderProps {
   onBack?: () => void;
 }
 
+// Figma ShmoozeLogo-Horizontal viewBox is 264×17.
+const LOGO_WIDTH = 264;
+const LOGO_HEIGHT = 17;
+// Comfortable, symmetric tap slots so the logo stays centered.
+const SLOT = 44;
+
 /**
- * Cream top bar with the centered Shmooze wordmark and an optional back arrow.
- * Extends cream up into the status bar via the top safe-area inset.
- * (Figma uses a horizontal logo asset; rendered here as Shrikhand text.)
+ * Cream top bar with the centered Shmooze wordmark (Figma horizontal logo asset)
+ * and an optional back arrow with a 44×44 tap target. Extends cream up into the
+ * status bar via the top safe-area inset.
  */
 export function AppHeader({ showBack = false, onBack }: AppHeaderProps) {
   const t = useTheme();
@@ -23,7 +32,7 @@ export function AppHeader({ showBack = false, onBack }: AppHeaderProps) {
         styles.bar,
         {
           backgroundColor: t.colors.bg,
-          borderBottomColor: t.colors.rust,
+          borderBottomColor: t.colors.divider,
           paddingTop: insets.top,
           height: 60 + insets.top,
         },
@@ -34,22 +43,20 @@ export function AppHeader({ showBack = false, onBack }: AppHeaderProps) {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Go back"
-            hitSlop={15}
+            hitSlop={12}
             onPress={onBack}
+            style={styles.backHit}
           >
             <Icon name="arrowLeft" size={30} color={t.colors.text} />
           </Pressable>
         ) : null}
       </View>
-      <Text
-        style={[
-          styles.wordmark,
-          { fontFamily: t.fonts.display, color: t.colors.text },
-        ]}
-        numberOfLines={1}
-      >
-        The Southern Shmooze
-      </Text>
+      <ShmoozeLogo
+        width={LOGO_WIDTH}
+        height={LOGO_HEIGHT}
+        accessibilityRole="image"
+        accessibilityLabel="The Southern Shmooze"
+      />
       <View style={styles.side} />
     </View>
   );
@@ -64,12 +71,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
-  side: { width: 18, alignItems: "center", justifyContent: "center" },
-  wordmark: {
-    fontSize: 18,
-    fontStyle: "italic",
-    textAlign: "center",
-    flex: 1,
-    marginHorizontal: 8,
+  side: {
+    width: SLOT,
+    height: SLOT,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  backHit: {
+    width: SLOT,
+    height: SLOT,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

@@ -74,14 +74,20 @@ export function DateField({ control, label }: DateFieldProps) {
               accessibilityLabel={label}
               onPress={open}
             >
-              <InputContainer icon="calendar" error={fieldState.error?.message}>
+              <InputContainer
+                label={label}
+                icon="calendar"
+                focused={show}
+                optional
+                error={fieldState.error?.message}
+              >
                 <Text
                   style={[
                     t.typography.body,
                     { color: value ? t.colors.text : t.colors.muted },
                   ]}
                 >
-                  {value ? formatDate(value) : label}
+                  {value ? formatDate(value) : "MM/DD/YYYY"}
                 </Text>
               </InputContainer>
             </Pressable>

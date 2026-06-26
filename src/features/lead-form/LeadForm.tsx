@@ -1,12 +1,12 @@
-import { View, Text, StyleSheet, TextInput } from 'react-native';
-import { Controller } from 'react-hook-form';
-import { useTheme } from '@/theme/ThemeProvider';
-import { Button } from '@/components/ui/Button';
-import { useLeadForm } from './useLeadForm';
-import { TextField } from './fields/TextField';
-import { BudgetSelect } from './fields/BudgetSelect';
-import { DateField } from './fields/DateField';
-import { FileField } from './fields/FileField';
+import { View, Text, StyleSheet, TextInput } from "react-native";
+import { Controller } from "react-hook-form";
+import { useTheme } from "@/theme/ThemeProvider";
+import { Button } from "@/components/ui/Button";
+import { useLeadForm } from "./useLeadForm";
+import { TextField } from "./fields/TextField";
+import { BudgetSelect } from "./fields/BudgetSelect";
+import { DateField } from "./fields/DateField";
+import { FileField } from "./fields/FileField";
 
 /** The Concierge lead form — label-inside fields, single-select budget, Button Full submit. */
 export function LeadForm() {
@@ -14,22 +14,41 @@ export function LeadForm() {
   const { form, status, errorMessage, onSubmit, reset } = useLeadForm();
   const { control } = form;
 
-  if (status === 'success') {
+  if (status === "success") {
     return (
       <View style={styles.success} accessibilityLiveRegion="polite">
         <Text style={t.typography.displayXS}>Thanks — we got it!</Text>
-        <Text style={t.typography.body}>We&apos;ll be in touch soon about your project.</Text>
-        <Button label="Submit another" variant="pill" tone="rust" onPress={reset} />
+        <Text style={t.typography.body}>
+          We&apos;ll be in touch soon about your project.
+        </Text>
+        <Button
+          label="Submit another"
+          variant="pill"
+          tone="rust"
+          onPress={reset}
+        />
       </View>
     );
   }
 
-  const submitting = status === 'submitting';
+  const submitting = status === "submitting";
 
   return (
     <View style={styles.form}>
-      <TextField control={control} name="firstName" label="First Name" required autoComplete="name" />
-      <TextField control={control} name="lastName" label="Last Name" required autoComplete="name" />
+      <TextField
+        control={control}
+        name="firstName"
+        label="First Name"
+        required
+        autoComplete="name"
+      />
+      <TextField
+        control={control}
+        name="lastName"
+        label="Last Name"
+        required
+        autoComplete="name"
+      />
       <TextField
         control={control}
         name="email"
@@ -44,12 +63,19 @@ export function LeadForm() {
         control={control}
         name="phone"
         label="Phone"
-        icon="phone"
+        icon="phoneFilled"
         required
         keyboardType="phone-pad"
         autoComplete="tel"
       />
-      <TextField control={control} name="address" label="Address" icon="house" required autoComplete="street-address" />
+      <TextField
+        control={control}
+        name="address"
+        label="Address"
+        icon="house"
+        required
+        autoComplete="street-address"
+      />
 
       <BudgetSelect control={control} label="Budget" />
       <DateField control={control} label="Project Start Date" />
@@ -57,8 +83,8 @@ export function LeadForm() {
       <TextField
         control={control}
         name="projectDetails"
-        label="Tell us what you're looking for…"
-        topLabel="Project Details"
+        label="Project Details"
+        placeholder="Tell us what you're looking for…"
         required
         multiline
       />
@@ -71,7 +97,7 @@ export function LeadForm() {
         name="company"
         render={({ field }) => (
           <TextInput
-            value={field.value ?? ''}
+            value={field.value ?? ""}
             onChangeText={field.onChange}
             style={styles.honeypot}
             accessibilityElementsHidden
@@ -82,14 +108,19 @@ export function LeadForm() {
         )}
       />
 
-      {status === 'error' && errorMessage ? (
-        <View style={[styles.banner, { borderColor: t.colors.rust }]} accessibilityLiveRegion="assertive">
-          <Text style={[t.typography.body, { color: t.colors.rust }]}>{errorMessage}</Text>
+      {status === "error" && errorMessage ? (
+        <View
+          style={[styles.banner, { borderColor: t.colors.rust }]}
+          accessibilityLiveRegion="assertive"
+        >
+          <Text style={[t.typography.body, { color: t.colors.rust }]}>
+            {errorMessage}
+          </Text>
         </View>
       ) : null}
 
       <Button
-        label={submitting ? 'Submitting…' : 'Submit'}
+        label={submitting ? "Submitting…" : "Submit"}
         variant="primary"
         tone="rust"
         onPress={onSubmit}
@@ -111,10 +142,10 @@ const styles = StyleSheet.create({
   success: {
     gap: 12,
     paddingVertical: 24,
-    alignItems: 'flex-start',
+    alignItems: "flex-start",
   },
   honeypot: {
-    position: 'absolute',
+    position: "absolute",
     width: 1,
     height: 1,
     opacity: 0,

@@ -1,6 +1,5 @@
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
 import { useTheme } from '@/theme/ThemeProvider';
-import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import type { DirectoryBusiness } from './providerTypes';
 
@@ -12,7 +11,7 @@ interface BusinessCardProps {
 const CARD_WIDTH = 180;
 const IMAGE_SIZE = CARD_WIDTH - 16; // image inset roughly matches Figma 164 in a ~180 card
 
-/** A Certified Providers card — logo, star, name, tagline, phone CTA. */
+/** A Certified Providers card — logo, star, name, tagline, phone row. */
 export function BusinessCard({ business, onCallPress }: BusinessCardProps) {
   const t = useTheme();
   return (
@@ -29,18 +28,25 @@ export function BusinessCard({ business, onCallPress }: BusinessCardProps) {
       )}
       <View style={styles.body}>
         <View style={styles.copy}>
-          <Icon name="star" size={20} color={t.colors.pumpkin} />
+          <Icon name="starFilled" size={20} color={t.colors.pumpkin} />
           <Text style={t.typography.cardTitle}>{business.name}</Text>
-          {business.tagline ? <Text style={t.typography.caption}>{business.tagline}</Text> : null}
+          {business.tagline ? (
+            <Text style={t.typography.caption} numberOfLines={3} ellipsizeMode="tail">
+              {business.tagline}
+            </Text>
+          ) : null}
         </View>
         {business.phoneDisplay && business.phone ? (
-          <Button
-            label={business.phoneDisplay}
-            icon="phone"
-            variant="pill"
-            tone="none"
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`Call ${business.name}`}
+            hitSlop={8}
             onPress={() => onCallPress(business.phone as string)}
-          />
+            style={styles.phoneRow}
+          >
+            <Icon name="phoneFilled" size={14} color={t.colors.text} />
+            <Text style={t.typography.captionSemi}>{business.phoneDisplay}</Text>
+          </Pressable>
         ) : null}
       </View>
     </View>
@@ -64,4 +70,5 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   copy: { gap: 2 },
+  phoneRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
 });

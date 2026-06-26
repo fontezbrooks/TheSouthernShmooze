@@ -6,31 +6,45 @@
 
 export const colors = {
   /** Page base — warm Vanilla, sits under the daisy pattern. */
-  bg: '#FFF8EA',
+  bg: "#FFF8EA",
   /** Card / input surface. */
-  surface: '#FFFFFF',
+  surface: "#FFFFFF",
 
   /** Brand rust — primary banner + primary button fill. */
-  rust: '#994706',
+  rust: "#994706",
   /** Orange600 — borders + the signature hard drop shadow. */
-  rustDark: '#602A00',
+  rustDark: "#602A00",
   /** Mustard — community banner + "See More" card. */
-  mustard: '#C18D22',
+  mustard: "#C18D22",
   /** Pumpkin accent. */
-  pumpkin: '#DF7C3D',
+  pumpkin: "#DF7C3D",
 
   /** Primary text (Grey120). */
-  text: '#1B1B1C',
+  text: "#1B1B1C",
   /** Softer text (Neutral700). */
-  textSoft: '#302B27',
+  textSoft: "#302B27",
   /** Muted — input placeholder / inside-label (Neutral600). */
-  muted: '#757371',
+  muted: "#757371",
 
   /** Input hairline border (Neutral400). */
-  inputBorder: '#CCCAC9',
+  inputBorder: "#CCCAC9",
+  /** AppHeader bottom divider (Figma drop-shadow 0.5px Neutral400). */
+  divider: "#CCCAC9",
+  /** Error border + warning-triangle fill (Reds/Red400). */
+  error: "#EE4145",
 
-  black: '#000000',
-  white: '#FFFFFF',
+  black: "#000000",
+  white: "#FFFFFF",
+} as const;
+
+/**
+ * Faux text-stroke for Shrikhand display headers (RN has no text-stroke).
+ * Rendered by `StrokedHeading` as offset copies behind the fill.
+ * NOTE: values pending exact confirmation from the Figma node `strokes`.
+ */
+export const heading = {
+  strokeColor: "#FEF8E8",
+  strokeWidth: 1,
 } as const;
 
 export const radii = {
@@ -88,13 +102,13 @@ export const durations = {
  */
 export const fonts = {
   /** Shrikhand — display/headings. */
-  display: 'Shrikhand_400Regular',
+  display: "Shrikhand_400Regular",
   /** Bitter — body. */
-  body: 'Bitter_400Regular',
-  bodySemi: 'Bitter_600SemiBold',
-  bodyBold: 'Bitter_800ExtraBold',
+  body: "Bitter_400Regular",
+  bodySemi: "Bitter_600SemiBold",
+  bodyBold: "Bitter_800ExtraBold",
   /** Open Sans — tab bar label only. */
-  tab: 'OpenSans_600SemiBold',
+  tab: "OpenSans_600SemiBold",
 } as const;
 
 export type Colors = typeof colors;
