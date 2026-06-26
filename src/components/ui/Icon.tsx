@@ -1,7 +1,11 @@
+import type { ComponentType } from 'react';
 import Feather from '@expo/vector-icons/Feather';
 import { useTheme } from '@/theme/ThemeProvider';
+import { PhoneIcon } from './icons/PhoneIcon';
+import { StarIcon } from './icons/StarIcon';
+import { TriangleWarningIcon } from './icons/TriangleWarningIcon';
 
-/** Semantic icon names used across the app, mapped to the Feather set. */
+/** Semantic icon names. Most map to Feather; a few route to Figma-exported SVGs. */
 export type IconName =
   | 'arrowRight'
   | 'arrowLeft'
@@ -12,9 +16,13 @@ export type IconName =
   | 'calendar'
   | 'plus'
   | 'chevronDown'
-  | 'star';
+  | 'star'
+  // Figma-exported custom glyphs:
+  | 'phoneFilled'
+  | 'starFilled'
+  | 'triangleWarning';
 
-const FEATHER: Record<IconName, React.ComponentProps<typeof Feather>['name']> = {
+const FEATHER: Record<string, React.ComponentProps<typeof Feather>['name']> = {
   arrowRight: 'arrow-right',
   arrowLeft: 'arrow-left',
   phone: 'phone',
@@ -27,14 +35,25 @@ const FEATHER: Record<IconName, React.ComponentProps<typeof Feather>['name']> = 
   star: 'star',
 };
 
+/** Custom glyphs exported from Figma, keyed by semantic name. */
+const CUSTOM: Partial<Record<IconName, ComponentType<{ size?: number; color?: string }>>> = {
+  phoneFilled: PhoneIcon,
+  starFilled: StarIcon,
+  triangleWarning: TriangleWarningIcon,
+};
+
 interface IconProps {
   name: IconName;
   size?: number;
   color?: string;
 }
 
-/** Thin wrapper over Feather so call sites use semantic names + theme colors. */
+/** Semantic icon — routes to a Figma SVG when available, else Feather. */
 export function Icon({ name, size = 18, color }: IconProps) {
   const t = useTheme();
+  const Custom = CUSTOM[name];
+  if (Custom) {
+    return <Custom size={size} color={color} />;
+  }
   return <Feather name={FEATHER[name]} size={size} color={color ?? t.colors.text} />;
 }

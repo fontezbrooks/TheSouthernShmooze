@@ -8,3 +8,7 @@ export const daisyBackground = require("../../assets/background.png");
 
 // Square brand logo (1600×1600) — the animated splash centerpiece.
 export const splashLogo = require("../../assets/splash-logo.png");
+
+// NOTE: the horizontal wordmark is a Figma-exported SVG
+// (assets/ShmoozeLogo-Horizontal.svg) imported directly as a component in
+// AppHeader via react-native-svg-transformer — not a require()'d raster.
