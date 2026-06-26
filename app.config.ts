@@ -11,6 +11,7 @@ import type { ExpoConfig, ConfigContext } from "expo/config";
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: "The Southern Shmooze",
+  owner: "carlhiggins",
   slug: "thesouthernshmooze",
   scheme: "shmooze",
   version: "1.0.0",
@@ -19,6 +20,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: "com.thesouthernshmooze.app",
+    infoPlist: {
+      ITSAppUsesNonExemptEncryption: false,
+    },
   },
   android: {
     package: "com.thesouthernshmooze.app",
@@ -54,5 +58,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ??
       process.env.SUPABASE_ANON_KEY ??
       "",
+    eas: {
+      projectId: "d0d1c671-c2a2-4691-8e6f-943b06100833",
+    },
   },
 });
