@@ -1,8 +1,10 @@
-import type { DirectoryBusinessRow } from '@/lib/database';
+import type { DirectoryBusinessRow } from "@/lib/database";
 
 /** Certified-provider view-model rendered by BusinessCard. */
 export interface DirectoryBusiness {
   id: string;
+  /** Directory deep-link key — opens shmoozeatl.com/directory#!biz/id/{sourceUid}. */
+  sourceUid: string;
   name: string;
   /** From `description`. */
   tagline: string;
@@ -11,11 +13,15 @@ export interface DirectoryBusiness {
   phone: string | null;
   /** Display phone, e.g. "678-790-4781". */
   phoneDisplay: string | null;
+  /** Has a coupon → discount (tag) chip. */
+  hasCoupon: boolean;
+  /** Has a Google marker → reviews (thumbsUp) chip. */
+  hasGoogleMarker: boolean;
 }
 
 /** Format a 10-digit US number as XXX-XXX-XXXX; otherwise return as-is. */
 export function formatPhone(raw: string): string {
-  const digits = raw.replace(/\D/g, '');
+  const digits = raw.replace(/\D/g, "");
   if (digits.length === 10) {
     return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
   }
@@ -27,10 +33,13 @@ export function toBusiness(row: DirectoryBusinessRow): DirectoryBusiness {
   const first = row.phone_numbers?.[0]?.normalized_phone_number ?? null;
   return {
     id: row.id,
+    sourceUid: row.source_uid,
     name: row.name,
-    tagline: row.description ?? '',
+    tagline: row.description ?? "",
     logoUrl: row.logo_url,
     phone: first,
     phoneDisplay: first ? formatPhone(first) : null,
+    hasCoupon: row.has_coupon,
+    hasGoogleMarker: row.has_google_marker,
   };
 }

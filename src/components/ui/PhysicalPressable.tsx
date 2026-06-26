@@ -1,7 +1,18 @@
-import { type ReactNode } from 'react';
-import { Pressable, View, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, withSpring } from 'react-native-reanimated';
-import { useTheme } from '@/theme/ThemeProvider';
+import { type ReactNode } from "react";
+import {
+  Pressable,
+  View,
+  StyleSheet,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
+} from "react-native-reanimated";
+import { useTheme } from "@/theme/ThemeProvider";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -13,6 +24,8 @@ interface PhysicalPressableProps {
   shadowColor?: string;
   /** Corner radius — must match the surface so the shadow lines up. */
   radius?: number;
+  /** Stretch to the parent's width (banners). When false, sizes to content (cards). */
+  fullWidth?: boolean;
   style?: StyleProp<ViewStyle>;
   accessibilityLabel?: string;
   children: ReactNode;
@@ -29,6 +42,7 @@ export function PhysicalPressable({
   offset = 4,
   shadowColor,
   radius = 0,
+  fullWidth = true,
   style,
   accessibilityLabel,
   children,
@@ -44,7 +58,7 @@ export function PhysicalPressable({
   }));
 
   return (
-    <View style={styles.wrap}>
+    <View style={fullWidth ? styles.wrap : styles.wrapContent}>
       <View
         pointerEvents="none"
         style={[
@@ -76,5 +90,7 @@ export function PhysicalPressable({
 
 const styles = StyleSheet.create({
   // Sizes to the content; the absolute shadow layer mirrors that size.
-  wrap: { position: 'relative', width: '100%' },
+  wrap: { position: "relative", width: "100%" },
+  // Sizes to the content's intrinsic width (cards in a horizontal row).
+  wrapContent: { position: "relative", alignSelf: "flex-start" },
 });

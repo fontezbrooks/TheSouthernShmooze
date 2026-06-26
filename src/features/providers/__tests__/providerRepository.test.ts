@@ -64,6 +64,26 @@ describe("providerRepository.fetchPinned", () => {
     expect(result.data[0].phoneDisplay).toBe("678-790-4781");
   });
 
+  it("maps source_uid and coupon/google flags to the view-model", async () => {
+    const data = [
+      row({
+        id: "1",
+        name: "Grantlanta Lawn",
+        source_uid: "abc-123",
+        has_coupon: true,
+        has_google_marker: true,
+      }),
+    ];
+    mockFrom.mockReturnValue(makeQuery({ data, error: null }).builder);
+
+    const result = await providerRepository.fetchPinned();
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.data[0].sourceUid).toBe("abc-123");
+    expect(result.data[0].hasCoupon).toBe(true);
+    expect(result.data[0].hasGoogleMarker).toBe(true);
+  });
+
   it("returns an error Result when the query errors", async () => {
     mockFrom.mockReturnValue(
       makeQuery({ data: null, error: { message: "boom" } }).builder,
