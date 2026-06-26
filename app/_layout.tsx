@@ -1,6 +1,6 @@
 // Must be the first import — sets up gesture-handler's native bindings.
 import "react-native-gesture-handler";
-import { useEffect } from "react";
+import { useState } from "react";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -13,10 +13,12 @@ import {
 } from "@expo-google-fonts/bitter";
 import { OpenSans_600SemiBold } from "@expo-google-fonts/open-sans";
 import { ThemeProvider } from "@/theme/ThemeProvider";
+import { AnimatedSplash } from "@/features/splash/AnimatedSplash";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const [splashDone, setSplashDone] = useState(false);
   const [loaded, error] = useFonts({
     Shrikhand_400Regular,
     Bitter_400Regular,
@@ -25,13 +27,9 @@ export default function RootLayout() {
     OpenSans_600SemiBold,
   });
 
-  useEffect(() => {
-    if (loaded || error) {
-      void SplashScreen.hideAsync();
-    }
-  }, [loaded, error]);
-
-  // Gate render until fonts resolve (or fail) so headings never flash a fallback face.
+  // Gate render until fonts resolve (or fail) so headings never flash a fallback
+  // face. The native splash stays up here (preventAutoHideAsync) and is hidden by
+  // AnimatedSplash on its first layout, so there is no white gap between them.
   if (!loaded && !error) {
     return null;
   }
@@ -41,6 +39,10 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <ThemeProvider>
           <Stack screenOptions={{ headerShown: false }} />
+          {/* Animated splash overlays the app from first frame, then fades out. */}
+          {!splashDone ? (
+            <AnimatedSplash onFinish={() => setSplashDone(true)} />
+          ) : null}
         </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
