@@ -70,6 +70,13 @@ export const typography = {
     lineHeight: 18,
     color: colors.text,
   },
+  /** Caption XS Semibold — chip labels ("Certified"). */
+  captionSemiXS: {
+    fontFamily: fonts.bodySemi,
+    fontSize: 10,
+    lineHeight: 15,
+    color: colors.text,
+  },
 
   /** Body XS Semibold — "See More". */
   seeMore: {

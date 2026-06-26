@@ -18,6 +18,8 @@ export const colors = {
   mustard: "#C18D22",
   /** Pumpkin accent. */
   pumpkin: "#DF7C3D",
+  /** Yellow400 — Certified chip star (Figma Yellow/Yellow400). */
+  yellow: "#EEB030",
 
   /** Primary text (Grey120). */
   text: "#1B1B1C",
@@ -30,6 +32,8 @@ export const colors = {
   inputBorder: "#CCCAC9",
   /** AppHeader bottom divider (Figma drop-shadow 0.5px Neutral400). */
   divider: "#CCCAC9",
+  /** Provider-card image/placeholder bottom hairline (Figma #EBEBEB). */
+  imageHairline: "#EBEBEB",
   /** Error border + warning-triangle fill (Reds/Red400). */
   error: "#EE4145",
 
@@ -44,7 +48,7 @@ export const colors = {
  */
 export const heading = {
   strokeColor: "#FEF8E8",
-  strokeWidth: 1,
+  strokeWidth: 4,
 } as const;
 
 export const radii = {

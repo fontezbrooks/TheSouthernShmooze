@@ -1,8 +1,14 @@
-import { View, Text, StyleSheet, type TextStyle, type StyleProp } from 'react-native';
-import { useTheme } from '@/theme/ThemeProvider';
-import { heading } from '@/theme/tokens';
+import {
+  View,
+  Text,
+  StyleSheet,
+  type TextStyle,
+  type StyleProp,
+} from "react-native";
+import { useTheme } from "@/theme/ThemeProvider";
+import { heading } from "@/theme/tokens";
 
-type DisplayVariant = 'displayL' | 'displayS' | 'displayXS';
+type DisplayVariant = "displayL" | "displayS" | "displayXS";
 
 interface StrokedHeadingProps {
   variant: DisplayVariant;
@@ -14,12 +20,14 @@ interface StrokedHeadingProps {
   style?: StyleProp<TextStyle>;
 }
 
-// 8-direction offsets give a uniform outline around the glyphs.
-const DIRECTIONS = [
-  [-1, -1], [0, -1], [1, -1],
-  [-1, 0], [1, 0],
-  [-1, 1], [0, 1], [1, 1],
-] as const;
+// Sample N points around a circle of radius = strokeWidth. A dense ring keeps
+// the outline gap-free at thicker stroke widths (8 fixed dirs leave diagonal
+// gaps past ~2px).
+const RING_SAMPLES = 16;
+const RING = Array.from({ length: RING_SAMPLES }, (_, i) => {
+  const a = (i / RING_SAMPLES) * 2 * Math.PI;
+  return [Math.cos(a), Math.sin(a)] as const;
+});
 
 /**
  * Shrikhand display header with a faux text-stroke (RN has no text-stroke). The
@@ -42,7 +50,7 @@ export function StrokedHeading({
 
   return (
     <View style={styles.wrap}>
-      {DIRECTIONS.map(([dx, dy], i) => (
+      {RING.map(([dx, dy], i) => (
         <Text
           key={i}
           accessible={false}
@@ -50,7 +58,12 @@ export function StrokedHeading({
           style={[
             StyleSheet.absoluteFill,
             stroke,
-            { transform: [{ translateX: dx * strokeWidth }, { translateY: dy * strokeWidth }] },
+            {
+              transform: [
+                { translateX: dx * strokeWidth },
+                { translateY: dy * strokeWidth },
+              ],
+            },
           ]}
         >
           {children}
@@ -63,5 +76,5 @@ export function StrokedHeading({
 
 const styles = StyleSheet.create({
   // Sizes to the fill text; absolute stroke copies mirror that box and wrap identically.
-  wrap: { position: 'relative' },
+  wrap: { position: "relative" },
 });
