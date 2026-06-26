@@ -34,10 +34,10 @@ export function AppHeader({ showBack = false, onBack }: AppHeaderProps) {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Go back"
-            hitSlop={8}
+            hitSlop={15}
             onPress={onBack}
           >
-            <Icon name="arrowLeft" size={18} color={t.colors.text} />
+            <Icon name="arrowLeft" size={30} color={t.colors.text} />
           </Pressable>
         ) : null}
       </View>

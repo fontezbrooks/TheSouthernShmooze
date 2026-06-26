@@ -158,6 +158,8 @@ design-extract-output/
 # Ignore the scraped directory images, but keep the app's runtime assets.
 assets/*
 !assets/background.png
+!assets/splash-logo.png
+!assets/splash.png
 
 # OS / tooling artifacts
 .DS_Store

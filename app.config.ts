@@ -30,7 +30,16 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   plugins: [
     "expo-router",
     "expo-font",
-    "expo-splash-screen",
+    [
+      "expo-splash-screen",
+      {
+        // Native launch screen — matches the in-app AnimatedSplash's first frame
+        // (mascot on Vanilla cream) so the OS splash → JS splash handoff is seamless.
+        image: "./assets/splash.png",
+        backgroundColor: "#FFF8EA",
+        imageWidth: 220,
+      },
+    ],
     "@react-native-community/datetimepicker",
     "expo-web-browser",
   ],
