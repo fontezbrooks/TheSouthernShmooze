@@ -11,7 +11,10 @@
 // Auth: caller must present `X-Sync-Secret: <SYNC_TRIGGER_SECRET>` (verify_jwt = false).
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { transformProfile, type RawProfile } from "../_shared/profile-transform.ts";
+import {
+  transformProfile,
+  type RawProfile,
+} from "../_shared/profile-transform.ts";
 
 const DEFAULT_ORG = "33993";
 const DEFAULT_BATCH = 25;
@@ -27,20 +30,27 @@ function json(status: number, body: unknown): Response {
 }
 
 /** Fetch one business's profile with a timeout. Throws on non-200 / bad JSON. */
-async function fetchProfile(uid: string, org: string, timeoutMs: number): Promise<RawProfile> {
+async function fetchProfile(
+  uid: string,
+  org: string,
+  timeoutMs: number,
+): Promise<RawProfile> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const res = await fetch(`https://api.membershipworks.com/v2/account/${uid}/profile`, {
-      method: "GET",
-      headers: {
-        accept: "application/json",
-        "x-org": org,
-        origin: "https://www.shmoozeatl.com",
-        referer: "https://www.shmoozeatl.com/",
+    const res = await fetch(
+      `https://api.membershipworks.com/v2/account/${uid}/profile`,
+      {
+        method: "GET",
+        headers: {
+          accept: "application/json",
+          "x-org": org,
+          origin: "https://www.shmoozeatl.com",
+          referer: "https://www.shmoozeatl.com/",
+        },
+        signal: controller.signal,
       },
-      signal: controller.signal,
-    });
+    );
     if (!res.ok) throw new Error(`MW ${res.status}`);
     return (await res.json()) as RawProfile;
   } finally {
@@ -88,15 +98,24 @@ Deno.serve(async (req: Request) => {
 
   const org = Deno.env.get("MW_ORG") ?? DEFAULT_ORG;
   const batch = Number(Deno.env.get("PROFILE_BATCH") ?? DEFAULT_BATCH);
-  const staleDays = Number(Deno.env.get("PROFILE_STALE_DAYS") ?? DEFAULT_STALE_DAYS);
-  const concurrency = Number(Deno.env.get("PROFILE_CONCURRENCY") ?? DEFAULT_CONCURRENCY);
-  const timeoutMs = Number(Deno.env.get("FETCH_TIMEOUT_MS") ?? DEFAULT_TIMEOUT_MS);
+  const staleDays = Number(
+    Deno.env.get("PROFILE_STALE_DAYS") ?? DEFAULT_STALE_DAYS,
+  );
+  const concurrency = Number(
+    Deno.env.get("PROFILE_CONCURRENCY") ?? DEFAULT_CONCURRENCY,
+  );
+  const timeoutMs = Number(
+    Deno.env.get("FETCH_TIMEOUT_MS") ?? DEFAULT_TIMEOUT_MS,
+  );
 
   // 1) Which businesses need a profile fetch (missing first, then stale).
-  const { data: due, error: dueErr } = await supabase.rpc("directory_profiles_due", {
-    p_limit: batch,
-    p_stale_days: staleDays,
-  });
+  const { data: due, error: dueErr } = await supabase.rpc(
+    "directory_profiles_due",
+    {
+      p_limit: batch,
+      p_stale_days: staleDays,
+    },
+  );
   if (dueErr) {
     await supabase.rpc("directory_log_profile_run", {
       p_status: "failed",
@@ -106,7 +125,9 @@ Deno.serve(async (req: Request) => {
     return json(200, { status: "failed", reason: dueErr.message });
   }
 
-  const uids: string[] = (due ?? []).map((r: { source_uid: string }) => r.source_uid);
+  const uids: string[] = (due ?? []).map(
+    (r: { source_uid: string }) => r.source_uid,
+  );
   if (uids.length === 0) {
     await supabase.rpc("directory_log_profile_run", {
       p_status: "ok",
@@ -120,13 +141,32 @@ Deno.serve(async (req: Request) => {
 
   // 2) Fetch + transform + upsert each, with bounded concurrency. Failures are isolated.
   const { updated, failed } = await pool(uids, concurrency, async (uid) => {
-    const raw = await fetchProfile(uid, org, timeoutMs);
-    const row = transformProfile(uid, raw);
-    if (!row) throw new Error("transform returned null");
-    const { error } = await supabase
-      .from("directory_business_profiles")
-      .upsert({ ...row, fetched_at: new Date().toISOString() }, { onConflict: "source_uid" });
-    if (error) throw new Error(error.message);
+    try {
+      const raw = await fetchProfile(uid, org, timeoutMs);
+      const row = transformProfile(uid, raw);
+      if (!row) throw new Error("transform returned null");
+      const { error } = await supabase
+        .from("directory_business_profiles")
+        .upsert(
+          {
+            ...row,
+            fetched_at: new Date().toISOString(),
+            fetch_error: null,
+            attempts: 0,
+          },
+          { onConflict: "source_uid" },
+        );
+      if (error) throw new Error(error.message);
+    } catch (e) {
+      // Record the attempt so this business leaves the "missing" set and doesn't
+      // starve later ones; it's retried on a short backoff (see directory_profiles_due).
+      const message = e instanceof Error ? e.message : String(e);
+      await supabase.rpc("directory_record_profile_failure", {
+        p_source_uid: uid,
+        p_error: message.slice(0, 300),
+      });
+      throw e; // re-throw so the pool counts it as failed
+    }
   });
 
   await supabase.rpc("directory_log_profile_run", {

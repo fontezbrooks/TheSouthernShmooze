@@ -29,7 +29,11 @@ const raw: RawProfile = {
     goo: "plus.google.com/abc",
   },
   pfk: [{ lbl: "Google Business Profile", url: "https://maps.app.goo.gl/abc" }],
-  cpn: { cpt: "Title", cpd: "Owner deal &mdash; 10% off", cpa: "https://cdn.membershipworks.com/u/abc_cp1.jpg" },
+  cpn: {
+    cpt: "Title",
+    cpd: "Owner deal &mdash; 10% off",
+    cpa: "https://cdn.membershipworks.com/u/abc_cp1.jpg",
+  },
   pfz: [{ s: "https://cdn/pf1.jpg", l: "https://cdn/pl1.jpg" }],
   _st: {
     // @ts-expect-error _mk is a secret we expect to be stripped (not in the typed shape)
@@ -39,7 +43,9 @@ const raw: RawProfile = {
         lbl: "About",
         box: [
           { htm: "<b>Grantlanta Lawn</b>" },
-          { htm: "<p>We provide <strong>residential and commercial landscaping</strong>, lawn care &amp; garden design.</p>" },
+          {
+            htm: "<p>We provide <strong>residential and commercial landscaping</strong>, lawn care &amp; garden design.</p>",
+          },
           { dat: "map" },
         ],
       },
@@ -84,6 +90,18 @@ describe("sanitizeHtml", () => {
     expect(out).not.toContain("onclick");
     expect(out).not.toContain("<script");
   });
+  it("strips event handlers in every attribute form (quoted and unquoted)", () => {
+    expect(sanitizeHtml("<img src=x onerror=alert(1)>")).not.toContain(
+      "onerror",
+    );
+    expect(sanitizeHtml("<a onmouseover='x()'>y</a>")).not.toContain(
+      "onmouseover",
+    );
+    expect(sanitizeHtml('<b ONCLICK="x">z</b>')).not.toMatch(/onclick/i);
+    expect(sanitizeHtml('<a href="javascript:alert(1)">x</a>')).not.toContain(
+      "javascript:",
+    );
+  });
 });
 
 describe("extractAboutHtml", () => {
@@ -117,7 +135,12 @@ describe("transformProfile", () => {
     expect(row.contact_name).toBe("Grant Wallace");
   });
   it("normalizes the address (and drops loc)", () => {
-    expect(row.address).toMatchObject({ line1: "225 glenwood ave se", city: "Atlanta", state: "GA", zip: "30312" });
+    expect(row.address).toMatchObject({
+      line1: "225 glenwood ave se",
+      city: "Atlanta",
+      state: "GA",
+      zip: "30312",
+    });
     expect(row.address).not.toHaveProperty("loc");
   });
   it("normalizes socials: https-prefixed pfu handles + labelled pfk links, skips empty", () => {
@@ -129,9 +152,14 @@ describe("transformProfile", () => {
     ]);
   });
   it("maps the deal and gallery", () => {
-    expect(row.deal).toMatchObject({ title: "Title", image: "https://cdn.membershipworks.com/u/abc_cp1.jpg" });
+    expect(row.deal).toMatchObject({
+      title: "Title",
+      image: "https://cdn.membershipworks.com/u/abc_cp1.jpg",
+    });
     expect(row.deal!.text).toContain("10% off");
-    expect(row.gallery).toEqual([{ small: "https://cdn/pf1.jpg", large: "https://cdn/pl1.jpg" }]);
+    expect(row.gallery).toEqual([
+      { small: "https://cdn/pf1.jpg", large: "https://cdn/pl1.jpg" },
+    ]);
   });
   it("strips the _mk secret from raw_profile", () => {
     expect(JSON.stringify(row.raw_profile)).not.toContain("SECRET_MAPS_KEY");

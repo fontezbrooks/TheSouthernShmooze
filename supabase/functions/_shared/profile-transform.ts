@@ -57,8 +57,9 @@ export function sanitizeHtml(value: unknown): string | null {
   if (typeof value !== "string") return null;
   const cleaned = value
     .replace(/<(script|style|iframe|object|embed)[\s\S]*?<\/\1>/gi, "")
-    .replace(/\son\w+\s*=\s*"[^"]*"/gi, "")
-    .replace(/\son\w+\s*=\s*'[^']*'/gi, "")
+    // Strip event handlers in ALL attribute forms: double-quoted, single-quoted,
+    // and unquoted (e.g. `<img src=x onerror=alert(1)>`).
+    .replace(/\son\w+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, "")
     .replace(/javascript:/gi, "");
   return cleaned.trim().length > 0 ? cleaned : null;
 }
