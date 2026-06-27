@@ -5,7 +5,12 @@
     "types": ["jest", "node"],
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    // allowImportingTsExtensions lets tsc accept the .ts import extensions that Deno
+    // (Supabase Edge Functions) requires under supabase/functions/_shared; noEmit keeps
+    // tsc check-only (Metro/Expo bundles the app, never tsc).
+    "noEmit": true,
+    "allowImportingTsExtensions": true
   },
   "include": [
     "**/*.ts",

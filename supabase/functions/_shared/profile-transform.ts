@@ -9,7 +9,7 @@
  * Runtime-agnostic (Deno + Bun), zero deps — reuses the inline HTML helpers from
  * `directory-transform.ts`. The `sync-profiles` Edge Function and any importer share it.
  */
-import { htmlToText, decodeText, stripSecrets } from "./directory-transform";
+import { htmlToText, decodeText, stripSecrets } from "./directory-transform.ts";
 
 /** Raw profile response (compact MW field names; only the parts we read are typed). */
 export interface RawProfile {

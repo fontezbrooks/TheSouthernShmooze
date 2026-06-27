@@ -5,3 +5,8 @@ project_id = "udbvtigwvhvxszimqlgj"
 [functions.sync-directory]
 enabled = true
 verify_jwt = false
+
+# Profile ingestion function. Same trigger pattern (pg_cron + pg_net + X-Sync-Secret).
+[functions.sync-profiles]
+enabled = true
+verify_jwt = false
