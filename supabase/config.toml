@@ -1,0 +1,7 @@
+project_id = "udbvtigwvhvxszimqlgj"
+
+# Directory sync function. Invoked by pg_cron via pg_net with an X-Sync-Secret header,
+# so JWT verification is disabled and auth is enforced by the shared secret in code.
+[functions.sync-directory]
+enabled = true
+verify_jwt = false

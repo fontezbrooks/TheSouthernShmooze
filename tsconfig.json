@@ -13,5 +13,5 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
   ],
-  "exclude": ["node_modules", "design-extract-output", "output", "docs", "dist", ".expo", "assets"]
+  "exclude": ["node_modules", "design-extract-output", "output", "docs", "dist", ".expo", "assets", "supabase/functions"]
 }
