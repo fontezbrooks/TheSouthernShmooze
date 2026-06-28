@@ -5,13 +5,20 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "@/theme/ThemeProvider";
 import { openLink } from "@/lib/openLink";
 import { LINKS } from "@/lib/links";
-import HouseIcon from "../../assets/icons/house.svg";
-import SquaresIcon from "../../assets/icons/squaresThreeCircle.svg";
-import GiftIcon from "../../assets/icons/gift.svg";
-import PeopleIcon from "../../assets/icons/peopleAvatars.svg";
-import SocialSpreadIcon from "../../assets/icons/socialSpread.svg";
+// Nav icons live under src/ (not assets/) so they aren't caught by the broad
+// `assets/*` gitignore — EAS's uploader doesn't honor a nested re-include, which
+// dropped them from the cloud build context. See `mem:build-status`.
+import HouseIcon from "@/components/ui/icons/house.svg";
+import SquaresIcon from "@/components/ui/icons/squaresThreeCircle.svg";
+import GiftIcon from "@/components/ui/icons/gift.svg";
+import PeopleIcon from "@/components/ui/icons/peopleAvatars.svg";
+import SocialSpreadIcon from "@/components/ui/icons/socialSpread.svg";
 
-type SvgIcon = ComponentType<{ width?: number; height?: number; color?: string }>;
+type SvgIcon = ComponentType<{
+  width?: number;
+  height?: number;
+  color?: string;
+}>;
 
 /**
  * The 5 nav destinations (Figma NavBar). `route` items navigate to a registered
@@ -27,8 +34,20 @@ const TABS: TabItem[] = [
   { key: "index", label: "Home", icon: HouseIcon, kind: "route" },
   { key: "directory", label: "Directory", icon: SquaresIcon, kind: "route" },
   { key: "concierge", label: "Concierge", icon: GiftIcon, kind: "route" },
-  { key: "community", label: "Community", icon: PeopleIcon, kind: "link", href: LINKS.facebook },
-  { key: "newsletter", label: "Newsletter", icon: SocialSpreadIcon, kind: "link", href: LINKS.newsletter },
+  {
+    key: "community",
+    label: "Community",
+    icon: PeopleIcon,
+    kind: "link",
+    href: LINKS.facebook,
+  },
+  {
+    key: "newsletter",
+    label: "Newsletter",
+    icon: SocialSpreadIcon,
+    kind: "link",
+    href: LINKS.newsletter,
+  },
 ];
 
 /**
@@ -80,7 +99,8 @@ function AppTabBar({ state, navigation }: TabBarProps) {
               target: route.key,
               canPreventDefault: true,
             });
-            if (!focused && !event.defaultPrevented) navigation.navigate(tab.key);
+            if (!focused && !event.defaultPrevented)
+              navigation.navigate(tab.key);
           };
           const IconCmp = tab.icon;
           return (
@@ -93,7 +113,9 @@ function AppTabBar({ state, navigation }: TabBarProps) {
               style={styles.item}
             >
               <IconCmp width={24} height={24} color={tint} />
-              <Text style={[t.typography.tab, { color: tint }]}>{tab.label}</Text>
+              <Text style={[t.typography.tab, { color: tint }]}>
+                {tab.label}
+              </Text>
             </Pressable>
           );
         })}

@@ -164,9 +164,6 @@ assets/*
 !assets/banner-help.png
 !assets/banner-community.png
 !assets/icon.png
-# Bundled UI icon SVGs (nav bar etc.) — code require()s these, so they must be tracked.
-!assets/icons/
-!assets/icons/*.svg
 
 # OS / tooling artifacts
 .DS_Store
