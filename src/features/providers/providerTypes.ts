@@ -15,8 +15,8 @@ export interface DirectoryBusiness {
   phoneDisplay: string | null;
   /** Has a coupon → discount (tag) chip. */
   hasCoupon: boolean;
-  /** Has a Google marker → reviews (thumbsUp) chip. */
-  hasGoogleMarker: boolean;
+  /** Source `xgm` flag → MembershipWorks certified-star badge. */
+  isCertified: boolean;
 }
 
 /** Format a 10-digit US number as XXX-XXX-XXXX; otherwise return as-is. */
@@ -40,6 +40,6 @@ export function toBusiness(row: DirectoryBusinessRow): DirectoryBusiness {
     phone: first,
     phoneDisplay: first ? formatPhone(first) : null,
     hasCoupon: row.has_coupon,
-    hasGoogleMarker: row.has_google_marker,
+    isCertified: row.is_certified,
   };
 }

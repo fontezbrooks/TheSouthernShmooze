@@ -22,8 +22,9 @@ function inList(values: readonly string[]): string {
 
 /**
  * Data access for Certified Providers. Pinned three are fetched by name and
- * re-sorted to canonical order; "See More" pages the remainder deterministically
- * by recommended_score DESC, name ASC. All methods return a Result (no throws).
+ * re-sorted to canonical order (always on top); "See More" pages the remainder
+ * deterministically certified-first: is_certified DESC, recommended_score DESC,
+ * name ASC. All methods return a Result (no throws).
  */
 export interface ProviderRepository {
   fetchPinned(): Promise<Result<DirectoryBusiness[]>>;
@@ -57,6 +58,7 @@ export const providerRepository: ProviderRepository = {
         .from(VIEW)
         .select("*")
         .not("name", "in", inList(PINNED_NAMES))
+        .order("is_certified", { ascending: false })
         .order("recommended_score", { ascending: false })
         .order("name", { ascending: true })
         .range(offset, offset + PAGE_SIZE - 1);
