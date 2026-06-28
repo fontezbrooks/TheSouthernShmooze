@@ -5,6 +5,7 @@ import {
   splitLoc,
   extractPhones,
   transformRecord,
+  contentHash,
   buildBatchPayload,
   type DirectoryRecord,
 } from "../transform";
@@ -134,6 +135,57 @@ describe("transformRecord", () => {
     expect(transformRecord({ uid: "x", nam: "Acme" })?.is_certified).toBe(
       false,
     );
+  });
+
+  it("stamps a content hash that changes only when content changes", () => {
+    const base = transformRecord(sample)?.source_content_hash;
+    expect(typeof base).toBe("string");
+    expect(base).toHaveLength(16);
+    // Same input → same hash (deterministic / idempotent sync).
+    expect(transformRecord(sample)?.source_content_hash).toBe(base);
+    // Certified flip, tagline edit, and a phone change each move the hash.
+    expect(
+      transformRecord({ ...sample, xgm: 1 })?.source_content_hash,
+    ).not.toBe(base);
+    expect(
+      transformRecord({ ...sample, cnm: "different tagline" })
+        ?.source_content_hash,
+    ).not.toBe(base);
+    expect(
+      transformRecord({ ...sample, phn: ["7705550000"] })?.source_content_hash,
+    ).not.toBe(base);
+  });
+});
+
+describe("contentHash", () => {
+  const content = {
+    source_uid: "uid",
+    name: "Biz",
+    description: "desc",
+    logo_url: null,
+    longitude: null,
+    latitude: null,
+    recommended_score: 1,
+    has_coupon: false,
+    is_certified: false,
+  };
+
+  it("is stable and 16 hex chars", () => {
+    const h = contentHash(content, []);
+    expect(h).toMatch(/^[0-9a-f]{16}$/);
+    expect(contentHash(content, [])).toBe(h);
+  });
+
+  it("ignores source_uid (the key) but reflects every content field + phones", () => {
+    const h = contentHash(content, []);
+    expect(contentHash({ ...content, source_uid: "other" }, [])).toBe(h);
+    expect(contentHash({ ...content, is_certified: true }, [])).not.toBe(h);
+    expect(contentHash({ ...content, logo_url: "x" }, [])).not.toBe(h);
+    expect(
+      contentHash(content, [
+        { phone_number: "1", normalized_phone_number: "1", position: 0 },
+      ]),
+    ).not.toBe(h);
   });
 });
 
