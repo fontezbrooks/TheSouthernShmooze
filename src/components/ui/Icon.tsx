@@ -20,6 +20,8 @@ export type IconName =
   | "plus"
   | "chevronDown"
   | "star"
+  | "search"
+  | "x"
   // Figma-exported custom glyphs:
   | "phoneFilled"
   | "starFilled"
@@ -39,6 +41,8 @@ const FEATHER: Record<string, React.ComponentProps<typeof Feather>["name"]> = {
   plus: "plus-circle",
   chevronDown: "chevron-down",
   star: "star",
+  search: "search",
+  x: "x",
 };
 
 /** Custom glyphs exported from Figma, keyed by semantic name. */

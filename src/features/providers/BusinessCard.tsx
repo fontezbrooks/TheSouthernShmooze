@@ -78,7 +78,7 @@ export function BusinessCard({
           </Text>
           <Text
             style={[t.typography.caption, styles.tagline]}
-            numberOfLines={3}
+            numberOfLines={2}
             ellipsizeMode="tail"
           >
             {business.tagline}
@@ -133,9 +133,10 @@ const styles = StyleSheet.create({
   },
   copy: { gap: 2 },
   // Reserve a fixed name + description height so every card is the same size,
-  // regardless of name/description length (cardTitle lh 18 → 2 lines = 36).
+  // regardless of name/description length (caption lh 18 → 2 lines = 36). Descriptions
+  // are capped at 2 lines + ellipsis so short copy doesn't leave a gap before the badge.
   name: { minHeight: 36 },
-  tagline: { minHeight: 54 },
+  tagline: { minHeight: 36 },
   chips: { flexDirection: "row", alignItems: "center", gap: 4 },
   phoneBtn: {
     flexDirection: "row",

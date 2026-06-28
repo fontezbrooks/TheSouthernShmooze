@@ -6,12 +6,16 @@ import { colors, fonts } from "./tokens";
  * Display = Shrikhand (italic), body/labels = Bitter, tab label = Open Sans.
  */
 export const typography = {
+  // Shrikhand is a heavy italic display face with tall ascenders. lineHeight ≈ fontSize
+  // clips the tops of glyphs (the "h"/"l"/"d") on iOS, so display line heights carry
+  // ~1.25-1.3x headroom. StrokedHeading draws all copies from the same metrics, so its
+  // stroke/fill stay aligned. (Figma line heights were near-1.0 — visually too tight here.)
   /** Header L — Concierge title. */
   displayL: {
     fontFamily: fonts.display,
     fontStyle: "italic",
     fontSize: 56,
-    lineHeight: 64,
+    lineHeight: 72,
     letterSpacing: -0.56,
     color: colors.text,
   },
@@ -20,7 +24,7 @@ export const typography = {
     fontFamily: fonts.display,
     fontStyle: "italic",
     fontSize: 32,
-    lineHeight: 33,
+    lineHeight: 42,
     letterSpacing: -0.32,
     color: colors.text,
   },
@@ -29,7 +33,7 @@ export const typography = {
     fontFamily: fonts.display,
     fontStyle: "italic",
     fontSize: 24,
-    lineHeight: 30,
+    lineHeight: 31,
     letterSpacing: -0.24,
     color: colors.text,
   },

@@ -64,6 +64,32 @@ export interface DirectoryBusinessRow {
   updated_at: string;
 }
 
+/**
+ * Row of `directory_business_detail_view` (migration 0010, renamed in 0013) — a
+ * business joined with its ingested MembershipWorks profile + phones, for the
+ * in-app business-detail screen.
+ */
+export interface DirectoryBusinessDetailRow {
+  source_uid: string;
+  name: string;
+  description: string | null;
+  logo_url: string | null;
+  longitude: number | null;
+  latitude: number | null;
+  recommended_score: number | null;
+  has_coupon: boolean;
+  is_certified: boolean;
+  about_text: string | null;
+  about_html: string | null;
+  website: string | null;
+  contact_name: string | null;
+  address: Record<string, unknown> | null;
+  socials: Record<string, unknown> | null;
+  deal: Record<string, unknown> | null;
+  gallery: Array<{ small: string | null; large: string | null }> | null;
+  phone_numbers: DirectoryPhone[] | null;
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -77,6 +103,10 @@ export interface Database {
     Views: {
       directory_businesses_app_view: {
         Row: DirectoryBusinessRow;
+        Relationships: [];
+      };
+      directory_business_detail_view: {
+        Row: DirectoryBusinessDetailRow;
         Relationships: [];
       };
     };

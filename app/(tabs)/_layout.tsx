@@ -1,8 +1,35 @@
+import type { ComponentType } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Tabs } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "@/theme/ThemeProvider";
-import { Icon } from "@/components/ui/Icon";
+import { openLink } from "@/lib/openLink";
+import { LINKS } from "@/lib/links";
+import HouseIcon from "../../assets/icons/house.svg";
+import SquaresIcon from "../../assets/icons/squaresThreeCircle.svg";
+import GiftIcon from "../../assets/icons/gift.svg";
+import PeopleIcon from "../../assets/icons/peopleAvatars.svg";
+import SocialSpreadIcon from "../../assets/icons/socialSpread.svg";
+
+type SvgIcon = ComponentType<{ width?: number; height?: number; color?: string }>;
+
+/**
+ * The 5 nav destinations (Figma NavBar). `route` items navigate to a registered
+ * tab screen; `link` items open an external URL (Community → Facebook group,
+ * Newsletter → Substack) without navigating — the same destinations as the
+ * Home/Community banners, reached a different way.
+ */
+type TabItem =
+  | { key: string; label: string; icon: SvgIcon; kind: "route" }
+  | { key: string; label: string; icon: SvgIcon; kind: "link"; href: string };
+
+const TABS: TabItem[] = [
+  { key: "index", label: "Home", icon: HouseIcon, kind: "route" },
+  { key: "directory", label: "Directory", icon: SquaresIcon, kind: "route" },
+  { key: "concierge", label: "Concierge", icon: GiftIcon, kind: "route" },
+  { key: "community", label: "Community", icon: PeopleIcon, kind: "link", href: LINKS.facebook },
+  { key: "newsletter", label: "Newsletter", icon: SocialSpreadIcon, kind: "link", href: LINKS.newsletter },
+];
 
 /**
  * Minimal structural subset of react-navigation's BottomTabBarProps — typed
@@ -20,10 +47,11 @@ interface TabBarProps {
   };
 }
 
-/** Custom bottom tab bar matching the Figma NavBar (cream, rust hairline, home indicator). */
+/** Custom 5-tab bar (cream, rust hairline). Route tabs navigate; link tabs open external URLs. */
 function AppTabBar({ state, navigation }: TabBarProps) {
   const t = useTheme();
   const insets = useSafeAreaInsets();
+  const activeRoute = state.routes[state.index]?.name;
 
   return (
     <View
@@ -37,39 +65,35 @@ function AppTabBar({ state, navigation }: TabBarProps) {
       ]}
     >
       <View style={styles.row}>
-        {state.routes.map((route, index) => {
-          const focused = state.index === index;
+        {TABS.map((tab) => {
+          const focused = tab.kind === "route" && activeRoute === tab.key;
+          const tint = focused ? t.colors.rust : t.colors.muted;
           const onPress = () => {
+            if (tab.kind === "link") {
+              openLink(tab.href);
+              return;
+            }
+            const route = state.routes.find((r) => r.name === tab.key);
+            if (!route) return;
             const event = navigation.emit({
               type: "tabPress",
               target: route.key,
               canPreventDefault: true,
             });
-            if (!focused && !event.defaultPrevented)
-              navigation.navigate(route.name);
+            if (!focused && !event.defaultPrevented) navigation.navigate(tab.key);
           };
+          const IconCmp = tab.icon;
           return (
             <Pressable
-              key={route.key}
+              key={tab.key}
               accessibilityRole="button"
               accessibilityState={focused ? { selected: true } : {}}
-              accessibilityLabel="Home"
+              accessibilityLabel={tab.label}
               onPress={onPress}
               style={styles.item}
             >
-              <Icon
-                name="house"
-                size={24}
-                color={focused ? t.colors.rust : t.colors.muted}
-              />
-              <Text
-                style={[
-                  t.typography.tab,
-                  { color: focused ? t.colors.rust : t.colors.muted },
-                ]}
-              >
-                Home
-              </Text>
+              <IconCmp width={24} height={24} color={tint} />
+              <Text style={[t.typography.tab, { color: tint }]}>{tab.label}</Text>
             </Pressable>
           );
         })}
@@ -85,6 +109,8 @@ export default function TabsLayout() {
       tabBar={(props) => <AppTabBar {...props} />}
     >
       <Tabs.Screen name="index" options={{ title: "Home" }} />
+      <Tabs.Screen name="directory" options={{ title: "Directory" }} />
+      <Tabs.Screen name="concierge" options={{ title: "Concierge" }} />
     </Tabs>
   );
 }
@@ -96,12 +122,12 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
   },
   item: {
     alignItems: "center",
     gap: 4,
-    width: 45,
+    flex: 1,
   },
 });
