@@ -17,6 +17,8 @@ export interface DirectoryBusiness {
   hasCoupon: boolean;
   /** Source `xgm` flag → MembershipWorks certified-star badge. */
   isCertified: boolean;
+  /** Source `ir5` "Recommended" flag (recommended_score present) → reviews (thumbsUp) chip. */
+  recommended: boolean;
 }
 
 /** Format a 10-digit US number as XXX-XXX-XXXX; otherwise return as-is. */
@@ -41,5 +43,6 @@ export function toBusiness(row: DirectoryBusinessRow): DirectoryBusiness {
     phoneDisplay: first ? formatPhone(first) : null,
     hasCoupon: row.has_coupon,
     isCertified: row.is_certified,
+    recommended: row.recommended_score != null,
   };
 }

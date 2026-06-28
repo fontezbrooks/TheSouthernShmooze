@@ -4,6 +4,7 @@ import { useTheme } from "@/theme/ThemeProvider";
 import { daisyBackground, bannerHelp, bannerCommunity } from "@/theme/assets";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Banner } from "@/components/ui/Banner";
+import { SearchBarButton } from "@/features/directory/SearchBar";
 import { CertifiedProviders } from "@/features/providers/CertifiedProviders";
 import { openLink } from "@/lib/openLink";
 import { LINKS } from "@/lib/links";
@@ -26,6 +27,10 @@ export function HomeScreen() {
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
       >
+        {/* Entry point to the Directory search — focus the input on arrival so the
+            user can type immediately (no second tap). */}
+        <SearchBarButton onPress={() => router.push("/directory?focus=1")} />
+
         <Banner
           layout="imageTop"
           image={bannerHelp}

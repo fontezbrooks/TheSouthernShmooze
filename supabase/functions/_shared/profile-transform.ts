@@ -157,7 +157,7 @@ export function transformProfile(
     source_uid: sourceUid,
     about_text: htmlToText(aboutHtmlRaw),
     about_html: sanitizeHtml(aboutHtmlRaw),
-    website: decodeText(raw.web),
+    website: ensureHttps(decodeText(raw.web)),
     contact_name: decodeText(raw.ctc),
     address: extractAddress(raw),
     socials: extractSocials(raw),

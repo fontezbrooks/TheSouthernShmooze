@@ -131,7 +131,8 @@ describe("transformProfile", () => {
   });
   it("maps the scalar fields", () => {
     expect(row.source_uid).toBe("abc");
-    expect(row.website).toBe("grantlantalawn.com");
+    // `web` is stored scheme-normalized so the detail screen's link opens.
+    expect(row.website).toBe("https://grantlantalawn.com");
     expect(row.contact_name).toBe("Grant Wallace");
   });
   it("normalizes the address (and drops loc)", () => {

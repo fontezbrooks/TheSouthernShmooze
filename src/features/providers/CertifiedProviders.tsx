@@ -6,11 +6,10 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from "react-native";
+import { useRouter } from "expo-router";
 import { useTheme } from "@/theme/ThemeProvider";
 import { Icon } from "@/components/ui/Icon";
 import { StrokedHeading } from "@/components/ui/StrokedHeading";
-import { openLink } from "@/lib/openLink";
-import { directoryBizUrl } from "@/lib/links";
 import { BusinessCard } from "./BusinessCard";
 import { useProviders } from "./useProviders";
 
@@ -21,11 +20,11 @@ interface CertifiedProvidersProps {
 /** Home section: header + horizontal row of provider cards + "See More". */
 export function CertifiedProviders({ onCallPress }: CertifiedProvidersProps) {
   const t = useTheme();
-  const { pinned, more, loading, loadingMore, hasMore, error, loadMore } =
-    useProviders();
-  const cards = [...pinned, ...more];
+  const router = useRouter();
+  const { pinned, loading, error } = useProviders();
+  const cards = pinned;
 
-  const openBiz = (sourceUid: string) => openLink(directoryBizUrl(sourceUid));
+  const openBiz = (sourceUid: string) => router.push(`/business/${sourceUid}`);
 
   return (
     <View style={styles.section}>
@@ -52,33 +51,24 @@ export function CertifiedProviders({ onCallPress }: CertifiedProvidersProps) {
             />
           ))}
 
-          {hasMore ? (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="See more providers"
-              onPress={loadMore}
-              disabled={loadingMore}
-              style={[
-                styles.seeMore,
-                {
-                  backgroundColor: t.colors.rust,
-                  borderColor: t.colors.rustDark,
-                  borderRadius: t.radii.card,
-                },
-              ]}
-            >
-              {loadingMore ? (
-                <ActivityIndicator color={t.colors.bg} />
-              ) : (
-                <>
-                  <Text style={[t.typography.seeMore, { color: t.colors.bg }]}>
-                    See More
-                  </Text>
-                  <Icon name="arrowRight" size={18} color={t.colors.bg} />
-                </>
-              )}
-            </Pressable>
-          ) : null}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="See more providers in the directory"
+            onPress={() => router.push("/directory")}
+            style={[
+              styles.seeMore,
+              {
+                backgroundColor: t.colors.rust,
+                borderColor: t.colors.rustDark,
+                borderRadius: t.radii.card,
+              },
+            ]}
+          >
+            <Text style={[t.typography.seeMore, { color: t.colors.bg }]}>
+              See More
+            </Text>
+            <Icon name="arrowRight" size={18} color={t.colors.bg} />
+          </Pressable>
         </ScrollView>
       )}
 
