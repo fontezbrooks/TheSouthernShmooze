@@ -60,10 +60,15 @@ describe("directoryRepository.browseAll", () => {
     if (!res.ok) return;
     expect(res.data[0].isCertified).toBe(true);
 
-    const orderCols = q.calls
-      .filter((c) => c.method === "order")
-      .map((c) => c.args[0]);
-    expect(orderCols).toEqual(["is_certified", "recommended_score", "name"]);
+    const orderCalls = q.calls.filter((c) => c.method === "order");
+    expect(orderCalls.map((c) => c.args[0])).toEqual([
+      "is_certified",
+      "recommended_score",
+      "name",
+    ]);
+    // recommended_score must sort nulls last (unscored businesses not ahead of recommended).
+    const scoreCall = orderCalls.find((c) => c.args[0] === "recommended_score");
+    expect(scoreCall?.args[1]).toEqual({ ascending: false, nullsFirst: false });
   });
 
   it("pins Grantlanta Lawn + Peace of Mind Recycling to the top (in that order)", async () => {

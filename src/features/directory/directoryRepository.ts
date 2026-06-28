@@ -40,7 +40,9 @@ export const directoryRepository: DirectoryRepository = {
         .from(VIEW)
         .select("*")
         .order("is_certified", { ascending: false })
-        .order("recommended_score", { ascending: false })
+        // nulls last (matches the directory_search RPC) so unscored businesses
+        // don't sort ahead of recommended ones.
+        .order("recommended_score", { ascending: false, nullsFirst: false })
         .order("name", { ascending: true });
 
       if (error) return err("We couldn’t load the directory right now.");

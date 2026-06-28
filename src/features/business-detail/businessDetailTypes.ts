@@ -43,10 +43,14 @@ function normalizeUrl(value: string | null): string | null {
   return /^https?:\/\//i.test(v) ? v : `https://${v}`;
 }
 
-/** Join the MW address object (`ad1, cit, sta, zip`) into a single readable line. */
+/**
+ * Join the normalized address object into a single readable line. Ingestion stores
+ * normalized keys (`line1, city, state, zip` — see `extractAddress`), NOT the raw MW
+ * keys, so read those.
+ */
 function formatAddress(address: Record<string, unknown> | null): string | null {
   if (!address) return null;
-  const parts = ["ad1", "cit", "sta", "zip"]
+  const parts = ["line1", "city", "state", "zip"]
     .map((k) => address[k])
     .filter((v): v is string => typeof v === "string" && v.trim().length > 0);
   return parts.length > 0 ? parts.join(", ") : null;

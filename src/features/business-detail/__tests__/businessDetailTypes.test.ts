@@ -19,11 +19,11 @@ function detailRow(
     website: "https://grantlanta.example",
     contact_name: "Sam",
     address: {
-      ad1: "1 Peachtree St",
-      cit: "Atlanta",
-      sta: "GA",
+      line1: "1 Peachtree St",
+      city: "Atlanta",
+      state: "GA",
       zip: "30301",
-      cot: "US",
+      country: "US",
     },
     socials: {
       fbk: "https://facebook.com/x",

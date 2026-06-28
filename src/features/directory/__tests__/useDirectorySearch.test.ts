@@ -16,9 +16,13 @@ const biz = (id: string): DirectoryBusiness => ({
   recommended: false,
 });
 
-function makeRepo(over: Partial<DirectoryRepository> = {}): DirectoryRepository {
+function makeRepo(
+  over: Partial<DirectoryRepository> = {},
+): DirectoryRepository {
   return {
-    browseAll: jest.fn().mockResolvedValue({ ok: true, data: [biz("a"), biz("b")] }),
+    browseAll: jest
+      .fn()
+      .mockResolvedValue({ ok: true, data: [biz("a"), biz("b")] }),
     search: jest.fn().mockResolvedValue({ ok: true, data: [biz("hit")] }),
     ...over,
   };
@@ -74,6 +78,18 @@ describe("useDirectorySearch", () => {
     await act(async () => result.current.setQuery("zzzz"));
     await flush();
     expect(result.current.mode).toBe("no-results");
+  });
+
+  it("surfaces a search failure instead of reporting no-results", async () => {
+    const repo = makeRepo({
+      search: jest.fn().mockResolvedValue({ ok: false, error: "outage" }),
+    });
+    const { result } = await render(repo);
+    await flush();
+    await act(async () => result.current.setQuery("lawn"));
+    await flush();
+    expect(result.current.mode).not.toBe("no-results");
+    expect(result.current.error).toBe("outage");
   });
 
   it("returns to browse after clearing the query", async () => {

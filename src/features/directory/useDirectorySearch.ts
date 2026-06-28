@@ -84,7 +84,9 @@ export function useDirectorySearch(
         setResults(res.data);
         setError(null);
       } else {
-        setResults([]);
+        // Keep results null (NOT []) so a failure renders the error rather than
+        // misreporting an outage as an empty "no results" search.
+        setResults(null);
         setError(res.error);
       }
       setSearching(false);
