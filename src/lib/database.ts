@@ -57,7 +57,8 @@ export interface DirectoryBusinessRow {
   latitude: number | null;
   recommended_score: number | null;
   has_coupon: boolean;
-  has_google_marker: boolean;
+  /** Source `xgm` flag — the MembershipWorks certified-star badge. */
+  is_certified: boolean;
   phone_numbers: DirectoryPhone[] | null;
   created_at: string;
   updated_at: string;

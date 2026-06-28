@@ -34,7 +34,8 @@ export interface BusinessRow {
   latitude: number | null;
   recommended_score: number | null;
   has_coupon: boolean;
-  has_google_marker: boolean;
+  /** Source `xgm` flag — the MembershipWorks CERTIFIED STAR badge (`xgm:1` → true, absent → false). */
+  is_certified: boolean;
   raw_source_payload: DirectoryRecord;
 }
 
@@ -183,7 +184,7 @@ export function transformRecord(record: DirectoryRecord): BusinessRow | null {
     latitude,
     recommended_score: typeof record.ir5 === "number" ? record.ir5 : null,
     has_coupon: toBooleanFlag(record.cpn),
-    has_google_marker: toBooleanFlag(record.xgm),
+    is_certified: toBooleanFlag(record.xgm),
     raw_source_payload: record,
   };
 }

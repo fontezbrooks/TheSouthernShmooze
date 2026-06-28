@@ -34,7 +34,7 @@ function row(over: Partial<DirectoryBusinessRow>): DirectoryBusinessRow {
     latitude: null,
     recommended_score: 1,
     has_coupon: false,
-    has_google_marker: false,
+    is_certified: false,
     phone_numbers: [
       { phone_number: "6787904781", normalized_phone_number: "6787904781" },
     ],
@@ -64,14 +64,14 @@ describe("providerRepository.fetchPinned", () => {
     expect(result.data[0].phoneDisplay).toBe("678-790-4781");
   });
 
-  it("maps source_uid and coupon/google flags to the view-model", async () => {
+  it("maps source_uid and coupon/certified flags to the view-model", async () => {
     const data = [
       row({
         id: "1",
         name: "Grantlanta Lawn",
         source_uid: "abc-123",
         has_coupon: true,
-        has_google_marker: true,
+        is_certified: true,
       }),
     ];
     mockFrom.mockReturnValue(makeQuery({ data, error: null }).builder);
@@ -81,7 +81,7 @@ describe("providerRepository.fetchPinned", () => {
     if (!result.ok) return;
     expect(result.data[0].sourceUid).toBe("abc-123");
     expect(result.data[0].hasCoupon).toBe(true);
-    expect(result.data[0].hasGoogleMarker).toBe(true);
+    expect(result.data[0].isCertified).toBe(true);
   });
 
   it("returns an error Result when the query errors", async () => {
@@ -107,5 +107,21 @@ describe("providerRepository.fetchMore", () => {
     expect(rangeCall?.args).toEqual([3, 5]); // offset 3, PAGE_SIZE 3 → [3,5]
     const notCall = q.calls.find((c) => c.method === "not");
     expect(notCall?.args[0]).toBe("name"); // excludes pinned by name
+  });
+
+  it("orders certified-first, then recommended_score, then name", async () => {
+    const q = makeQuery({ data: [], error: null });
+    mockFrom.mockReturnValue(q.builder);
+
+    await providerRepository.fetchMore(0);
+    const orderCols = q.calls
+      .filter((c) => c.method === "order")
+      .map((c) => c.args[0]);
+    expect(orderCols).toEqual(["is_certified", "recommended_score", "name"]);
+
+    const certifiedCall = q.calls.find(
+      (c) => c.method === "order" && c.args[0] === "is_certified",
+    );
+    expect(certifiedCall?.args[1]).toEqual({ ascending: false });
   });
 });

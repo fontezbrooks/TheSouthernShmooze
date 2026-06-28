@@ -91,7 +91,8 @@ export function BusinessCard({
             label="Certified"
             iconColor={t.colors.yellow}
           />
-          {business.hasGoogleMarker ? <Chip icon="thumbsUp" /> : null}
+          {/* TODO(figma-round): re-skin this badge — `isCertified` is the certified star, not a "reviews" chip. */}
+          {business.isCertified ? <Chip icon="thumbsUp" /> : null}
           {business.hasCoupon ? <Chip icon="tag" /> : null}
         </View>
 
