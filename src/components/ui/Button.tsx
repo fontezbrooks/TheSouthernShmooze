@@ -1,7 +1,6 @@
 import {
   Pressable,
   Text,
-  View,
   StyleSheet,
   type StyleProp,
   type ViewStyle,
@@ -11,11 +10,12 @@ import { Icon, type IconName } from "./Icon";
 
 /**
  * Figma button set:
- * - `primary` → "Button Full": rust fill, 3px rustDark border, hard shadow, white label (form submit).
- * - `pill`    → "Button S":    cream fill, 32h, hugs content; border/shadow per `tone` (banner CTAs, card phone).
- * - `wide`    → "Button L":    cream fill, 56h, full width, no border/shadow ("Add a File").
+ * - `primary` → "Button Full": rust fill, 3px rustDark border, hard shadow, white label, 56h full-width (form submit).
+ * - `solid`   → "Button L":     rust fill, 2px rustDark border, hard shadow, white label, 48h, hugs content (Empty State CTA).
+ * - `pill`    → "Button S":     cream fill, 32h, hugs content; border/shadow per `tone` (banner CTAs, card phone).
+ * - `wide`    → "Button L":     cream fill, 56h, full width, no border/shadow ("Add a File").
  */
-export type ButtonVariant = "primary" | "pill" | "wide";
+export type ButtonVariant = "primary" | "solid" | "pill" | "wide";
 
 /** Border + shadow + label color family for `pill` buttons. */
 export type ButtonTone = "rust" | "black" | "none";
@@ -44,7 +44,9 @@ export function Button({
   const t = useTheme();
 
   const isPrimary = variant === "primary";
+  const isSolid = variant === "solid";
   const isPill = variant === "pill";
+  const isRustFill = isPrimary || isSolid;
 
   // Resolve surface, border, shadow, and label color.
   const toneColor =
@@ -60,25 +62,25 @@ export function Button({
 
   const bg = disabledPrimary
     ? t.colors.inputBorder
-    : isPrimary
+    : isRustFill
       ? t.colors.rust
       : t.colors.bg;
-  const labelColor = isPrimary ? t.colors.white : toneColor;
-  const labelStyle = isPrimary
-    ? t.typography.bodySemibold
-    : isPill
-      ? t.typography.captionSemi
-      : t.typography.bodySemibold;
+  const labelColor = isRustFill ? t.colors.white : toneColor;
+  const labelStyle = isPill
+    ? t.typography.captionSemi
+    : t.typography.bodySemibold;
 
-  const bordered = isPrimary || (isPill && tone !== "none");
+  const bordered = isRustFill || (isPill && tone !== "none");
   const borderColor = disabledPrimary
     ? t.colors.neutral500
-    : isPrimary
+    : isRustFill
       ? t.colors.rustDark
       : tone === "black"
         ? t.colors.black
         : t.colors.rustDark;
-  const shadowed = isPrimary || (isPill && tone !== "none");
+  // primary 3px (2px when disabled), solid/pill 2px.
+  const borderWidth = !bordered ? 0 : isPrimary ? (disabledPrimary ? 2 : 3) : 2;
+  const shadowed = isRustFill || (isPill && tone !== "none");
   const shadowStyle = disabledPrimary
     ? t.shadow.hardNeutral
     : tone === "black"
@@ -98,11 +100,13 @@ export function Button({
       style={({ pressed }) => [
         styles.base,
         isPrimary && styles.primary,
-        isPill ? styles.pill : styles.wide,
+        isSolid && styles.solid,
+        isPill && styles.pill,
+        variant === "wide" && styles.wide,
         {
           backgroundColor: bg,
           borderRadius: t.radii.button,
-          borderWidth: bordered ? (isPrimary ? 3 : 2) : 0,
+          borderWidth,
           borderColor: bordered ? borderColor : "transparent",
           opacity: disabledPrimary ? 1 : disabled ? 0.5 : pressed ? 0.85 : 1,
         },
@@ -127,6 +131,11 @@ const styles = StyleSheet.create({
   primary: {
     height: 56,
     width: "100%",
+    paddingHorizontal: 16,
+  },
+  solid: {
+    height: 48,
+    alignSelf: "center",
     paddingHorizontal: 16,
   },
   pill: {

@@ -90,11 +90,11 @@ export const typography = {
     color: colors.text,
   },
 
-  /** Tab bar label. */
+  /** Tab bar label — Bitter SemiBold 10/1.5 (RC1 NavBar). */
   tab: {
     fontFamily: fonts.tab,
     fontSize: 10,
-    lineHeight: 12,
+    lineHeight: 15,
     color: colors.rust,
   },
 } satisfies Record<string, TextStyle>;

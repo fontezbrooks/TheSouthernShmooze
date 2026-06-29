@@ -5,19 +5,16 @@ import {
   TextInput,
   FlatList,
   ActivityIndicator,
-  ImageBackground,
   StyleSheet,
 } from "react-native";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useTheme } from "@/theme/ThemeProvider";
-import { daisyBackground, bannerCommunity } from "@/theme/assets";
 import { AppHeader } from "@/components/ui/AppHeader";
-import { Banner } from "@/components/ui/Banner";
-import { StrokedHeading } from "@/components/ui/StrokedHeading";
 import { openLink } from "@/lib/openLink";
 import { LINKS } from "@/lib/links";
 import { SearchBar } from "./SearchBar";
 import { BusinessCardHorizontal } from "./BusinessCardHorizontal";
+import { SearchEmptyState } from "./SearchEmptyState";
 import { useDirectorySearch } from "./useDirectorySearch";
 
 /**
@@ -48,11 +45,8 @@ export function DirectoryScreen() {
     router.push(`/business/${sourceUid}`);
 
   return (
-    <ImageBackground
-      source={daisyBackground}
-      resizeMode="repeat"
-      style={[styles.flex, { backgroundColor: t.colors.bg }]}
-    >
+    // No daisy background on the directory tab — plain Vanilla per RC2 (40:7272).
+    <View style={[styles.flex, { backgroundColor: t.colors.bg }]}>
       <AppHeader />
       <View style={styles.searchWrap}>
         <SearchBar
@@ -71,25 +65,7 @@ export function DirectoryScreen() {
           accessibilityLabel="Loading directory"
         />
       ) : s.mode === "no-results" ? (
-        <View style={styles.noResults}>
-          {/* #FEF8E8 stroke (like the home headers) keeps it legible over the daisy bg. */}
-          <StrokedHeading variant="displayXS">No results</StrokedHeading>
-          <View
-            style={[styles.captionChip, { backgroundColor: t.colors.surface }]}
-          >
-            <Text style={[t.typography.caption, { color: t.colors.textSoft }]}>
-              Please try your search again
-            </Text>
-          </View>
-          <Banner
-            layout="imageLeft"
-            image={bannerCommunity}
-            title="Ask the community"
-            subtitle="Get recommendations and connect with locals."
-            cta={{ label: "Join the Facebook Group" }}
-            onPress={() => openLink(LINKS.facebook)}
-          />
-        </View>
+        <SearchEmptyState onAskCommunity={() => openLink(LINKS.facebook)} />
       ) : (
         <FlatList
           data={s.items}
@@ -116,7 +92,7 @@ export function DirectoryScreen() {
           }
         />
       )}
-    </ImageBackground>
+    </View>
   );
 }
 
@@ -127,18 +103,4 @@ const styles = StyleSheet.create({
   list: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 44, gap: 16 },
   footer: { paddingVertical: 24 },
   error: { textAlign: "center", paddingVertical: 24 },
-  noResults: {
-    paddingHorizontal: 16,
-    paddingTop: 48,
-    gap: 8,
-    alignItems: "center",
-  },
-  // Cream chip so the secondary line stays readable over the busy background.
-  captionChip: {
-    alignSelf: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 9999,
-    marginBottom: 24,
-  },
 });

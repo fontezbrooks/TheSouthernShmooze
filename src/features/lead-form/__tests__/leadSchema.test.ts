@@ -63,11 +63,11 @@ describe("leadSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("exposes three budget options matching the site labels", () => {
+  it("exposes three budget options matching the Figma labels", () => {
     expect(BUDGET_OPTIONS.map((o) => o.label)).toEqual([
-      "< $1000",
-      "$1000 - $5000",
-      "> $5000",
+      "< $1,000",
+      "$1,000 – $5,000",
+      "> $5,000",
     ]);
   });
 

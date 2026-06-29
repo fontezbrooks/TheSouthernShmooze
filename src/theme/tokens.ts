@@ -20,9 +20,13 @@ export const colors = {
   pumpkin: "#DF7C3D",
   /** Yellow400 — Certified chip star (Figma Yellow/Yellow400). */
   yellow: "#EEB030",
+  /** Yellow200 — "Shmooze Certified" pill background (Figma Yellow/Yellow200). */
+  yellow200: "#FFEABE",
 
   /** Primary text (Grey120). */
   text: "#1B1B1C",
+  /** Near-black (Neutral800) — navbar inactive icon/label + tab text. */
+  neutral800: "#25201B",
   /** Softer text (Neutral700). */
   textSoft: "#302B27",
   /** Muted — input placeholder / inside-label (Neutral600). */
@@ -98,6 +102,14 @@ export const shadow = {
     shadowRadius: 0,
     elevation: 4,
   },
+  /** Smaller 2px hard offset in mustard — the "Shmooze Certified" pill. */
+  certified: {
+    shadowColor: colors.mustard,
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 2,
+  },
 } as const;
 
 /** Motion durations (ms). */
@@ -121,8 +133,8 @@ export const fonts = {
   body: "Bitter_400Regular",
   bodySemi: "Bitter_600SemiBold",
   bodyBold: "Bitter_800ExtraBold",
-  /** Open Sans — tab bar label only. */
-  tab: "OpenSans_600SemiBold",
+  /** Tab bar label — Bitter SemiBold per RC1 NavBar (was Open Sans). */
+  tab: "Bitter_600SemiBold",
 } as const;
 
 export type Colors = typeof colors;

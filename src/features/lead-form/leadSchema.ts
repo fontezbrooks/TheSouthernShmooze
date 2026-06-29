@@ -6,9 +6,9 @@ export const BUDGET_OPTIONS: ReadonlyArray<{
   value: BudgetValue;
   label: string;
 }> = [
-  { value: "lt_1000", label: "< $1000" },
-  { value: "1000_5000", label: "$1000 - $5000" },
-  { value: "gt_5000", label: "> $5000" },
+  { value: "lt_1000", label: "< $1,000" },
+  { value: "1000_5000", label: "$1,000 – $5,000" },
+  { value: "gt_5000", label: "> $5,000" },
 ];
 
 const budgetEnum = z.enum(["lt_1000", "1000_5000", "gt_5000"]);

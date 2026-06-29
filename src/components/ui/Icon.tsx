@@ -1,12 +1,16 @@
 import type { ComponentType } from "react";
+import type { SvgProps } from "react-native-svg";
 import Feather from "@expo/vector-icons/Feather";
 import { useTheme } from "@/theme/ThemeProvider";
 import { PhoneIcon } from "./icons/PhoneIcon";
-import { StarIcon } from "./icons/StarIcon";
 import { TriangleWarningIcon } from "./icons/TriangleWarningIcon";
 import { BriefcaseIcon } from "./icons/BriefcaseIcon";
-import { ThumbsUpIcon } from "./icons/ThumbsUpIcon";
-import { TagIcon } from "./icons/TagIcon";
+// Figma-exported glyphs (RC1) — color is driven by `currentColor`, so the
+// `color` prop flows through via react-native-svg's `color`.
+import ThumbsUpSvg from "./icons/thumbs-up.svg";
+import SaleSvg from "./icons/sale-03.svg";
+import StarSvg from "./icons/star-01.svg";
+import FileQuestionSvg from "./icons/fileQuestion.svg";
 
 /** Semantic icon names. Most map to Feather; a few route to Figma-exported SVGs. */
 export type IconName =
@@ -28,7 +32,8 @@ export type IconName =
   | "triangleWarning"
   | "briefcaseFilled"
   | "thumbsUp"
-  | "tag";
+  | "discount"
+  | "fileQuestion";
 
 const FEATHER: Record<string, React.ComponentProps<typeof Feather>["name"]> = {
   arrowRight: "arrow-right",
@@ -45,16 +50,26 @@ const FEATHER: Record<string, React.ComponentProps<typeof Feather>["name"]> = {
   x: "x",
 };
 
-/** Custom glyphs exported from Figma, keyed by semantic name. */
-const CUSTOM: Partial<
-  Record<IconName, ComponentType<{ size?: number; color?: string }>>
-> = {
+type GlyphProps = { size?: number; color?: string };
+
+/** Adapt a Figma `.svg` module (SvgProps) to the `{ size, color }` glyph contract. */
+function svgGlyph(
+  Svg: ComponentType<SvgProps>,
+): ComponentType<GlyphProps> {
+  return function Glyph({ size = 16, color }: GlyphProps) {
+    return <Svg width={size} height={size} color={color} />;
+  };
+}
+
+/** Custom glyphs (hand-authored tsx + Figma SVGs), keyed by semantic name. */
+const CUSTOM: Partial<Record<IconName, ComponentType<GlyphProps>>> = {
   phoneFilled: PhoneIcon,
-  starFilled: StarIcon,
   triangleWarning: TriangleWarningIcon,
   briefcaseFilled: BriefcaseIcon,
-  thumbsUp: ThumbsUpIcon,
-  tag: TagIcon,
+  thumbsUp: svgGlyph(ThumbsUpSvg),
+  discount: svgGlyph(SaleSvg),
+  starFilled: svgGlyph(StarSvg),
+  fileQuestion: svgGlyph(FileQuestionSvg),
 };
 
 interface IconProps {
