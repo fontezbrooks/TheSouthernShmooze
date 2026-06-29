@@ -8,10 +8,10 @@ import { LINKS } from "@/lib/links";
 // Nav icons live under src/ (not assets/) so they aren't caught by the broad
 // `assets/*` gitignore — EAS's uploader doesn't honor a nested re-include, which
 // dropped them from the cloud build context. See `mem:build-status`.
-import HouseIcon from "@/components/ui/icons/house.svg";
-import SquaresIcon from "@/components/ui/icons/squaresThreeCircle.svg";
-import GiftIcon from "@/components/ui/icons/gift.svg";
-import PeopleIcon from "@/components/ui/icons/peopleAvatars.svg";
+import HomeIcon from "@/components/ui/icons/home-05.svg";
+import PhoneCallIcon from "@/components/ui/icons/phone-call-01.svg";
+import HeartHandIcon from "@/components/ui/icons/heart-hand.svg";
+import UsersIcon from "@/components/ui/icons/users-03.svg";
 import SocialSpreadIcon from "@/components/ui/icons/socialSpread.svg";
 
 type SvgIcon = ComponentType<{
@@ -31,13 +31,13 @@ type TabItem =
   | { key: string; label: string; icon: SvgIcon; kind: "link"; href: string };
 
 const TABS: TabItem[] = [
-  { key: "index", label: "Home", icon: HouseIcon, kind: "route" },
-  { key: "directory", label: "Directory", icon: SquaresIcon, kind: "route" },
-  { key: "concierge", label: "Concierge", icon: GiftIcon, kind: "route" },
+  { key: "index", label: "Home", icon: HomeIcon, kind: "route" },
+  { key: "directory", label: "Directory", icon: PhoneCallIcon, kind: "route" },
+  { key: "concierge", label: "Concierge", icon: HeartHandIcon, kind: "route" },
   {
     key: "community",
     label: "Community",
-    icon: PeopleIcon,
+    icon: UsersIcon,
     kind: "link",
     href: LINKS.facebook,
   },
@@ -78,7 +78,7 @@ function AppTabBar({ state, navigation }: TabBarProps) {
         styles.bar,
         {
           backgroundColor: t.colors.bg,
-          borderTopColor: t.colors.rust,
+          borderTopColor: t.colors.divider,
           paddingBottom: Math.max(insets.bottom, 8),
         },
       ]}
@@ -86,7 +86,7 @@ function AppTabBar({ state, navigation }: TabBarProps) {
       <View style={styles.row}>
         {TABS.map((tab) => {
           const focused = tab.kind === "route" && activeRoute === tab.key;
-          const tint = focused ? t.colors.rust : t.colors.muted;
+          const tint = focused ? t.colors.rust : t.colors.neutral800;
           const onPress = () => {
             if (tab.kind === "link") {
               openLink(tab.href);

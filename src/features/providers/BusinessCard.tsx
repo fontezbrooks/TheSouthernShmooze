@@ -1,7 +1,8 @@
 import { View, Text, Image, Pressable, StyleSheet } from "react-native";
 import { useTheme } from "@/theme/ThemeProvider";
 import { Icon } from "@/components/ui/Icon";
-import { Chip } from "@/components/ui/Chip";
+import { CardBadge } from "@/components/ui/CardBadge";
+import { CertifiedBadge } from "@/components/ui/CertifiedBadge";
 import { PhysicalPressable } from "@/components/ui/PhysicalPressable";
 import type { DirectoryBusiness } from "./providerTypes";
 
@@ -86,14 +87,9 @@ export function BusinessCard({
         </View>
 
         <View style={styles.chips}>
-          <Chip
-            icon="starFilled"
-            label="Certified"
-            iconColor={t.colors.yellow}
-          />
-          {/* TODO(figma-round): re-skin this badge — `isCertified` is the certified star, not a "reviews" chip. */}
-          {business.isCertified ? <Chip icon="thumbsUp" /> : null}
-          {business.hasCoupon ? <Chip icon="tag" /> : null}
+          <CertifiedBadge label="Certified" />
+          {business.recommended ? <CardBadge icon="thumbsUp" /> : null}
+          {business.hasCoupon ? <CardBadge icon="discount" /> : null}
         </View>
 
         {business.phoneDisplay && business.phone ? (
@@ -137,7 +133,7 @@ const styles = StyleSheet.create({
   // are capped at 2 lines + ellipsis so short copy doesn't leave a gap before the badge.
   name: { minHeight: 36 },
   tagline: { minHeight: 36 },
-  chips: { flexDirection: "row", alignItems: "center", gap: 4 },
+  chips: { flexDirection: "row", alignItems: "center", gap: 6 },
   phoneBtn: {
     flexDirection: "row",
     alignItems: "center",

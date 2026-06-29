@@ -11,7 +11,6 @@ import {
   Bitter_600SemiBold,
   Bitter_800ExtraBold,
 } from "@expo-google-fonts/bitter";
-import { OpenSans_600SemiBold } from "@expo-google-fonts/open-sans";
 import { ThemeProvider } from "@/theme/ThemeProvider";
 import { AnimatedSplash } from "@/features/splash/AnimatedSplash";
 
@@ -24,7 +23,6 @@ export default function RootLayout() {
     Bitter_400Regular,
     Bitter_600SemiBold,
     Bitter_800ExtraBold,
-    OpenSans_600SemiBold,
   });
 
   // Gate render until fonts resolve (or fail) so headings never flash a fallback

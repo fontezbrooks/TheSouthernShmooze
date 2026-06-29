@@ -1,6 +1,6 @@
-import { View, Text, StyleSheet } from 'react-native';
-import { useTheme } from '@/theme/ThemeProvider';
-import { Button } from '@/components/ui/Button';
+import { View, Text, StyleSheet } from "react-native";
+import { useTheme } from "@/theme/ThemeProvider";
+import { Button } from "@/components/ui/Button";
 
 interface SuccessViewProps {
   onBackHome: () => void;
@@ -18,17 +18,33 @@ export function SuccessView({ onBackHome, onSubmitAnother }: SuccessViewProps) {
       <View
         style={[
           styles.card,
-          { backgroundColor: t.colors.surface, borderColor: t.colors.rustDark, borderRadius: t.radii.card },
+          {
+            backgroundColor: t.colors.surface,
+            borderColor: t.colors.rustDark,
+            borderRadius: t.radii.card,
+          },
           t.shadow.hard,
         ]}
       >
-        <Text style={[t.typography.displayS, { color: t.colors.text }]}>Thanks for reaching out!</Text>
+        <Text style={[t.typography.displayXS, { color: t.colors.text }]}>
+          Thanks for reaching out!
+        </Text>
         <Text style={t.typography.body}>
-          We&apos;ll get back to you soon with a personalized recommendation based on your needs.
+          We&apos;ll get back to you soon with a personalized recommendation
+          based on your needs.
         </Text>
       </View>
-      <Button label="Back Home" variant="primary" tone="rust" onPress={onBackHome} />
-      <Button label="Submit Another Request" variant="wide" onPress={onSubmitAnother} />
+      <Button
+        label="Back Home"
+        variant="primary"
+        tone="rust"
+        onPress={onBackHome}
+      />
+      <Button
+        label="Submit Another Request"
+        variant="wide"
+        onPress={onSubmitAnother}
+      />
     </View>
   );
 }
@@ -39,6 +55,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     padding: 24,
     gap: 16,
-    alignItems: 'flex-start',
+    alignItems: "flex-start",
   },
 });

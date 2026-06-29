@@ -1,7 +1,8 @@
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, Pressable, StyleSheet } from "react-native";
 import { useTheme } from "@/theme/ThemeProvider";
-import { Icon, type IconName } from "@/components/ui/Icon";
-import { PhysicalPressable } from "@/components/ui/PhysicalPressable";
+import { Icon } from "@/components/ui/Icon";
+import { CardBadge } from "@/components/ui/CardBadge";
+import { CertifiedBadge } from "@/components/ui/CertifiedBadge";
 import type { DirectoryBusiness } from "@/features/providers/providerTypes";
 
 interface BusinessCardHorizontalProps {
@@ -11,63 +12,50 @@ interface BusinessCardHorizontalProps {
 
 const LOGO_SIZE = 104;
 
-/** Outlined 20×20 indicator chip (reviews / discount) — Figma horizontal-card style. */
-function IndicatorChip({ icon }: { icon: IconName }) {
-  const t = useTheme();
-  return (
-    <View style={[styles.indicator, { borderColor: t.colors.rustDark }]}>
-      <Icon name={icon} size={12} color={t.colors.rustDark} />
-    </View>
-  );
-}
-
 /**
- * Horizontal directory list card (Figma node 40:7337): square logo at left, a
- * solid "Certified" pill, name + 2-line tagline, and reviews/discount indicator
- * chips. No phone button. The whole card pushes into its shadow and opens the
- * business-detail screen. No-logo businesses show a briefcase placeholder.
+ * Horizontal directory list card (Figma node 40:7337). Flat layout — no card
+ * border/background/shadow; only the square logo carries an 8px radius + hairline.
+ * Body stacks reviews/discount badges (top), name + 2-line tagline, and the
+ * "Shmooze Certified" pill (bottom). The whole row opens the business-detail
+ * screen. No-logo businesses show a briefcase placeholder.
  */
 export function BusinessCardHorizontal({
   business,
   onPress,
 }: BusinessCardHorizontalProps) {
   const t = useTheme();
-  const hasIndicators = business.recommended || business.hasCoupon;
+  const hasBadges = business.recommended || business.hasCoupon;
 
   return (
-    <PhysicalPressable
+    <Pressable
       onPress={() => onPress(business.sourceUid)}
+      accessibilityRole="button"
       accessibilityLabel={`${business.name} — view details`}
-      radius={t.radii.card}
-      shadowColor={t.colors.rustDark}
-      style={[
-        styles.card,
-        {
-          backgroundColor: t.colors.surface,
-          borderColor: t.colors.rustDark,
-          borderRadius: t.radii.card,
-        },
-      ]}
+      style={({ pressed }) => [styles.card, { opacity: pressed ? 0.7 : 1 }]}
     >
       {business.logoUrl ? (
         <Image
           source={{ uri: business.logoUrl }}
-          style={styles.logo}
+          style={[styles.logo, { borderColor: t.colors.inputBorder }]}
           resizeMode="cover"
         />
       ) : (
-        <View style={[styles.logo, styles.placeholder, { backgroundColor: t.colors.bg }]}>
+        <View
+          style={[
+            styles.logo,
+            styles.placeholder,
+            { borderColor: t.colors.inputBorder, backgroundColor: t.colors.bg },
+          ]}
+        >
           <Icon name="briefcaseFilled" size={40} color={t.colors.rustDark} />
         </View>
       )}
 
       <View style={styles.body}>
-        {business.isCertified ? (
-          <View style={[styles.certified, { backgroundColor: t.colors.mustard }]}>
-            <Icon name="starFilled" size={12} color={t.colors.white} />
-            <Text style={[t.typography.captionSemiXS, { color: t.colors.white }]}>
-              Certified
-            </Text>
+        {hasBadges ? (
+          <View style={styles.badgeRow}>
+            {business.recommended ? <CardBadge icon="thumbsUp" /> : null}
+            {business.hasCoupon ? <CardBadge icon="discount" /> : null}
           </View>
         ) : null}
 
@@ -84,51 +72,33 @@ export function BusinessCardHorizontal({
           </Text>
         </View>
 
-        {hasIndicators ? (
-          <View style={styles.chipRow}>
-            {business.recommended ? <IndicatorChip icon="thumbsUp" /> : null}
-            {business.hasCoupon ? <IndicatorChip icon="tag" /> : null}
-          </View>
-        ) : null}
+        {business.isCertified ? <CertifiedBadge /> : null}
       </View>
-    </PhysicalPressable>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
     width: "100%",
+    height: LOGO_SIZE,
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 2,
-    overflow: "hidden",
   },
-  logo: { width: LOGO_SIZE, height: LOGO_SIZE },
+  logo: {
+    width: LOGO_SIZE,
+    height: LOGO_SIZE,
+    borderRadius: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
   placeholder: { alignItems: "center", justifyContent: "center" },
   body: {
     flex: 1,
     justifyContent: "center",
-    gap: 4,
+    gap: 6,
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
+  badgeRow: { flexDirection: "row", gap: 4 },
   copy: { gap: 2 },
-  certified: {
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "flex-start",
-    gap: 2,
-    height: 20,
-    paddingHorizontal: 6,
-    borderRadius: 9999,
-  },
-  chipRow: { flexDirection: "row", gap: 4 },
-  indicator: {
-    width: 20,
-    height: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderRadius: 9999,
-  },
 });
