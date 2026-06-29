@@ -10,3 +10,9 @@ verify_jwt = false
 [functions.sync-profiles]
 enabled = true
 verify_jwt = false
+
+# Lead notification. Fired by an AFTER INSERT trigger on `leads` via pg_net with the
+# shared X-Sync-Secret header, so JWT verification is disabled (auth enforced in code).
+[functions.notify-lead]
+enabled = true
+verify_jwt = false
