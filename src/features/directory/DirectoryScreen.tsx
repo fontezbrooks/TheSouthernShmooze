@@ -10,6 +10,7 @@ import {
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useTheme } from "@/theme/ThemeProvider";
 import { AppHeader } from "@/components/ui/AppHeader";
+import { Button } from "@/components/ui/Button";
 import { openLink } from "@/lib/openLink";
 import { LINKS } from "@/lib/links";
 import { SearchBar } from "./SearchBar";
@@ -56,6 +57,12 @@ export function DirectoryScreen() {
           onFocus={() => s.setFocused(true)}
           onBlur={() => s.setFocused(false)}
         />
+        <Button
+          label="Need something done? Swipe to match"
+          variant="solid"
+          onPress={() => router.push("/swipe")}
+          style={styles.shmoozerCta}
+        />
       </View>
 
       {s.loading ? (
@@ -98,7 +105,13 @@ export function DirectoryScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  searchWrap: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 8 },
+  searchWrap: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 8,
+    gap: 8,
+  },
+  shmoozerCta: { alignSelf: "stretch" },
   center: { marginTop: 48 },
   list: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 44, gap: 16 },
   footer: { paddingVertical: 24 },
