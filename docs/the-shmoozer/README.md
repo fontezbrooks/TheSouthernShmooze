@@ -14,12 +14,13 @@
 | Decision | Value |
 |---|---|
 | Model | **One-sided lead funnel** — only the Seeker swipes; businesses don't swipe back in v1 |
-| Intake | **Task-first** — need captured once per session (category + location/radius + budget + timing) |
+| Intake | **Task-first** — need captured once per session (keyword + location/radius + budget + timing) |
+| Matching | **Fuzzy keyword** over listing text — no MembershipWorks category taxonomy in V1 (see §5) |
 | Right-swipe | **Instant lead**, broadcast (no cap) via the existing Concierge → Resend pipeline |
 | Left-swipe | Pass |
 | Primary goal | **Lead-generation funnel** (monetize via lead value + featured placement) |
 | "Match" | 2-stage: **Stage 1** "It's a match!" on right-swipe (lead sent) → **Stage 2** "Confirmed" when business responds |
-| Fit Score | **Exact %** ("87% match"), deterministic & explainable |
+| Score | **Match-confidence %** ("87% match" = how sure we are the business does that service) |
 | Account | **Not required** — capture Seeker contact once on first right-swipe |
 | Featured placement | **v1 requirement** — labeled slot, shows the provider's *true* Fit % |
 | Surface name | **"The Shmoozer"** |
@@ -30,10 +31,14 @@
 
 ---
 
-## 2. Two hard prerequisites (P0 — block everything)
+## 2. Prerequisites (non-blocking in V1)
 
-1. **No category taxonomy exists in app data.** `DirectoryBusiness` and `directory_businesses_app_view` carry `name, description, is_certified, has_coupon, recommended_score, phones, lat/lng` — **no category/tags**. Task-first filtering *and* the Fit Score's category component require a category taxonomy surfaced from the MembershipWorks source.
-2. **Lat/lng dropped from the view-model.** `toBusiness()` discards `latitude/longitude`; the distance component needs them carried into the deck payload.
+> **V1 uses fuzzy keyword matching, not a category taxonomy — so there is no taxonomy
+> blocker.** The earlier "source a category from MembershipWorks" P0 is **retired**
+> (no category exists in MembershipWorks). What remains is small and non-blocking:
+
+1. **Search index over listing text.** Add a trigram/`tsvector` index over the matched text fields (`name + description + about_text + deal`) to back fuzzy keyword matching at speed. Likely **reuses/extends the existing `directory_search` RPC**.
+2. **Lat/lng dropped from the view-model.** `toBusiness()` discards `latitude/longitude`; still needed for the distance **filter + badge** (distance is *not* part of the score — see §5).
 
 ---
 
@@ -49,7 +54,7 @@ graph TD
     SESH["useSwipeSession hook"]
     REPO["swipeRepository (Result envelope)"]
     DC["SwipeDeck (Reanimated + gesture-handler)"]
-    CARD["BusinessCard (reused) + Fit% + Featured badge"]
+    CARD["BusinessCard (reused) + confidence% + Featured badge"]
     MATCH["MatchesScreen (Sent→Confirmed)"]
     STORE["device storage: session_token + verified contact"]
   end
@@ -61,7 +66,7 @@ graph TD
     T1[("swipe_tasks")]
     T2[("swipe_leads")]
     T3[("provider_promotions")]
-    V["directory_businesses_app_view (+category,+geo)"]
+    V["directory_businesses_app_view (+search-index,+geo)"]
     TRG["AFTER INSERT trigger → pg_net"]
     EF["Edge Fn: notify-swipe-lead → Resend"]
   end
@@ -84,7 +89,7 @@ graph TD
 | Route | `app/business/[uid].tsx` root-stack subpage | `app/swipe.tsx` → `src/features/swipe/SwipeScreen.tsx` | Same pattern, off the Directory |
 | Data fetch | repo → `.rpc()` returning `Result<T>` | New `swipeRepository` → RPCs, same `Result` envelope | Consistent |
 | Lead write | direct `supabase.from("leads").insert()` | **`submit_swipe_lead` SECURITY DEFINER RPC** | Anon can't self-enforce caps/throttle/verification — must be server-atomic |
-| Deck scoring/order | client `.order()` | **server RPC computes Fit Score + featured slots** | Score must be trustworthy; featured placement is monetization (not client-trustable) |
+| Deck scoring/order | client `.order()` | **server RPC computes match confidence + featured slots** | Score must be trustworthy; featured placement is monetization (not client-trustable) |
 | Session state | bespoke hook + `useState` | New `SwipeSessionProvider` Context in `app/_layout.tsx` | Task + verified contact must survive swipe-page ↔ tabs nav |
 | State library | none | **none** (Context + hooks; no zustand) | Stay consistent |
 
@@ -109,7 +114,7 @@ create index on public.provider_promotions (business_uid) where active;
 create table public.swipe_tasks (
   id            uuid primary key default gen_random_uuid(),
   session_token uuid not null,            -- anonymous device identity
-  category      text not null,            -- requires category taxonomy (P0)
+  keyword       text not null,            -- fuzzy-matched service keyword (e.g. "roofing")
   origin_lat    double precision,
   origin_lng    double precision,
   radius_km     integer not null default 25,
@@ -129,7 +134,7 @@ create table public.swipe_leads (
   task_id       uuid not null references public.swipe_tasks(id),
   session_token uuid not null,
   business_uid  text not null,            -- targeted provider
-  fit_score     integer not null,         -- exact % snapshot at swipe time
+  confidence    integer not null,         -- match-confidence % snapshot at swipe time
   status        text not null default 'sent',  -- sent → confirmed → closed
   created_at    timestamptz not null default now(),
   unique (task_id, business_uid)          -- dedup: no double-send per task
@@ -142,21 +147,27 @@ create index on public.swipe_leads (business_uid, created_at);  -- throttle wind
 
 ---
 
-## 5. Fit Score — deterministic & explainable
+## 5. Match Confidence — fuzzy keyword (V1)
 
-Computed **server-side** in `directory_swipe_deck`, returned with sub-scores so the UI shows an exact number *and* a "why" breakdown. Weighted sum 0–100, rounded:
+> **No category taxonomy.** V1 matches a Seeker keyword (e.g. "roofing") against the
+> provider's listing text. The displayed % is **pure match confidence** — *how sure we
+> are the business does that service* — and nothing else.
 
-| Component | Weight | Rule |
-|---|---|---|
-| Category match | 35 | exact = 35; adjacent/parent = 18; else excluded from deck |
-| Distance | 30 | `30 * (1 − dist_km / radius_km)`, clamped ≥ 0 (haversine from task origin) |
-| Budget fit | 15 | band overlaps = 15; partial = 7; unknown = 7 (neutral) |
-| Availability | 10 | **contingent on data** — if absent, folds into neutral baseline (R-2) |
-| Certified | 10 | `is_certified` = 10; else 0 |
+**Input:** hybrid — suggested service **chips** (Landscaping, Roofing, Plumbing…) **+** free-text keyword.
 
-`fit_score = round(Σ components)` — no randomness, so "87%" is reproducible. Certified-first ordering preserved as the **secondary sort** after score (consistent with existing `.order("is_certified", desc)`).
+**Matching:** raw fuzzy (trigram / full-text) over **all available text fields** (`name + description + about_text + deal`), to maximize recall. **No synonym map in V1** (sparse-listing false negatives accepted — see R-3; matching every field is the cheap recall hedge). Computed **server-side** in `directory_swipe_deck` (reusing/extending `directory_search`), returned with the matched terms so the UI can show a "why".
 
-**Featured placement (T-1):** featured providers are injected into **labeled slots** (e.g. 1 per 5 cards), carry an `is_featured` flag → UI "Featured" badge, and **still display their real `fit_score`**. Position boosted; number never faked.
+**Score = `confidence` (0–100)** = keyword-match strength only. Deterministic → "87%" is reproducible and means *87% confident they do roofing*.
+
+**Certified & distance are NOT in the number** — they are:
+- **Distance:** a radius **pre-filter** + a card **badge** (haversine from task origin).
+- **Certified:** a **secondary sort / tiebreak** + the existing certified **badge**.
+
+**Deck ordering:** `confidence desc`, then `is_certified desc`, then `name`.
+
+**Confidence floor:** matches below a tunable floor (≈ **30%**) are **hidden**; the rest are ranked high→low. When nothing clears the floor → empty-state ("widen your search / try another term").
+
+**Featured placement (T-1):** featured providers are injected into **labeled slots** (e.g. 1 per 5 cards), carry an `is_featured` flag → UI "Featured" badge, and **still display their real `confidence`**. Position boosted; number never faked.
 
 ---
 
@@ -164,16 +175,18 @@ Computed **server-side** in `directory_swipe_deck`, returned with sub-scores so 
 
 ```text
 directory_swipe_deck(
-  p_category text, p_lat float8, p_lng float8, p_radius_km int,
-  p_budget text, p_session_token uuid, p_exclude uuid[], p_limit int
+  p_keyword text, p_lat float8, p_lng float8, p_radius_km int,
+  p_budget text, p_session_token uuid, p_exclude uuid[],
+  p_min_confidence int, p_limit int
 ) RETURNS setof deck_card
 -- deck_card: { business_uid, name, logo_url, is_certified, has_coupon,
---   distance_km, fit_score, fit_breakdown jsonb, is_featured bool }
--- Filters: category match + within radius + NOT business-throttled.
--- Orders: featured-slot injection over (fit_score desc, is_certified desc, name).
+--   distance_km, confidence, matched_terms jsonb, is_featured bool }
+-- Fuzzy-matches p_keyword over listing text (name+description+about_text+deal).
+-- Filters: confidence >= p_min_confidence (floor) + within radius + NOT throttled.
+-- Orders: featured-slot injection over (confidence desc, is_certified desc, name).
 
 submit_swipe_lead(  -- SECURITY DEFINER; enforces ALL abuse rules atomically
-  p_session_token uuid, p_task_id uuid, p_business_uid text, p_fit_score int
+  p_session_token uuid, p_task_id uuid, p_business_uid text, p_confidence int
 ) RETURNS result
 -- Rejects if: contact not verified | seeker over daily cap |
 --   business over throttle | duplicate (task_id,business_uid).
@@ -203,12 +216,12 @@ confirm_contact_verification(p_session_token uuid, p_code text) RETURNS result
 ```ts
 // src/features/swipe/swipeTypes.ts
 export interface SwipeTask {
-  category: string; originLat?: number; originLng?: number;
+  keyword: string; originLat?: number; originLng?: number;
   radiusKm: number; budget?: BudgetBand; timing?: Timing;
 }
 export interface SeekerContact { name: string; email: string; phone?: string; verified: boolean; }
 export interface DeckCard extends DirectoryBusiness {   // extends existing view-model
-  distanceKm: number; fitScore: number; fitBreakdown: FitBreakdown; isFeatured: boolean;
+  distanceKm: number; confidence: number; matchedTerms: string[]; isFeatured: boolean;
 }
 export interface SwipeMatch {
   businessUid: string; name: string; logoUrl: string | null;
@@ -247,7 +260,7 @@ sequenceDiagram
     U->>V: confirm_contact_verification(code)
   end
   D->>R: swipeRight(card)
-  R->>S: submit_swipe_lead(token, task, biz, fit)
+  R->>S: submit_swipe_lead(token, task, biz, confidence)
   S-->>R: rejected? (cap/throttle/dupe) → toast | ok
   S->>T: insert swipe_lead (status=sent)
   T->>E: trigger → Edge Fn → Resend (owner inbox)
@@ -277,42 +290,42 @@ sequenceDiagram
 | ID | Risk | v1 resolution |
 |---|---|---|
 | R-1 | No business emails | Route leads to owner inbox (owner-as-broker); direct-to-business = phase 2 |
-| R-2 | Availability data may not exist | Drop the 10-pt component, re-normalize to 100 |
-| R-3 | **Category taxonomy (P0)** | Surface from MembershipWorks source *before* Phase 1 |
+| R-2 | ~~Availability data~~ | Dropped — availability is not part of the V1 confidence score |
+| R-3 | **Sparse-listing false negatives** (a real provider's text never says "roofing") | Accepted in V1 — no synonym map; mitigated by matching all text fields. Revisit synonyms/aliases in v1.1 |
 | R-4 | Who flips `sent`→`confirmed`? | v1 = owner/admin action; phase 2 = business self-serve |
 
 ---
 
 ## 13. Implementation Workflow
 
-### Phase 0 — Data prerequisites *(blocks everything)*
-- **0.1** Source a category taxonomy from MembershipWorks (folders/account-types) → add `category` (and/or `tags`) to `directory_businesses`; backfill via the existing sync.
-- **0.2** Carry `latitude`/`longitude` (and `category`) through `directory_businesses_app_view` and into `toBusiness()` / `DirectoryBusiness`.
-- **Acceptance:** deck candidates can be filtered by category and have usable coordinates.
+### Phase 0 — Search prerequisites *(small, non-blocking)*
+- **0.1** Add a trigram/`tsvector` search index over the matched text fields (`name + description + about_text + deal`); reuse/extend the existing `directory_search` RPC for fuzzy keyword matching + a confidence score.
+- **0.2** Carry `latitude`/`longitude` through `directory_businesses_app_view` and into `toBusiness()` / `DirectoryBusiness` (for the distance filter + badge).
+- **Acceptance:** a keyword returns providers ranked by a 0–100 confidence, with coordinates available.
 
 ### Phase 1 — Core funnel
 | # | Task | Depends on | Acceptance |
 |---|---|---|---|
 | 1.1 | Migration `0016`: `provider_promotions`, `swipe_tasks`, `swipe_leads` + RLS | 0.1 | Tables apply; anon has no direct table access |
-| 1.2 | RPC `directory_swipe_deck` (filter + Fit Score + featured slots) | 1.1, 0.2 | Returns ranked deck with exact `fit_score` + breakdown |
+| 1.2 | RPC `directory_swipe_deck` (fuzzy keyword + confidence floor + featured slots) | 1.1, 0.2 | Returns ranked deck with exact `confidence` + `matched_terms` |
 | 1.3 | RPCs `request_/confirm_contact_verification` + `notify` email | 1.1 | Email OTP verifies a contact; `contact_verified` flips |
 | 1.4 | RPC `submit_swipe_lead` (SECURITY DEFINER; caps/throttle/dedup) | 1.1, 1.3 | Rejects unverified/over-cap/throttled/dupe; else inserts |
 | 1.5 | RPC `get_my_swipe_leads` | 1.1 | Anonymous seeker reads own leads by `session_token` |
 | 1.6 | `notify-swipe-lead` Edge Fn + AFTER INSERT trigger | 1.4 | Right-swipe emails owner inbox via Resend |
 | 1.7 | `SwipeSessionProvider` + on-device persistence | — | Task + verified contact survive nav & restart |
 | 1.8 | `swipeRepository` + `useSwipeDeck` / `useMatches` hooks | 1.2,1.4,1.5 | `Result`-enveloped, repo injectable for tests |
-| 1.9 | `TaskIntake` screen (category/location/radius/budget/timing) | 1.7 | Captures task; gates the deck |
-| 1.10 | `SwipeDeck` (Reanimated gestures over `BusinessCard`) + Fit% + Featured badge | 1.8 | 60fps swipe; left=pass, right=lead; undo last |
+| 1.9 | `TaskIntake` screen (keyword chips + free text / location / radius / budget / timing) | 1.7 | Captures task; gates the deck |
+| 1.10 | `SwipeDeck` (Reanimated gestures over `BusinessCard`) + confidence% + Featured badge | 1.8 | 60fps swipe; left=pass, right=lead; undo last |
 | 1.11 | `ContactCapture` + verify modal (first right-swipe) | 1.3,1.7 | Blocks first send until verified |
 | 1.12 | `MatchesScreen` (Sent→Confirmed) | 1.5 | Lists leads + status; polls |
 | 1.13 | `app/swipe.tsx` route + Directory CTA entry point | 1.9 | "The Shmoozer" reachable from Directory |
-| 1.14 | Tests (hooks w/ injected repo; Fit Score; RPC guards) | all | ≥80% on new feature code |
+| 1.14 | Tests (hooks w/ injected repo; confidence scoring; RPC guards) | all | ≥80% on new feature code |
 
 ### Phase 2 — Later
-Business-facing accept/decline (true mutual match), direct-to-business email, phone OTP, paid-tier promotion-management UI.
+Business-facing accept/decline (true mutual match), direct-to-business email, phone OTP, paid-tier promotion-management UI, **synonym/alias map (v1.1)** to lift recall on sparse listings.
 
 ---
 
 ## 14. Next step
 
-Resolve **Phase 0** (R-3 category taxonomy) before `/sc:implement`. Then implement Phase 1 in the order above.
+Phase 0 is now small and non-blocking. Resolve **0.1 / 0.2** (search index + carry geo), then implement Phase 1 in order via `/sc:implement`.
