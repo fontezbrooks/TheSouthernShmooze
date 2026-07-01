@@ -44,6 +44,8 @@ export function MatchesScreen() {
           accessibilityRole="button"
           accessibilityLabel="Back"
           onPress={() => router.back()}
+          hitSlop={12}
+          style={styles.backBtn}
         >
           <Text style={[t.typography.bodySemibold, { color: t.colors.rust }]}>
             ‹ Back
@@ -74,21 +76,35 @@ export function MatchesScreen() {
             </Text>
           }
           renderItem={({ item }) => (
-            <View
-              style={[
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`${item.name} — open profile`}
+              onPress={() => router.push(`/business/${item.businessUid}`)}
+              style={({ pressed }) => [
                 styles.row,
                 {
                   backgroundColor: t.colors.surface,
                   borderColor: t.colors.inputBorder,
                   borderRadius: t.radii.card,
+                  opacity: pressed ? 0.85 : 1,
                 },
               ]}
             >
               {item.logoUrl ? (
                 <Image source={{ uri: item.logoUrl }} style={styles.logo} />
               ) : (
-                <View style={[styles.logo, styles.placeholder, { backgroundColor: t.colors.bg }]}>
-                  <Icon name="briefcaseFilled" size={28} color={t.colors.rustDark} />
+                <View
+                  style={[
+                    styles.logo,
+                    styles.placeholder,
+                    { backgroundColor: t.colors.bg },
+                  ]}
+                >
+                  <Icon
+                    name="briefcaseFilled"
+                    size={28}
+                    color={t.colors.rustDark}
+                  />
                 </View>
               )}
               <View style={styles.rowBody}>
@@ -100,11 +116,14 @@ export function MatchesScreen() {
                 </Text>
               </View>
               <Text
-                style={[t.typography.captionSemi, { color: statusColor(item.status) }]}
+                style={[
+                  t.typography.captionSemi,
+                  { color: statusColor(item.status) },
+                ]}
               >
                 {STATUS_LABEL[item.status]}
               </Text>
-            </View>
+            </Pressable>
           )}
         />
       )}
@@ -123,6 +142,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   spacer: { width: 48 },
+  backBtn: { paddingVertical: 6, paddingRight: 12 },
   list: { padding: 16, gap: 12, flexGrow: 1 },
   empty: { textAlign: "center", marginTop: 48 },
   row: {

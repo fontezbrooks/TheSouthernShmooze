@@ -99,6 +99,8 @@ export function SwipeScreen() {
           accessibilityRole="button"
           accessibilityLabel="Back"
           onPress={() => router.back()}
+          hitSlop={12}
+          style={styles.navBtn}
         >
           <Text style={[t.typography.bodySemibold, { color: t.colors.rust }]}>
             ‹ Back
@@ -109,6 +111,8 @@ export function SwipeScreen() {
           accessibilityRole="button"
           accessibilityLabel="View matches"
           onPress={() => router.push("/matches")}
+          hitSlop={12}
+          style={styles.navBtn}
         >
           <Text style={[t.typography.bodySemibold, { color: t.colors.rust }]}>
             Matches
@@ -163,6 +167,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
+  navBtn: { paddingVertical: 6 },
   banner: {
     marginHorizontal: 16,
     marginBottom: 8,

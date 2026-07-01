@@ -99,16 +99,17 @@ export function SwipeDeck({
 }
 
 const styles = StyleSheet.create({
-  // Center the card + actions as one group so the buttons sit just below the card
-  // (a central position) rather than pinned to the bottom of the screen.
-  wrap: { flex: 1, paddingHorizontal: 16, justifyContent: "center" },
+  // Top-align the card (a little breathing room under the header) with the actions
+  // stacked just below it — no big empty gap above, and a clear gap before the buttons
+  // so the card never crowds them.
+  wrap: { flex: 1, paddingHorizontal: 16, paddingTop: 12 },
   deck: {},
   actions: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     gap: 16,
-    marginTop: 20,
+    marginTop: 24,
   },
   action: { flex: 1 },
   center: {
