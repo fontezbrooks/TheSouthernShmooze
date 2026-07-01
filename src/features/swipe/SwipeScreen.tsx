@@ -53,16 +53,13 @@ export function SwipeScreen() {
     setBanner(res.ok ? "It’s a match! We’ve sent your details." : res.error);
   };
 
-  const onLike = async () => {
+  const onLike = () => {
     const card = deck.current;
     if (!card) return;
-    if (!session.contact?.verified) {
-      setPending(card);
-      setFormOpen(true);
-      return;
-    }
-    deck.advance();
-    await sendLead(card);
+    // Confirm every Match: open the (prefilled) form so nothing sends silently.
+    setBanner(null);
+    setPending(card);
+    setFormOpen(true);
   };
 
   const onPass = () => {
