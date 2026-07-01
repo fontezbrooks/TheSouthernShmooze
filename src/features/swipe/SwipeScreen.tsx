@@ -15,7 +15,8 @@ import { swipeRepository } from "./swipeRepository";
 import { TaskIntake } from "./TaskIntake";
 import { SwipeDeck } from "./SwipeDeck";
 import { LeadCaptureModal } from "./LeadCaptureModal";
-import type { DeckCard, SeekerContact } from "./swipeTypes";
+import { FiltersModal } from "./FiltersModal";
+import type { DeckCard, SeekerContact, SwipeTask } from "./swipeTypes";
 
 /**
  * "The Shmoozer" flow: state a task → swipe a confidence-ranked deck → a right-swipe
@@ -30,8 +31,16 @@ export function SwipeScreen() {
   const deck = useSwipeDeck(session.task, session.sessionToken);
 
   const [formOpen, setFormOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [pending, setPending] = useState<DeckCard | null>(null);
   const [banner, setBanner] = useState<string | null>(null);
+
+  // Change the active search from the deck → re-runs useSwipeDeck with new matches.
+  const applyFilters = (next: SwipeTask) => {
+    setFiltersOpen(false);
+    setBanner(null);
+    session.setTask(next);
+  };
 
   const sendLead = async (card: DeckCard) => {
     if (!deck.taskId) return;
@@ -107,17 +116,30 @@ export function SwipeScreen() {
           </Text>
         </Pressable>
         <Text style={t.typography.displayXS}>The Shmoozer</Text>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="View matches"
-          onPress={() => router.push("/matches")}
-          hitSlop={12}
-          style={styles.navBtn}
-        >
-          <Text style={[t.typography.bodySemibold, { color: t.colors.rust }]}>
-            Matches
-          </Text>
-        </Pressable>
+        <View style={styles.headerRight}>
+          {session.task ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Filters"
+              onPress={() => setFiltersOpen(true)}
+              hitSlop={12}
+              style={styles.navBtn}
+            >
+              <Text style={[styles.dots, { color: t.colors.rust }]}>⋯</Text>
+            </Pressable>
+          ) : null}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="View matches"
+            onPress={() => router.push("/matches")}
+            hitSlop={12}
+            style={styles.navBtn}
+          >
+            <Text style={[t.typography.bodySemibold, { color: t.colors.rust }]}>
+              Matches
+            </Text>
+          </Pressable>
+        </View>
       </View>
 
       {banner ? (
@@ -154,6 +176,13 @@ export function SwipeScreen() {
         }}
         onSubmitted={onSubmitted}
       />
+
+      <FiltersModal
+        visible={filtersOpen}
+        current={session.task}
+        onClose={() => setFiltersOpen(false)}
+        onApply={applyFilters}
+      />
     </View>
   );
 }
@@ -169,6 +198,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   navBtn: { paddingVertical: 6 },
+  headerRight: { flexDirection: "row", alignItems: "center", gap: 16 },
+  dots: { fontSize: 24, lineHeight: 24, fontWeight: "800" },
   banner: {
     marginHorizontal: 16,
     marginBottom: 8,
