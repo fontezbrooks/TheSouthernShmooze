@@ -19,6 +19,9 @@ export interface DirectoryBusiness {
   isCertified: boolean;
   /** Source `ir5` "Recommended" flag (recommended_score present) → reviews (thumbsUp) chip. */
   recommended: boolean;
+  /** Geo coordinates (from the source feed) — used by The Shmoozer for distance. Null when unknown. */
+  latitude: number | null;
+  longitude: number | null;
 }
 
 /** Format a 10-digit US number as XXX-XXX-XXXX; otherwise return as-is. */
@@ -44,5 +47,7 @@ export function toBusiness(row: DirectoryBusinessRow): DirectoryBusiness {
     hasCoupon: row.has_coupon,
     isCertified: row.is_certified,
     recommended: row.recommended_score != null,
+    latitude: row.latitude,
+    longitude: row.longitude,
   };
 }

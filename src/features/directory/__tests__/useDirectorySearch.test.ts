@@ -14,6 +14,8 @@ const biz = (id: string): DirectoryBusiness => ({
   hasCoupon: false,
   isCertified: false,
   recommended: false,
+  latitude: null,
+  longitude: null,
 });
 
 function makeRepo(

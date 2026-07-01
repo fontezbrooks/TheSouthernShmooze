@@ -12,6 +12,7 @@ import {
   Bitter_800ExtraBold,
 } from "@expo-google-fonts/bitter";
 import { ThemeProvider } from "@/theme/ThemeProvider";
+import { SwipeSessionProvider } from "@/features/swipe/SwipeSessionProvider";
 import { AnimatedSplash } from "@/features/splash/AnimatedSplash";
 
 SplashScreen.preventAutoHideAsync();
@@ -36,11 +37,13 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <ThemeProvider>
-          <Stack screenOptions={{ headerShown: false }} />
-          {/* Animated splash overlays the app from first frame, then fades out. */}
-          {!splashDone ? (
-            <AnimatedSplash onFinish={() => setSplashDone(true)} />
-          ) : null}
+          <SwipeSessionProvider>
+            <Stack screenOptions={{ headerShown: false }} />
+            {/* Animated splash overlays the app from first frame, then fades out. */}
+            {!splashDone ? (
+              <AnimatedSplash onFinish={() => setSplashDone(true)} />
+            ) : null}
+          </SwipeSessionProvider>
         </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

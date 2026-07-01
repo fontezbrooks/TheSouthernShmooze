@@ -16,3 +16,17 @@ verify_jwt = false
 [functions.notify-lead]
 enabled = true
 verify_jwt = false
+
+# Shmoozer swipe-lead notification. Fired by an AFTER INSERT trigger on `swipe_leads`
+# via pg_net with the shared X-Sync-Secret header, so JWT verification is disabled
+# (auth enforced in code). See migration 0016.
+[functions.notify-swipe-lead]
+enabled = true
+verify_jwt = false
+
+# Shmoozer contact-verification OTP. Fired by `request_contact_verification` via pg_net
+# with the shared X-Sync-Secret header, so JWT verification is disabled (auth enforced
+# in code). See migration 0016.
+[functions.notify-swipe-verify]
+enabled = true
+verify_jwt = false
