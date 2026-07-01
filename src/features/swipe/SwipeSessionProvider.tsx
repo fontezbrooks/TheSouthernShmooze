@@ -37,7 +37,9 @@ export function SwipeSessionProvider({ children }: { children: ReactNode }) {
   const [task, setTaskState] = useState<SwipeTask | null>(null);
   const [contact, setContactState] = useState<SeekerContact | null>(null);
 
-  // Load or mint the session token + restore any verified contact.
+  // Load or mint the session token + restore the remembered contact. We keep the contact
+  // details but reset `verified` to false so the form re-opens on the first Match of each
+  // app session (then it prefills and later swipes auto-send within the session).
   useEffect(() => {
     let alive = true;
     (async () => {
@@ -45,7 +47,9 @@ export function SwipeSessionProvider({ children }: { children: ReactNode }) {
       if (!alive) return;
       if (stored) {
         setSessionToken(stored.sessionToken);
-        setContactState(stored.contact);
+        setContactState(
+          stored.contact ? { ...stored.contact, verified: false } : null,
+        );
       } else {
         const token = randomUUID();
         setSessionToken(token);

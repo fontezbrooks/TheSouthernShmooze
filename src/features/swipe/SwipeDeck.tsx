@@ -40,10 +40,16 @@ export function SwipeDeck({
   if (error) {
     return (
       <View style={styles.center}>
-        <Text style={[t.typography.body, styles.msg, { color: t.colors.error }]}>
+        <Text
+          style={[t.typography.body, styles.msg, { color: t.colors.error }]}
+        >
           {error}
         </Text>
-        <Button label="Try another search" variant="solid" onPress={onNewSearch} />
+        <Button
+          label="Try another search"
+          variant="solid"
+          onPress={onNewSearch}
+        />
       </View>
     );
   }
@@ -54,7 +60,9 @@ export function SwipeDeck({
         <Text style={[t.typography.displayXS, styles.msg]}>
           That’s everyone for now
         </Text>
-        <Text style={[t.typography.body, styles.msg, { color: t.colors.muted }]}>
+        <Text
+          style={[t.typography.body, styles.msg, { color: t.colors.muted }]}
+        >
           Widen your search or try a different keyword.
         </Text>
         <Button label="New search" variant="solid" onPress={onNewSearch} />
@@ -75,8 +83,7 @@ export function SwipeDeck({
       <View style={styles.actions}>
         <Button
           label="Pass"
-          variant="pill"
-          tone="black"
+          variant="outline"
           onPress={onPass}
           style={styles.action}
         />
@@ -92,16 +99,19 @@ export function SwipeDeck({
 }
 
 const styles = StyleSheet.create({
-  wrap: { flex: 1, paddingHorizontal: 16 },
-  deck: { flex: 1, justifyContent: "center" },
+  // Top-align the card (a little breathing room under the header) with the actions
+  // stacked just below it — no big empty gap above, and a clear gap before the buttons
+  // so the card never crowds them.
+  wrap: { flex: 1, paddingHorizontal: 16, paddingTop: 12 },
+  deck: {},
   actions: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     gap: 16,
-    paddingVertical: 20,
+    marginTop: 24,
   },
-  action: { minWidth: 120 },
+  action: { flex: 1 },
   center: {
     flex: 1,
     alignItems: "center",

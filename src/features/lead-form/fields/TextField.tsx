@@ -1,14 +1,18 @@
-import { useState } from 'react';
-import { TextInput, StyleSheet, type KeyboardTypeOptions } from 'react-native';
-import { Controller, type Control, type FieldPath } from 'react-hook-form';
-import { useTheme } from '@/theme/ThemeProvider';
-import type { IconName } from '@/components/ui/Icon';
-import type { LeadFormValues } from '../leadSchema';
-import { InputContainer } from './InputContainer';
+import { useState } from "react";
+import { TextInput, StyleSheet, type KeyboardTypeOptions } from "react-native";
+import {
+  Controller,
+  type Control,
+  type FieldPath,
+  type FieldValues,
+} from "react-hook-form";
+import { useTheme } from "@/theme/ThemeProvider";
+import type { IconName } from "@/components/ui/Icon";
+import { InputContainer } from "./InputContainer";
 
-interface TextFieldProps {
-  control: Control<LeadFormValues>;
-  name: FieldPath<LeadFormValues>;
+interface TextFieldProps<T extends FieldValues> {
+  control: Control<T>;
+  name: FieldPath<T>;
   /** Floating label (placeholder when empty, small top label when filled). */
   label: string;
   /** Example hint shown in the value row once the label has floated. */
@@ -17,23 +21,23 @@ interface TextFieldProps {
   /** Accepted for call-site clarity; the V3 design has no "optional" affordance. */
   required?: boolean;
   keyboardType?: KeyboardTypeOptions;
-  autoCapitalize?: 'none' | 'sentences' | 'words';
-  autoComplete?: 'email' | 'tel' | 'name' | 'street-address' | 'off';
+  autoCapitalize?: "none" | "sentences" | "words";
+  autoComplete?: "email" | "tel" | "name" | "street-address" | "off";
   multiline?: boolean;
 }
 
 /** Controlled text input with a floating label (Figma V3) + padded error. */
-export function TextField({
+export function TextField<T extends FieldValues>({
   control,
   name,
   label,
   placeholder,
   icon,
   keyboardType,
-  autoCapitalize = 'sentences',
-  autoComplete = 'off',
+  autoCapitalize = "sentences",
+  autoComplete = "off",
   multiline = false,
-}: TextFieldProps) {
+}: TextFieldProps<T>) {
   const t = useTheme();
   const [focused, setFocused] = useState(false);
   return (
@@ -41,7 +45,7 @@ export function TextField({
       control={control}
       name={name}
       render={({ field, fieldState }) => {
-        const value = typeof field.value === 'string' ? field.value : '';
+        const value = typeof field.value === "string" ? field.value : "";
         const floated = multiline || focused || value.length > 0;
         return (
           <InputContainer
@@ -78,6 +82,6 @@ export function TextField({
 const styles = StyleSheet.create({
   multiline: {
     minHeight: 96,
-    textAlignVertical: 'top',
+    textAlignVertical: "top",
   },
 });

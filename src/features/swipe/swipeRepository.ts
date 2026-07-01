@@ -7,13 +7,22 @@ import { ok, err, type Result } from "@/lib/result";
 import {
   toDeckCard,
   toMatch,
+  type BudgetBand,
   type DeckCard,
   type MyLeadRow,
-  type SeekerContact,
   type SwipeDeckRow,
   type SwipeMatch,
   type SwipeTask,
 } from "./swipeTypes";
+
+/** Contact + task context captured by the first-Match form. */
+export interface SwipeContactInput {
+  name: string;
+  email: string;
+  phone: string | null;
+  budget: BudgetBand | null;
+  details: string | null;
+}
 
 const DECK_LIMIT = 30;
 const MIN_CONFIDENCE = 30;
@@ -27,13 +36,10 @@ export interface SwipeRepository {
     sessionToken: string,
     excludeUids: string[],
   ): Promise<Result<DeckCard[]>>;
-  requestVerification(
+  saveContact(
     sessionToken: string,
-    contact: Pick<SeekerContact, "name" | "email" | "phone">,
-  ): Promise<Result<void>>;
-  confirmVerification(
-    sessionToken: string,
-    code: string,
+    taskId: string | null,
+    contact: SwipeContactInput,
   ): Promise<Result<void>>;
   submitLead(
     sessionToken: string,
@@ -61,7 +67,8 @@ export const swipeRepository: SwipeRepository = {
         p_budget: task.budget,
         p_timing: task.timing,
       });
-      if (error || !data) return err("We couldn’t start your search right now.");
+      if (error || !data)
+        return err("We couldn’t start your search right now.");
       return ok(data as string);
     } catch {
       return err("Network error starting your search.");
@@ -89,38 +96,23 @@ export const swipeRepository: SwipeRepository = {
     }
   },
 
-  async requestVerification(sessionToken, contact) {
+  async saveContact(sessionToken, taskId, contact) {
     try {
-      const { data, error } = await getSupabase().rpc(
-        "request_contact_verification",
-        {
-          p_session_token: sessionToken,
-          p_name: contact.name,
-          p_email: contact.email,
-          p_phone: contact.phone,
-        },
-      );
-      if (error) return err("We couldn’t send your code right now.");
+      const { data, error } = await getSupabase().rpc("save_swipe_contact", {
+        p_session_token: sessionToken,
+        p_task_id: taskId,
+        p_name: contact.name,
+        p_email: contact.email,
+        p_phone: contact.phone,
+        p_budget: contact.budget,
+        p_details: contact.details,
+      });
+      if (error) return err("We couldn’t save your details right now.");
       const { status, reason } = readStatus(data);
-      if (status === "sent") return ok(undefined);
-      return err(reason ?? "We couldn’t send your code.");
+      if (status === "ok") return ok(undefined);
+      return err(reason ?? "We couldn’t save your details.");
     } catch {
-      return err("Network error sending your code.");
-    }
-  },
-
-  async confirmVerification(sessionToken, code) {
-    try {
-      const { data, error } = await getSupabase().rpc(
-        "confirm_contact_verification",
-        { p_session_token: sessionToken, p_code: code },
-      );
-      if (error) return err("We couldn’t verify that code right now.");
-      const { status, reason } = readStatus(data);
-      if (status === "verified") return ok(undefined);
-      return err(reason ?? "That code didn’t work.");
-    } catch {
-      return err("Network error verifying your code.");
+      return err("Network error saving your details.");
     }
   },
 

@@ -36,13 +36,29 @@ const TIMINGS: { value: Timing; label: string }[] = [
 
 const RADII = [10, 25, 50] as const;
 
-/** Task-first intake: state a need (keyword + filters) once, then swipe providers. */
-export function TaskIntake({ onSubmit }: { onSubmit: (task: SwipeTask) => void }) {
+interface TaskIntakeProps {
+  onSubmit: (task: SwipeTask) => void;
+  /** Prefill the fields (used by the Filters sheet to edit an existing search). */
+  initial?: SwipeTask | null;
+  heading?: string;
+  submitLabel?: string;
+}
+
+/** Task-first intake: state a need (keyword + filters), then swipe providers. Reused by
+ * the Filters sheet to change an in-progress search. */
+export function TaskIntake({
+  onSubmit,
+  initial = null,
+  heading = "What do you need?",
+  submitLabel = "Find matches",
+}: TaskIntakeProps) {
   const t = useTheme();
-  const [keyword, setKeyword] = useState("");
-  const [radiusKm, setRadiusKm] = useState<number>(25);
-  const [budget, setBudget] = useState<BudgetBand | null>(null);
-  const [timing, setTiming] = useState<Timing | null>(null);
+  const [keyword, setKeyword] = useState(initial?.keyword ?? "");
+  const [radiusKm, setRadiusKm] = useState<number>(initial?.radiusKm ?? 25);
+  const [budget, setBudget] = useState<BudgetBand | null>(
+    initial?.budget ?? null,
+  );
+  const [timing, setTiming] = useState<Timing | null>(initial?.timing ?? null);
 
   const trimmed = keyword.trim();
 
@@ -50,8 +66,8 @@ export function TaskIntake({ onSubmit }: { onSubmit: (task: SwipeTask) => void }
     if (!trimmed) return;
     onSubmit({
       keyword: trimmed,
-      originLat: null,
-      originLng: null,
+      originLat: initial?.originLat ?? null,
+      originLng: initial?.originLng ?? null,
       radiusKm,
       budget,
       timing,
@@ -96,7 +112,7 @@ export function TaskIntake({ onSubmit }: { onSubmit: (task: SwipeTask) => void }
       contentContainerStyle={styles.content}
       keyboardShouldPersistTaps="handled"
     >
-      <Text style={t.typography.displayS}>What do you need?</Text>
+      <Text style={t.typography.displayS}>{heading}</Text>
 
       <TextInput
         value={keyword}
@@ -172,7 +188,7 @@ export function TaskIntake({ onSubmit }: { onSubmit: (task: SwipeTask) => void }
       </View>
 
       <Button
-        label="Find matches"
+        label={submitLabel}
         variant="primary"
         disabled={!trimmed}
         onPress={submit}

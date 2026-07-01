@@ -14,13 +14,14 @@ import { useSwipeDeck } from "./useSwipeDeck";
 import { swipeRepository } from "./swipeRepository";
 import { TaskIntake } from "./TaskIntake";
 import { SwipeDeck } from "./SwipeDeck";
-import { ContactVerifyModal } from "./ContactVerifyModal";
-import type { DeckCard, SeekerContact } from "./swipeTypes";
+import { LeadCaptureModal } from "./LeadCaptureModal";
+import { FiltersModal } from "./FiltersModal";
+import type { DeckCard, SeekerContact, SwipeTask } from "./swipeTypes";
 
 /**
  * "The Shmoozer" flow: state a task → swipe a confidence-ranked deck → a right-swipe
- * sends an intent-rich lead (gated by one-time contact verification). A null task shows
- * the intake; otherwise the deck.
+ * sends an intent-rich lead (gated on the first Match by a one-time contact form). A null
+ * task shows the intake; otherwise the deck.
  */
 export function SwipeScreen() {
   const t = useTheme();
@@ -29,9 +30,17 @@ export function SwipeScreen() {
   const session = useSwipeSession();
   const deck = useSwipeDeck(session.task, session.sessionToken);
 
-  const [verifyOpen, setVerifyOpen] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [pending, setPending] = useState<DeckCard | null>(null);
   const [banner, setBanner] = useState<string | null>(null);
+
+  // Change the active search from the deck → re-runs useSwipeDeck with new matches.
+  const applyFilters = (next: SwipeTask) => {
+    setFiltersOpen(false);
+    setBanner(null);
+    session.setTask(next);
+  };
 
   const sendLead = async (card: DeckCard) => {
     if (!deck.taskId) return;
@@ -44,16 +53,13 @@ export function SwipeScreen() {
     setBanner(res.ok ? "It’s a match! We’ve sent your details." : res.error);
   };
 
-  const onLike = async () => {
+  const onLike = () => {
     const card = deck.current;
     if (!card) return;
-    if (!session.contact?.verified) {
-      setPending(card);
-      setVerifyOpen(true);
-      return;
-    }
-    deck.advance();
-    await sendLead(card);
+    // Confirm every Match: open the (prefilled) form so nothing sends silently.
+    setBanner(null);
+    setPending(card);
+    setFormOpen(true);
   };
 
   const onPass = () => {
@@ -61,9 +67,9 @@ export function SwipeScreen() {
     deck.advance();
   };
 
-  const onVerified = async (contact: SeekerContact) => {
+  const onSubmitted = async (contact: SeekerContact) => {
     session.setContact(contact);
-    setVerifyOpen(false);
+    setFormOpen(false);
     const card = pending;
     setPending(null);
     if (card) {
@@ -79,7 +85,9 @@ export function SwipeScreen() {
 
   if (!session.ready) {
     return (
-      <View style={[styles.flex, styles.center, { backgroundColor: t.colors.bg }]}>
+      <View
+        style={[styles.flex, styles.center, { backgroundColor: t.colors.bg }]}
+      >
         <ActivityIndicator color={t.colors.rust} />
       </View>
     );
@@ -97,21 +105,38 @@ export function SwipeScreen() {
           accessibilityRole="button"
           accessibilityLabel="Back"
           onPress={() => router.back()}
+          hitSlop={12}
+          style={styles.navBtn}
         >
           <Text style={[t.typography.bodySemibold, { color: t.colors.rust }]}>
             ‹ Back
           </Text>
         </Pressable>
         <Text style={t.typography.displayXS}>The Shmoozer</Text>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="View matches"
-          onPress={() => router.push("/matches")}
-        >
-          <Text style={[t.typography.bodySemibold, { color: t.colors.rust }]}>
-            Matches
-          </Text>
-        </Pressable>
+        <View style={styles.headerRight}>
+          {session.task ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Filters"
+              onPress={() => setFiltersOpen(true)}
+              hitSlop={12}
+              style={styles.navBtn}
+            >
+              <Text style={[styles.dots, { color: t.colors.rust }]}>⋯</Text>
+            </Pressable>
+          ) : null}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="View matches"
+            onPress={() => router.push("/matches")}
+            hitSlop={12}
+            style={styles.navBtn}
+          >
+            <Text style={[t.typography.bodySemibold, { color: t.colors.rust }]}>
+              Matches
+            </Text>
+          </Pressable>
+        </View>
       </View>
 
       {banner ? (
@@ -136,14 +161,24 @@ export function SwipeScreen() {
         />
       )}
 
-      <ContactVerifyModal
-        visible={verifyOpen}
+      <LeadCaptureModal
+        visible={formOpen}
         sessionToken={session.sessionToken}
+        task={session.task}
+        taskId={deck.taskId}
+        contact={session.contact}
         onClose={() => {
-          setVerifyOpen(false);
+          setFormOpen(false);
           setPending(null);
         }}
-        onVerified={onVerified}
+        onSubmitted={onSubmitted}
+      />
+
+      <FiltersModal
+        visible={filtersOpen}
+        current={session.task}
+        onClose={() => setFiltersOpen(false)}
+        onApply={applyFilters}
       />
     </View>
   );
@@ -159,6 +194,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
+  navBtn: { paddingVertical: 6 },
+  headerRight: { flexDirection: "row", alignItems: "center", gap: 16 },
+  dots: { fontSize: 24, lineHeight: 24, fontWeight: "800" },
   banner: {
     marginHorizontal: 16,
     marginBottom: 8,

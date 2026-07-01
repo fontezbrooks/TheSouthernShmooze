@@ -1,8 +1,6 @@
 import {
   buildSwipeLeadHtml,
   buildSwipeLeadSubject,
-  buildVerifyHtml,
-  buildVerifySubject,
   timingLabel,
   type SwipeLeadRecord,
 } from "../swipe-email";
@@ -16,6 +14,8 @@ const lead: SwipeLeadRecord = {
   keyword: "landscaping",
   budget: "1000_5000",
   timing: "this_week",
+  details: "Need the back yard re-sodded before July.",
+  radius_km: 25,
   contact_name: "Carl Higgins",
   contact_email: "carl@example.com",
   contact_phone: "404-437-2480",
@@ -46,6 +46,7 @@ describe("buildSwipeLeadHtml", () => {
     expect(html).toContain("landscaping");
     expect(html).toContain("$1,000 – $5,000");
     expect(html).toContain("This week");
+    expect(html).toContain("Need the back yard re-sodded before July.");
     expect(html).toContain("carl@example.com");
   });
 
@@ -73,13 +74,5 @@ describe("timingLabel", () => {
     expect(timingLabel("flexible")).toBe("Flexible");
     expect(timingLabel(null)).toBe("");
     expect(timingLabel("whenever")).toBe("whenever");
-  });
-});
-
-describe("verification email", () => {
-  it("has a fixed subject and shows the code", () => {
-    expect(buildVerifySubject()).toBe("Your Shmoozer verification code");
-    expect(buildVerifyHtml("123456")).toContain("123456");
-    expect(buildVerifyHtml("123456")).toContain("expires in 15 minutes");
   });
 });

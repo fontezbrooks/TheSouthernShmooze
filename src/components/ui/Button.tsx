@@ -14,8 +14,10 @@ import { Icon, type IconName } from "./Icon";
  * - `solid`   → "Button L":     rust fill, 2px rustDark border, hard shadow, white label, 48h, hugs content (Empty State CTA).
  * - `pill`    → "Button S":     cream fill, 32h, hugs content; border/shadow per `tone` (banner CTAs, card phone).
  * - `wide`    → "Button L":     cream fill, 56h, full width, no border/shadow ("Add a File").
+ * - `outline` → cream fill, 2px rustDark border, hard shadow, rustDark label, 48h — the
+ *              light twin of `solid` so a pair (e.g. Pass/Match) shares one shape.
  */
-export type ButtonVariant = "primary" | "solid" | "pill" | "wide";
+export type ButtonVariant = "primary" | "solid" | "pill" | "wide" | "outline";
 
 /** Border + shadow + label color family for `pill` buttons. */
 export type ButtonTone = "rust" | "black" | "none";
@@ -46,6 +48,7 @@ export function Button({
   const isPrimary = variant === "primary";
   const isSolid = variant === "solid";
   const isPill = variant === "pill";
+  const isOutline = variant === "outline";
   const isRustFill = isPrimary || isSolid;
 
   // Resolve surface, border, shadow, and label color.
@@ -65,22 +68,26 @@ export function Button({
     : isRustFill
       ? t.colors.rust
       : t.colors.bg;
-  const labelColor = isRustFill ? t.colors.white : toneColor;
+  const labelColor = isRustFill
+    ? t.colors.white
+    : isOutline
+      ? t.colors.rustDark
+      : toneColor;
   const labelStyle = isPill
     ? t.typography.captionSemi
     : t.typography.bodySemibold;
 
-  const bordered = isRustFill || (isPill && tone !== "none");
+  const bordered = isRustFill || isOutline || (isPill && tone !== "none");
   const borderColor = disabledPrimary
     ? t.colors.neutral500
-    : isRustFill
+    : isRustFill || isOutline
       ? t.colors.rustDark
       : tone === "black"
         ? t.colors.black
         : t.colors.rustDark;
-  // primary 3px (2px when disabled), solid/pill 2px.
+  // primary 3px (2px when disabled), solid/pill/outline 2px.
   const borderWidth = !bordered ? 0 : isPrimary ? (disabledPrimary ? 2 : 3) : 2;
-  const shadowed = isRustFill || (isPill && tone !== "none");
+  const shadowed = isRustFill || isOutline || (isPill && tone !== "none");
   const shadowStyle = disabledPrimary
     ? t.shadow.hardNeutral
     : tone === "black"
@@ -102,6 +109,7 @@ export function Button({
         isPrimary && styles.primary,
         isSolid && styles.solid,
         isPill && styles.pill,
+        isOutline && styles.outline,
         variant === "wide" && styles.wide,
         {
           backgroundColor: bg,
@@ -142,6 +150,11 @@ const styles = StyleSheet.create({
     height: 32,
     paddingHorizontal: 12,
     alignSelf: "flex-start",
+  },
+  outline: {
+    height: 48,
+    alignSelf: "center",
+    paddingHorizontal: 16,
   },
   wide: {
     height: 56,

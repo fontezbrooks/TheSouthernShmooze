@@ -1,11 +1,10 @@
-// Pure formatting helpers for "The Shmoozer" swipe-lead + verification emails. No Deno /
-// network / Supabase imports so this module is unit-testable under jest while the
-// `notify-swipe-lead` / `notify-swipe-verify` Edge Functions import it at runtime.
-// Reuses the escape/budget helpers from the Concierge lead email module.
+// Pure formatting helpers for "The Shmoozer" swipe-lead email. No Deno / network / Supabase
+// imports so this module is unit-testable under jest while the `notify-swipe-lead` Edge
+// Function imports it at runtime. Reuses the escape/budget helpers from the Concierge email.
 
 import { budgetLabel, escapeHtml } from "./lead-email.ts";
 
-/** The assembled swipe-lead payload delivered by the AFTER INSERT trigger (migration 0016). */
+/** The assembled swipe-lead payload delivered by the AFTER INSERT trigger (migrations 0016/0017). */
 export interface SwipeLeadRecord {
   lead_id: string;
   created_at: string | null;
@@ -15,6 +14,7 @@ export interface SwipeLeadRecord {
   keyword: string | null;
   budget: string | null;
   timing: string | null;
+  details: string | null;
   radius_km: number | null;
   contact_name: string | null;
   contact_email: string | null;
@@ -64,6 +64,7 @@ export function buildSwipeLeadHtml(lead: SwipeLeadRecord): string {
     row("Match confidence", escapeHtml(confidence)),
     row("Budget", escapeHtml(budgetLabel(lead.budget ? [lead.budget] : null))),
     row("Timing", escapeHtml(timingLabel(lead.timing))),
+    row("Details", escapeHtml(lead.details ?? "").replace(/\n/g, "<br>")),
     row("Contact", escapeHtml(lead.contact_name ?? "")),
     row("Email", escapeHtml(lead.contact_email ?? "")),
     row("Phone", escapeHtml(lead.contact_phone ?? "")),
@@ -71,20 +72,4 @@ export function buildSwipeLeadHtml(lead: SwipeLeadRecord): string {
   ]
     .filter(Boolean)
     .join("");
-}
-
-/** Email subject for the verification code. */
-export function buildVerifySubject(): string {
-  return "Your Shmoozer verification code";
-}
-
-/** Build the verification-code email body. */
-export function buildVerifyHtml(code: string): string {
-  return [
-    `<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#1b1b1c;line-height:1.5">`,
-    `<p style="margin:0 0 16px">Enter this code in The Shmoozer to confirm your contact info:</p>`,
-    `<p style="margin:0 0 16px;font-size:28px;font-weight:bold;letter-spacing:4px">${escapeHtml(code)}</p>`,
-    `<p style="margin:0;color:#6b6b6b">This code expires in 15 minutes.</p>`,
-    `</div>`,
-  ].join("");
 }

@@ -1,27 +1,36 @@
 import { useState } from "react";
 import { Pressable, Text, View, Modal, StyleSheet } from "react-native";
-import { Controller, type Control } from "react-hook-form";
+import {
+  Controller,
+  type Control,
+  type FieldPath,
+  type FieldValues,
+} from "react-hook-form";
 import { useTheme } from "@/theme/ThemeProvider";
 import { Icon } from "@/components/ui/Icon";
 import type { BudgetValue } from "@/lib/database";
-import type { LeadFormValues } from "../leadSchema";
 import { BUDGET_OPTIONS } from "../leadSchema";
 import { InputContainer } from "./InputContainer";
 
-interface BudgetSelectProps {
-  control: Control<LeadFormValues>;
+interface BudgetSelectProps<T extends FieldValues> {
+  control: Control<T>;
+  name: FieldPath<T>;
   label: string;
 }
 
 /** Single-select budget dropdown (dollar icon + chevron) per Figma. */
-export function BudgetSelect({ control, label }: BudgetSelectProps) {
+export function BudgetSelect<T extends FieldValues>({
+  control,
+  name,
+  label,
+}: BudgetSelectProps<T>) {
   const t = useTheme();
   const [open, setOpen] = useState(false);
 
   return (
     <Controller
       control={control}
-      name="budget"
+      name={name}
       render={({ field, fieldState }) => {
         const selected = BUDGET_OPTIONS.find((o) => o.value === field.value);
         const choose = (value: BudgetValue) => {
