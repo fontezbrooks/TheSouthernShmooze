@@ -44,6 +44,8 @@ interface LeadCaptureModalProps {
   sessionToken: string;
   task: SwipeTask | null;
   taskId: string | null;
+  /** Remembered contact (name/email/phone) to prefill for a returning Seeker. */
+  contact: SeekerContact | null;
   onClose: () => void;
   onSubmitted: (contact: SeekerContact) => void;
   repo?: SwipeRepository;
@@ -60,6 +62,7 @@ export function LeadCaptureModal({
   sessionToken,
   task,
   taskId,
+  contact,
   onClose,
   onSubmitted,
   repo = swipeRepository,
@@ -70,7 +73,7 @@ export function LeadCaptureModal({
 
   const form = useForm<SwipeContactValues>({
     resolver: zodResolver(swipeContactSchema),
-    defaultValues: prefillFromTask(task),
+    defaultValues: prefillFromTask(task, contact),
     mode: "onTouched",
   });
 
@@ -80,7 +83,7 @@ export function LeadCaptureModal({
   // Re-prefill + replay the entrance each time the sheet opens.
   useEffect(() => {
     if (visible) {
-      form.reset(prefillFromTask(task));
+      form.reset(prefillFromTask(task, contact));
       setError(null);
       dragY.value = 0;
       progress.value = withSpring(1, SPRING);
@@ -88,9 +91,9 @@ export function LeadCaptureModal({
       progress.value = 0;
       dragY.value = 0;
     }
-    // form is stable from RHF; task drives the prefill.
+    // form is stable from RHF; task + contact drive the prefill.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible, task]);
+  }, [visible, task, contact]);
 
   const close = () => {
     setError(null);
@@ -187,8 +190,8 @@ export function LeadCaptureModal({
             >
               <Text style={t.typography.displayXS}>Send your details</Text>
               <Text style={[t.typography.caption, { color: t.colors.muted }]}>
-                We share these with the pros you match — filled in once, then it’s
-                one tap.
+                We share these with the pros you match — filled in once, then
+                it’s one tap.
               </Text>
 
               <TextField
@@ -224,7 +227,11 @@ export function LeadCaptureModal({
                 keyboardType="phone-pad"
                 autoComplete="tel"
               />
-              <BudgetSelect control={form.control} name="budget" label="Budget" />
+              <BudgetSelect
+                control={form.control}
+                name="budget"
+                label="Budget"
+              />
               <TextField
                 control={form.control}
                 name="projectDetails"
@@ -245,7 +252,12 @@ export function LeadCaptureModal({
               ) : (
                 <Button label="Send match" variant="primary" onPress={submit} />
               )}
-              <Button label="Cancel" variant="pill" tone="black" onPress={close} />
+              <Button
+                label="Cancel"
+                variant="pill"
+                tone="black"
+                onPress={close}
+              />
             </ScrollView>
           </Animated.View>
         </KeyboardAvoidingView>

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { SwipeTask } from "./swipeTypes";
+import type { SeekerContact, SwipeTask } from "./swipeTypes";
 
 // Plain regex mirrors the Concierge schema (avoids zod-version churn around `.email()`).
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
@@ -23,13 +23,20 @@ export const swipeContactSchema = z.object({
 
 export type SwipeContactValues = z.infer<typeof swipeContactSchema>;
 
-/** Prefill contact-form defaults from the Shmoozer onboarding so it stays a quick step. */
-export function prefillFromTask(task: SwipeTask | null): SwipeContactValues {
+/**
+ * Prefill contact-form defaults: budget/details from the onboarding task, and the
+ * name/email/phone from a remembered contact (so a returning Seeker just re-confirms).
+ */
+export function prefillFromTask(
+  task: SwipeTask | null,
+  contact?: SeekerContact | null,
+): SwipeContactValues {
+  const parts = (contact?.name ?? "").trim().split(/\s+/).filter(Boolean);
   return {
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
+    firstName: parts[0] ?? "",
+    lastName: parts.slice(1).join(" "),
+    email: contact?.email ?? "",
+    phone: contact?.phone ?? "",
     budget: task?.budget ?? undefined,
     projectDetails: task?.keyword ? `Looking for ${task.keyword}.` : "",
   };

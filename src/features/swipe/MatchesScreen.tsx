@@ -60,7 +60,9 @@ export function MatchesScreen() {
       ) : (
         <FlatList
           data={matches}
-          keyExtractor={(m) => m.businessUid}
+          // A Seeker can have leads to the same business under different tasks, so
+          // businessUid alone isn't unique — pair it with the per-lead timestamp.
+          keyExtractor={(m) => `${m.businessUid}-${m.createdAt}`}
           onRefresh={refresh}
           refreshing={loading}
           contentContainerStyle={styles.list}

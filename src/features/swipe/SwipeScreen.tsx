@@ -147,6 +147,7 @@ export function SwipeScreen() {
         sessionToken={session.sessionToken}
         task={session.task}
         taskId={deck.taskId}
+        contact={session.contact}
         onClose={() => {
           setFormOpen(false);
           setPending(null);
