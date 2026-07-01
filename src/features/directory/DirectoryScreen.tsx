@@ -58,7 +58,7 @@ export function DirectoryScreen() {
           onBlur={() => s.setFocused(false)}
         />
         <Button
-          label="Need something done? Swipe to match"
+          label="Try The Shmoozer!"
           variant="solid"
           onPress={() => router.push("/swipe")}
           style={styles.shmoozerCta}

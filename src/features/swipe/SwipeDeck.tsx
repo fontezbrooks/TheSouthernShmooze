@@ -40,10 +40,16 @@ export function SwipeDeck({
   if (error) {
     return (
       <View style={styles.center}>
-        <Text style={[t.typography.body, styles.msg, { color: t.colors.error }]}>
+        <Text
+          style={[t.typography.body, styles.msg, { color: t.colors.error }]}
+        >
           {error}
         </Text>
-        <Button label="Try another search" variant="solid" onPress={onNewSearch} />
+        <Button
+          label="Try another search"
+          variant="solid"
+          onPress={onNewSearch}
+        />
       </View>
     );
   }
@@ -54,7 +60,9 @@ export function SwipeDeck({
         <Text style={[t.typography.displayXS, styles.msg]}>
           That’s everyone for now
         </Text>
-        <Text style={[t.typography.body, styles.msg, { color: t.colors.muted }]}>
+        <Text
+          style={[t.typography.body, styles.msg, { color: t.colors.muted }]}
+        >
           Widen your search or try a different keyword.
         </Text>
         <Button label="New search" variant="solid" onPress={onNewSearch} />
@@ -75,8 +83,7 @@ export function SwipeDeck({
       <View style={styles.actions}>
         <Button
           label="Pass"
-          variant="pill"
-          tone="black"
+          variant="outline"
           onPress={onPass}
           style={styles.action}
         />
@@ -101,7 +108,7 @@ const styles = StyleSheet.create({
     gap: 16,
     paddingVertical: 20,
   },
-  action: { minWidth: 120 },
+  action: { flex: 1 },
   center: {
     flex: 1,
     alignItems: "center",
