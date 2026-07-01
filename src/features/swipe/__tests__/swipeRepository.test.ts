@@ -81,24 +81,47 @@ describe("fetchDeck", () => {
   });
 });
 
-describe("verification", () => {
-  it("treats status 'sent' as success", async () => {
-    mockRpc.mockResolvedValue({ data: { status: "sent" }, error: null });
-    const res = await swipeRepository.requestVerification("sess", {
-      name: "Carl",
+describe("saveContact", () => {
+  it("forwards contact + budget + details and treats 'ok' as success", async () => {
+    mockRpc.mockResolvedValue({ data: { status: "ok" }, error: null });
+    const res = await swipeRepository.saveContact("sess", "task-1", {
+      name: "Carl Higgins",
       email: "c@x.com",
-      phone: null,
+      phone: "4044372480",
+      budget: "1000_5000",
+      details: "Need sod",
     });
     expect(res.ok).toBe(true);
+    expect(mockRpc).toHaveBeenCalledWith("save_swipe_contact", {
+      p_session_token: "sess",
+      p_task_id: "task-1",
+      p_name: "Carl Higgins",
+      p_email: "c@x.com",
+      p_phone: "4044372480",
+      p_budget: "1000_5000",
+      p_details: "Need sod",
+    });
   });
 
-  it("surfaces the rejection reason from confirm", async () => {
+  it("surfaces a rejection reason", async () => {
     mockRpc.mockResolvedValue({
-      data: { status: "rejected", reason: "incorrect code" },
+      data: {
+        status: "rejected",
+        reason: "name and a valid email are required",
+      },
       error: null,
     });
-    const res = await swipeRepository.confirmVerification("sess", "000000");
-    expect(res).toEqual({ ok: false, error: "incorrect code" });
+    const res = await swipeRepository.saveContact("sess", null, {
+      name: "",
+      email: "bad",
+      phone: null,
+      budget: null,
+      details: null,
+    });
+    expect(res).toEqual({
+      ok: false,
+      error: "name and a valid email are required",
+    });
   });
 });
 
@@ -109,7 +132,10 @@ describe("submitLead", () => {
       ok: true,
       data: "ok",
     });
-    mockRpc.mockResolvedValueOnce({ data: { status: "duplicate" }, error: null });
+    mockRpc.mockResolvedValueOnce({
+      data: { status: "duplicate" },
+      error: null,
+    });
     expect(await swipeRepository.submitLead("s", "t", "u", 90)).toEqual({
       ok: true,
       data: "duplicate",

@@ -99,14 +99,16 @@ export function SwipeDeck({
 }
 
 const styles = StyleSheet.create({
-  wrap: { flex: 1, paddingHorizontal: 16 },
-  deck: { flex: 1, justifyContent: "center" },
+  // Center the card + actions as one group so the buttons sit just below the card
+  // (a central position) rather than pinned to the bottom of the screen.
+  wrap: { flex: 1, paddingHorizontal: 16, justifyContent: "center" },
+  deck: {},
   actions: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     gap: 16,
-    paddingVertical: 20,
+    marginTop: 20,
   },
   action: { flex: 1 },
   center: {

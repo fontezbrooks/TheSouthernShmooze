@@ -14,13 +14,13 @@ import { useSwipeDeck } from "./useSwipeDeck";
 import { swipeRepository } from "./swipeRepository";
 import { TaskIntake } from "./TaskIntake";
 import { SwipeDeck } from "./SwipeDeck";
-import { ContactVerifyModal } from "./ContactVerifyModal";
+import { LeadCaptureModal } from "./LeadCaptureModal";
 import type { DeckCard, SeekerContact } from "./swipeTypes";
 
 /**
  * "The Shmoozer" flow: state a task → swipe a confidence-ranked deck → a right-swipe
- * sends an intent-rich lead (gated by one-time contact verification). A null task shows
- * the intake; otherwise the deck.
+ * sends an intent-rich lead (gated on the first Match by a one-time contact form). A null
+ * task shows the intake; otherwise the deck.
  */
 export function SwipeScreen() {
   const t = useTheme();
@@ -29,7 +29,7 @@ export function SwipeScreen() {
   const session = useSwipeSession();
   const deck = useSwipeDeck(session.task, session.sessionToken);
 
-  const [verifyOpen, setVerifyOpen] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
   const [pending, setPending] = useState<DeckCard | null>(null);
   const [banner, setBanner] = useState<string | null>(null);
 
@@ -49,7 +49,7 @@ export function SwipeScreen() {
     if (!card) return;
     if (!session.contact?.verified) {
       setPending(card);
-      setVerifyOpen(true);
+      setFormOpen(true);
       return;
     }
     deck.advance();
@@ -61,9 +61,9 @@ export function SwipeScreen() {
     deck.advance();
   };
 
-  const onVerified = async (contact: SeekerContact) => {
+  const onSubmitted = async (contact: SeekerContact) => {
     session.setContact(contact);
-    setVerifyOpen(false);
+    setFormOpen(false);
     const card = pending;
     setPending(null);
     if (card) {
@@ -79,7 +79,9 @@ export function SwipeScreen() {
 
   if (!session.ready) {
     return (
-      <View style={[styles.flex, styles.center, { backgroundColor: t.colors.bg }]}>
+      <View
+        style={[styles.flex, styles.center, { backgroundColor: t.colors.bg }]}
+      >
         <ActivityIndicator color={t.colors.rust} />
       </View>
     );
@@ -136,14 +138,16 @@ export function SwipeScreen() {
         />
       )}
 
-      <ContactVerifyModal
-        visible={verifyOpen}
+      <LeadCaptureModal
+        visible={formOpen}
         sessionToken={session.sessionToken}
+        task={session.task}
+        taskId={deck.taskId}
         onClose={() => {
-          setVerifyOpen(false);
+          setFormOpen(false);
           setPending(null);
         }}
-        onVerified={onVerified}
+        onSubmitted={onSubmitted}
       />
     </View>
   );

@@ -39,8 +39,7 @@ function makeRepo(over: Partial<SwipeRepository> = {}): SwipeRepository {
     fetchDeck: jest
       .fn()
       .mockResolvedValue({ ok: true, data: [card("a"), card("b")] }),
-    requestVerification: jest.fn(),
-    confirmVerification: jest.fn(),
+    saveContact: jest.fn(),
     submitLead: jest.fn(),
     fetchMatches: jest.fn(),
     ...over,

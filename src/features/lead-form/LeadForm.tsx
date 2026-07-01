@@ -74,7 +74,7 @@ export function LeadForm() {
         autoComplete="street-address"
       />
 
-      <BudgetSelect control={control} label="Budget" />
+      <BudgetSelect control={control} name="budget" label="Budget" />
       <DateField control={control} label="Project Start Date" />
 
       <TextField
