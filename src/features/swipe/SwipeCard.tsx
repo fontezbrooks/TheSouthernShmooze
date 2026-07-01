@@ -32,9 +32,14 @@ export function SwipeCard({ card, onSwipeLeft, onSwipeRight }: SwipeCardProps) {
     })
     .onEnd((e) => {
       if (e.translationX > SWIPE_THRESHOLD) {
-        x.value = withSpring(SCREEN_W * 1.5);
+        // Right = Match. Spring back to center rather than fling off-screen: a right
+        // swipe may be gated by contact verification (the parent opens a modal WITHOUT
+        // advancing), so the card must stay recoverable if the user cancels. When the
+        // parent does advance, this card unmounts and the spring is never seen.
+        x.value = withSpring(0);
         runOnJS(onSwipeRight)();
       } else if (e.translationX < -SWIPE_THRESHOLD) {
+        // Left = Pass. The parent always advances, so fling it away.
         x.value = withSpring(-SCREEN_W * 1.5);
         runOnJS(onSwipeLeft)();
       } else {
@@ -43,10 +48,7 @@ export function SwipeCard({ card, onSwipeLeft, onSwipeRight }: SwipeCardProps) {
     });
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateX: x.value },
-      { rotate: `${x.value / 22}deg` },
-    ],
+    transform: [{ translateX: x.value }, { rotate: `${x.value / 22}deg` }],
   }));
 
   return (

@@ -233,13 +233,33 @@ security definer
 set search_path = public
 as $$
 declare
-  v_code   text := lpad((floor(random() * 1000000))::int::text, 6, '0');
-  v_secret text;
+  v_code       text := lpad((floor(random() * 1000000))::int::text, 6, '0');
+  v_secret     text;
+  v_email       text := lower(btrim(coalesce(p_email, '')));
+  v_last_sent  timestamptz;
+  v_email_1h   integer;
 begin
   if p_session_token is null
-     or coalesce(btrim(p_email), '') = ''
-     or p_email !~* '^[^@[:space:]]+@[^@[:space:]]+\.[^@[:space:]]+$' then
+     or v_email = ''
+     or v_email !~* '^[^@[:space:]]+@[^@[:space:]]+\.[^@[:space:]]+$' then
     return jsonb_build_object('status', 'rejected', 'reason', 'invalid email');
+  end if;
+
+  -- RATE LIMIT (defense against turning Resend into an open relay via the anon key):
+  -- 1) per-session cooldown — one code per 60s while a prior code is still unverified.
+  select updated_at into v_last_sent
+    from public.swipe_contacts
+   where session_token = p_session_token and not verified;
+  if v_last_sent is not null and v_last_sent > now() - interval '60 seconds' then
+    return jsonb_build_object('status', 'rejected', 'reason', 'please wait before requesting another code');
+  end if;
+
+  -- 2) per-email hourly cap — bounds how many codes any one address can receive.
+  select count(*) into v_email_1h
+    from public.swipe_contacts
+   where email = v_email and updated_at > now() - interval '1 hour';
+  if v_email_1h >= 5 then
+    return jsonb_build_object('status', 'rejected', 'reason', 'too many requests, try again later');
   end if;
 
   insert into public.swipe_contacts (
@@ -247,7 +267,7 @@ begin
     verify_attempts, updated_at
   )
   values (
-    p_session_token, p_name, lower(btrim(p_email)), p_phone, false, v_code,
+    p_session_token, p_name, v_email, p_phone, false, v_code,
     now() + interval '15 minutes', 0, now()
   )
   on conflict (session_token) do update set
@@ -267,7 +287,7 @@ begin
     perform net.http_post(
       url     := 'https://udbvtigwvhvxszimqlgj.supabase.co/functions/v1/notify-swipe-verify',
       headers := jsonb_build_object('Content-Type', 'application/json', 'X-Sync-Secret', v_secret),
-      body    := jsonb_build_object('email', lower(btrim(p_email)), 'code', v_code)
+      body    := jsonb_build_object('email', v_email, 'code', v_code)
     );
   end if;
 
