@@ -13,12 +13,10 @@ import { Icon } from "@/components/ui/Icon";
 import { Button } from "@/components/ui/Button";
 import { useSwipeSession } from "./SwipeSessionProvider";
 import { useSwipeDeck } from "./useSwipeDeck";
-import { swipeRepository } from "./swipeRepository";
 import { SwipeDeck } from "./SwipeDeck";
-import { LeadCaptureModal } from "./LeadCaptureModal";
 import { FiltersModal } from "./FiltersModal";
 import { ProfileQuickView } from "./ProfileQuickView";
-import type { DeckCard, SeekerContact, SwipeTask } from "./swipeTypes";
+import type { SwipeTask } from "./swipeTypes";
 
 /** How long the transient "Passed" flash stays up (ST3). */
 const PASS_FLASH_MS = 900;
@@ -36,16 +34,9 @@ export function SwipeScreen() {
   const session = useSwipeSession();
   const deck = useSwipeDeck(session.task, session.sessionToken);
 
-  const [formOpen, setFormOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [pending, setPending] = useState<DeckCard | null>(null);
   /** Error feedback only — success feedback lives in the ST2/ST4 states. */
   const [banner, setBanner] = useState<string | null>(null);
-  /** ST2/ST4 match confirmation card ({first} drives the ST1 celebratory copy). */
-  const [confirmation, setConfirmation] = useState<{
-    name: string;
-    first: boolean;
-  } | null>(null);
   /** ST3 transient pass flash. */
   const [passed, setPassed] = useState(false);
   const [quickViewUid, setQuickViewUid] = useState<string | null>(null);
@@ -60,33 +51,27 @@ export function SwipeScreen() {
   const applyFilters = (next: SwipeTask) => {
     setFiltersOpen(false);
     setBanner(null);
-    setConfirmation(null);
+    session.clearMatchResult();
     session.setTask(next);
   };
 
-  const sendLead = async (card: DeckCard) => {
-    if (!deck.taskId) return;
-    const res = await swipeRepository.submitLead(
-      session.sessionToken,
-      deck.taskId,
-      card.sourceUid,
-      card.confidence,
-    );
-    if (res.ok) {
-      setConfirmation({ name: card.name, first: !session.hasMatched });
-      session.markMatched();
-    } else {
-      setBanner(res.error);
-    }
+  // The contact page (CP1) reports a successful send via session.matchResult —
+  // rendered directly as the ST2 confirmation. "Keep swiping" advances past the
+  // matched card and clears it. Backing out of the page sets nothing, so the
+  // card stays current (cancel).
+  const confirmation = session.matchResult;
+  const keepSwiping = () => {
+    deck.advance();
+    session.clearMatchResult();
   };
 
   const onLike = () => {
     const card = deck.current;
-    if (!card) return;
-    // Confirm every Match: open the (prefilled) form so nothing sends silently.
+    if (!card || !deck.taskId) return;
+    // Confirm every Match: the routed contact page — nothing sends silently.
     setBanner(null);
-    setPending(card);
-    setFormOpen(true);
+    session.setPending({ card, taskId: deck.taskId });
+    router.push("/match-contact");
   };
 
   const onPass = () => {
@@ -95,20 +80,9 @@ export function SwipeScreen() {
     deck.advance();
   };
 
-  const onSubmitted = async (contact: SeekerContact) => {
-    session.setContact(contact);
-    setFormOpen(false);
-    const card = pending;
-    setPending(null);
-    if (card) {
-      deck.advance();
-      await sendLead(card);
-    }
-  };
-
   const newSearch = () => {
     setBanner(null);
-    setConfirmation(null);
+    session.clearMatchResult();
     session.clearTask();
   };
 
@@ -212,11 +186,7 @@ export function SwipeScreen() {
             We’ve sent your details to {confirmation.name} — they’ll reach out
             to you.
           </Text>
-          <Button
-            label="Keep swiping"
-            variant="solid"
-            onPress={() => setConfirmation(null)}
-          />
+          <Button label="Keep swiping" variant="solid" onPress={keepSwiping} />
         </View>
       ) : (
         <SwipeDeck
@@ -252,19 +222,6 @@ export function SwipeScreen() {
           </Text>
         </View>
       ) : null}
-
-      <LeadCaptureModal
-        visible={formOpen}
-        sessionToken={session.sessionToken}
-        task={session.task}
-        taskId={deck.taskId}
-        contact={session.contact}
-        onClose={() => {
-          setFormOpen(false);
-          setPending(null);
-        }}
-        onSubmitted={onSubmitted}
-      />
 
       {/* S1/S2: one intake surface, two triggers — first entry + filters button. */}
       <FiltersModal

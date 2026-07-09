@@ -14,7 +14,12 @@ import {
   type ReactNode,
 } from "react";
 import { randomUUID } from "expo-crypto";
-import type { SeekerContact, SwipeTask } from "./swipeTypes";
+import type {
+  MatchResult,
+  PendingMatch,
+  SeekerContact,
+  SwipeTask,
+} from "./swipeTypes";
 import { loadSession, saveSession } from "./swipeStorage";
 
 export interface SwipeSessionValue {
@@ -25,11 +30,19 @@ export interface SwipeSessionValue {
   contact: SeekerContact | null;
   /** True once a match has been sent this app session (ST1 vs ST4 copy). */
   hasMatched: boolean;
+  /** Right-swiped card handed to the contact page (CP1). */
+  pending: PendingMatch | null;
+  /** Successful send reported by the contact page; the deck consumes it (ST2). */
+  matchResult: MatchResult | null;
   setTask: (task: SwipeTask) => void;
   clearTask: () => void;
   setContact: (contact: SeekerContact) => void;
   markVerified: () => void;
   markMatched: () => void;
+  setPending: (pending: PendingMatch) => void;
+  clearPending: () => void;
+  setMatchResult: (result: MatchResult) => void;
+  clearMatchResult: () => void;
 }
 
 const SwipeSessionContext = createContext<SwipeSessionValue | null>(null);
@@ -41,6 +54,10 @@ export function SwipeSessionProvider({ children }: { children: ReactNode }) {
   const [contact, setContactState] = useState<SeekerContact | null>(null);
   // In-memory only — "first match" celebration resets with each app session.
   const [hasMatched, setHasMatched] = useState(false);
+  // Contact-page plumbing (CP1): the pending card + the send result, both
+  // in-memory — they only bridge the /swipe ↔ /match-contact hop.
+  const [pending, setPendingState] = useState<PendingMatch | null>(null);
+  const [matchResult, setMatchResultState] = useState<MatchResult | null>(null);
 
   // Load or mint the session token + restore the remembered contact. We keep the contact
   // details but reset `verified` to false so the form re-opens on the first Match of each
@@ -89,6 +106,16 @@ export function SwipeSessionProvider({ children }: { children: ReactNode }) {
   );
 
   const markMatched = useCallback(() => setHasMatched(true), []);
+  const setPending = useCallback(
+    (next: PendingMatch) => setPendingState(next),
+    [],
+  );
+  const clearPending = useCallback(() => setPendingState(null), []);
+  const setMatchResult = useCallback(
+    (next: MatchResult) => setMatchResultState(next),
+    [],
+  );
+  const clearMatchResult = useCallback(() => setMatchResultState(null), []);
 
   const value = useMemo<SwipeSessionValue>(
     () => ({
@@ -97,11 +124,17 @@ export function SwipeSessionProvider({ children }: { children: ReactNode }) {
       task,
       contact,
       hasMatched,
+      pending,
+      matchResult,
       setTask,
       clearTask,
       setContact,
       markVerified,
       markMatched,
+      setPending,
+      clearPending,
+      setMatchResult,
+      clearMatchResult,
     }),
     [
       ready,
@@ -109,11 +142,17 @@ export function SwipeSessionProvider({ children }: { children: ReactNode }) {
       task,
       contact,
       hasMatched,
+      pending,
+      matchResult,
       setTask,
       clearTask,
       setContact,
       markVerified,
       markMatched,
+      setPending,
+      clearPending,
+      setMatchResult,
+      clearMatchResult,
     ],
   );
 

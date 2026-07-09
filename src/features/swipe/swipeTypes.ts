@@ -63,3 +63,15 @@ export function toDeckCard(row: SwipeDeckRow): DeckCard {
 // The Matches list was removed (July 2026 round, S9) — its client view-models
 // (SwipeMatch/MyLeadRow/toMatch) went with it. Server-side lead data and the
 // `get_my_swipe_leads` RPC are intentionally untouched.
+
+/** A right-swiped card awaiting the contact page (CP1) — travels via session context. */
+export interface PendingMatch {
+  card: DeckCard;
+  taskId: string;
+}
+
+/** Set by the contact page after a successful send; consumed by the deck (ST1/ST2). */
+export interface MatchResult {
+  name: string;
+  first: boolean;
+}
