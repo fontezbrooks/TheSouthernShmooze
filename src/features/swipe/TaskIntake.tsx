@@ -1,30 +1,10 @@
 import { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-} from "react-native";
+import { View, Text, TextInput, ScrollView, StyleSheet } from "react-native";
 import { useTheme } from "@/theme/ThemeProvider";
 import { Button } from "@/components/ui/Button";
+import { CategoryChip } from "@/features/providers/CategoryChips";
 import { SUGGESTED_CATEGORIES } from "@/features/providers/categories";
-import type { BudgetBand, SwipeTask, Timing } from "./swipeTypes";
-
-const BUDGETS: { value: BudgetBand; label: string }[] = [
-  { value: "lt_1000", label: "< $1,000" },
-  { value: "1000_5000", label: "$1k–$5k" },
-  { value: "gt_5000", label: "> $5,000" },
-];
-
-const TIMINGS: { value: Timing; label: string }[] = [
-  { value: "asap", label: "ASAP" },
-  { value: "this_week", label: "This week" },
-  { value: "flexible", label: "Flexible" },
-];
-
-const RADII = [10, 25, 50] as const;
+import type { SwipeTask } from "./swipeTypes";
 
 interface TaskIntakeProps {
   onSubmit: (task: SwipeTask) => void;
@@ -34,8 +14,12 @@ interface TaskIntakeProps {
   submitLabel?: string;
 }
 
-/** Task-first intake: state a need (keyword + filters), then swipe providers. Reused by
- * the Filters sheet to change an in-progress search. */
+/**
+ * Type-only intake (July 2026 round, S1/S2): just the keyword + category tags.
+ * Radius/budget/timing were dropped from the UI — the task ships with the old
+ * defaults so `SwipeTask` and the RPCs are untouched. Reused by the Filters
+ * sheet to change an in-progress search.
+ */
 export function TaskIntake({
   onSubmit,
   initial = null,
@@ -44,11 +28,6 @@ export function TaskIntake({
 }: TaskIntakeProps) {
   const t = useTheme();
   const [keyword, setKeyword] = useState(initial?.keyword ?? "");
-  const [radiusKm, setRadiusKm] = useState<number>(initial?.radiusKm ?? 25);
-  const [budget, setBudget] = useState<BudgetBand | null>(
-    initial?.budget ?? null,
-  );
-  const [timing, setTiming] = useState<Timing | null>(initial?.timing ?? null);
 
   const trimmed = keyword.trim();
 
@@ -58,44 +37,11 @@ export function TaskIntake({
       keyword: trimmed,
       originLat: initial?.originLat ?? null,
       originLng: initial?.originLng ?? null,
-      radiusKm,
-      budget,
-      timing,
+      radiusKm: initial?.radiusKm ?? 25,
+      budget: initial?.budget ?? null,
+      timing: initial?.timing ?? null,
     });
   };
-
-  const Chip = ({
-    label,
-    selected,
-    onPress,
-  }: {
-    label: string;
-    selected: boolean;
-    onPress: () => void;
-  }) => (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ selected }}
-      onPress={onPress}
-      style={[
-        styles.chip,
-        {
-          borderRadius: t.radii.pill,
-          backgroundColor: selected ? t.colors.rust : t.colors.surface,
-          borderColor: selected ? t.colors.rustDark : t.colors.inputBorder,
-        },
-      ]}
-    >
-      <Text
-        style={[
-          t.typography.captionSemi,
-          { color: selected ? t.colors.white : t.colors.text },
-        ]}
-      >
-        {label}
-      </Text>
-    </Pressable>
-  );
 
   return (
     <ScrollView
@@ -126,53 +72,11 @@ export function TaskIntake({
       </Text>
       <View style={styles.chips}>
         {SUGGESTED_CATEGORIES.map((s) => (
-          <Chip
+          <CategoryChip
             key={s}
             label={s}
             selected={trimmed.toLowerCase() === s.toLowerCase()}
             onPress={() => setKeyword(s)}
-          />
-        ))}
-      </View>
-
-      <Text style={[t.typography.captionSemi, { color: t.colors.muted }]}>
-        Within
-      </Text>
-      <View style={styles.chips}>
-        {RADII.map((r) => (
-          <Chip
-            key={r}
-            label={`${r} km`}
-            selected={radiusKm === r}
-            onPress={() => setRadiusKm(r)}
-          />
-        ))}
-      </View>
-
-      <Text style={[t.typography.captionSemi, { color: t.colors.muted }]}>
-        Budget (optional)
-      </Text>
-      <View style={styles.chips}>
-        {BUDGETS.map((b) => (
-          <Chip
-            key={b.value}
-            label={b.label}
-            selected={budget === b.value}
-            onPress={() => setBudget(budget === b.value ? null : b.value)}
-          />
-        ))}
-      </View>
-
-      <Text style={[t.typography.captionSemi, { color: t.colors.muted }]}>
-        Timing (optional)
-      </Text>
-      <View style={styles.chips}>
-        {TIMINGS.map((tm) => (
-          <Chip
-            key={tm.value}
-            label={tm.label}
-            selected={timing === tm.value}
-            onPress={() => setTiming(timing === tm.value ? null : tm.value)}
           />
         ))}
       </View>
@@ -196,12 +100,5 @@ const styles = StyleSheet.create({
     height: 48,
   },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  chip: {
-    borderWidth: 1,
-    paddingHorizontal: 14,
-    height: 36,
-    alignItems: "center",
-    justifyContent: "center",
-  },
   submit: { marginTop: 12 },
 });

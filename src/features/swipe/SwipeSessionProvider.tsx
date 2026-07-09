@@ -23,10 +23,13 @@ export interface SwipeSessionValue {
   sessionToken: string;
   task: SwipeTask | null;
   contact: SeekerContact | null;
+  /** True once a match has been sent this app session (ST1 vs ST4 copy). */
+  hasMatched: boolean;
   setTask: (task: SwipeTask) => void;
   clearTask: () => void;
   setContact: (contact: SeekerContact) => void;
   markVerified: () => void;
+  markMatched: () => void;
 }
 
 const SwipeSessionContext = createContext<SwipeSessionValue | null>(null);
@@ -36,6 +39,8 @@ export function SwipeSessionProvider({ children }: { children: ReactNode }) {
   const [sessionToken, setSessionToken] = useState("");
   const [task, setTaskState] = useState<SwipeTask | null>(null);
   const [contact, setContactState] = useState<SeekerContact | null>(null);
+  // In-memory only — "first match" celebration resets with each app session.
+  const [hasMatched, setHasMatched] = useState(false);
 
   // Load or mint the session token + restore the remembered contact. We keep the contact
   // details but reset `verified` to false so the form re-opens on the first Match of each
@@ -83,26 +88,32 @@ export function SwipeSessionProvider({ children }: { children: ReactNode }) {
     [contact, persist],
   );
 
+  const markMatched = useCallback(() => setHasMatched(true), []);
+
   const value = useMemo<SwipeSessionValue>(
     () => ({
       ready,
       sessionToken,
       task,
       contact,
+      hasMatched,
       setTask,
       clearTask,
       setContact,
       markVerified,
+      markMatched,
     }),
     [
       ready,
       sessionToken,
       task,
       contact,
+      hasMatched,
       setTask,
       clearTask,
       setContact,
       markVerified,
+      markMatched,
     ],
   );
 
