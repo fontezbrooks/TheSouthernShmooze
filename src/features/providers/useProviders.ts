@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   providerRepository,
   PAGE_SIZE,
@@ -53,8 +53,14 @@ export function useProviders(
     };
   }, [repo]);
 
+  // Synchronous in-flight guard: onEndReached can re-fire before the
+  // loadingMore state lands, and every call in that window sees the same
+  // stale offset — state alone can't serialize them.
+  const pageInFlight = useRef(false);
+
   const loadMore = useCallback(() => {
-    if (loadingMore || !hasMore) return;
+    if (pageInFlight.current || !hasMore) return;
+    pageInFlight.current = true;
     setLoadingMore(true);
     setError(null);
     (async () => {
@@ -65,9 +71,10 @@ export function useProviders(
       } else {
         setError(result.error);
       }
+      pageInFlight.current = false;
       setLoadingMore(false);
     })();
-  }, [repo, more.length, loadingMore, hasMore]);
+  }, [repo, more.length, hasMore]);
 
   return { pinned, more, loading, loadingMore, hasMore, error, loadMore };
 }
