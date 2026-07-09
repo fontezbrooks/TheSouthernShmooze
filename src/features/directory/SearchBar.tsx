@@ -93,7 +93,7 @@ export function SearchBar({
       <Icon name="search" size={18} color={t.colors.rust} />
       <TextInput
         ref={inputRef}
-        style={[styles.input, t.typography.body, { color: t.colors.text }]}
+        style={[t.typography.body, styles.input, { color: t.colors.text }]}
         value={value}
         onChangeText={onChangeText}
         onFocus={onFocus}
@@ -129,7 +129,7 @@ export function SearchBarButton({ onPress }: { onPress: () => void }) {
     >
       <Icon name="search" size={18} color={t.colors.rust} />
       <Text
-        style={[styles.input, t.typography.body, { color: t.colors.muted }]}
+        style={[t.typography.body, styles.input, { color: t.colors.muted }]}
       >
         {PLACEHOLDER}
       </Text>
@@ -157,8 +157,17 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 100,
   },
-  // Kill the default vertical padding so the text centers in the 48px pill.
-  input: { flex: 1, paddingVertical: 0 },
+  // Center the text in the 48px pill: no default vertical padding, lineHeight
+  // matched to the body font size (the 24px token leading sat the text low), and
+  // Android's extra font padding stripped. Listed AFTER t.typography.body so the
+  // lineHeight override wins.
+  input: {
+    flex: 1,
+    paddingVertical: 0,
+    lineHeight: 16,
+    textAlignVertical: "center",
+    includeFontPadding: false,
+  },
   clear: {
     width: 18,
     height: 18,

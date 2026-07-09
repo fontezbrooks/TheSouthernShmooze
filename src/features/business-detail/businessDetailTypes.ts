@@ -10,7 +10,10 @@ export interface DetailPhone {
 
 /** Social link surfaced on the detail screen. */
 export interface DetailSocial {
+  /** Raw MW social key (bbb/fbk/goo/igm/ylp), or "link" for free-form links — drives the icon (P6). */
   key: string;
+  /** Short pill label ("BBB", "Yelp", …). */
+  label: string;
   url: string;
 }
 
@@ -56,16 +59,13 @@ function formatAddress(address: Record<string, unknown> | null): string | null {
   return parts.length > 0 ? parts.join(", ") : null;
 }
 
-/**
- * Human labels for the known MW social keys. Temporary — surfaces real names so the
- * designer knows which icon replaces each word (unmapped keys fall back to the key).
- */
+/** Short pill labels for the known MW social keys (P6 — "Better Business Bureau" → "BBB"). */
 const SOCIAL_LABELS: Record<string, string> = {
-  bbb: "Better Business Bureau",
-  fbk: "facebook",
-  goo: "google business profile",
-  igm: "instagram",
-  ylp: "yelp",
+  bbb: "BBB",
+  fbk: "Facebook",
+  goo: "Google Business",
+  igm: "Instagram",
+  ylp: "Yelp",
 };
 
 /** Flatten the socials object (`{ fbk: url, igm: url, links: [...] }`) into a flat list. */
@@ -76,13 +76,17 @@ function flattenSocials(
   const out: DetailSocial[] = [];
   for (const [key, value] of Object.entries(socials)) {
     if (typeof value === "string") {
-      out.push({ key: SOCIAL_LABELS[key] ?? key, url: value });
+      out.push({ key, label: SOCIAL_LABELS[key] ?? key, url: value });
     } else if (key === "links" && Array.isArray(value)) {
       for (const link of value) {
         const url = (link as { url?: unknown })?.url;
         const label = (link as { label?: unknown })?.label;
         if (typeof url === "string") {
-          out.push({ key: typeof label === "string" ? label : "link", url });
+          out.push({
+            key: "link",
+            label: typeof label === "string" ? label : "Link",
+            url,
+          });
         }
       }
     }

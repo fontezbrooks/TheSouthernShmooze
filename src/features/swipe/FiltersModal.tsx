@@ -26,8 +26,8 @@ export function FiltersModal({
       <TaskIntake
         key={visible ? "filters-open" : "filters-closed"}
         initial={current}
-        heading="Filters"
-        submitLabel="Update matches"
+        heading="What are you looking for?"
+        submitLabel="Find my match"
         onSubmit={onApply}
       />
     </CenteredSheet>

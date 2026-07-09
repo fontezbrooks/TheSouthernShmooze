@@ -9,6 +9,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/theme/ThemeProvider";
+import { Icon } from "@/components/ui/Icon";
 import { useSwipeSession } from "./SwipeSessionProvider";
 import { useSwipeDeck } from "./useSwipeDeck";
 import { swipeRepository } from "./swipeRepository";
@@ -108,11 +109,8 @@ export function SwipeScreen() {
           hitSlop={12}
           style={styles.navBtn}
         >
-          <Text style={[t.typography.bodySemibold, { color: t.colors.rust }]}>
-            ‹ Back
-          </Text>
+          <Icon name="chevronLeft" size={28} color={t.colors.rust} />
         </Pressable>
-        <Text style={t.typography.displayXS}>The Shmoozer</Text>
         <View style={styles.headerRight}>
           {session.task ? (
             <Pressable

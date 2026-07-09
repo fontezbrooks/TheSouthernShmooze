@@ -9,18 +9,8 @@ import {
 } from "react-native";
 import { useTheme } from "@/theme/ThemeProvider";
 import { Button } from "@/components/ui/Button";
+import { SUGGESTED_CATEGORIES } from "@/features/providers/categories";
 import type { BudgetBand, SwipeTask, Timing } from "./swipeTypes";
-
-const SUGGESTED = [
-  "Landscaping",
-  "Roofing",
-  "Plumbing",
-  "Electrical",
-  "Cleaning",
-  "HVAC",
-  "Painting",
-  "Catering",
-] as const;
 
 const BUDGETS: { value: BudgetBand; label: string }[] = [
   { value: "lt_1000", label: "< $1,000" },
@@ -135,7 +125,7 @@ export function TaskIntake({
         Popular
       </Text>
       <View style={styles.chips}>
-        {SUGGESTED.map((s) => (
+        {SUGGESTED_CATEGORIES.map((s) => (
           <Chip
             key={s}
             label={s}

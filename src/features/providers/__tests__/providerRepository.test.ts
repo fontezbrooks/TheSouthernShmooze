@@ -104,7 +104,7 @@ describe("providerRepository.fetchMore", () => {
     const result = await providerRepository.fetchMore(3);
     expect(result.ok).toBe(true);
     const rangeCall = q.calls.find((c) => c.method === "range");
-    expect(rangeCall?.args).toEqual([3, 5]); // offset 3, PAGE_SIZE 3 → [3,5]
+    expect(rangeCall?.args).toEqual([3, 7]); // offset 3, PAGE_SIZE 5 → [3,7]
     const notCall = q.calls.find((c) => c.method === "not");
     expect(notCall?.args[0]).toBe("name"); // excludes pinned by name
   });
