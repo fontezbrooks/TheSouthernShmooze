@@ -150,3 +150,15 @@ Voice reference (current app copy): *"It's a match! We've sent your details."*, 
 |----|--------|-------------|
 | A1 | H3/H4/H5/H8 (Top Card) | Top Card is too large. New layout per owner's Figma (RC4 `rctwIFsBZ4f0MpuDqWp3AP` node `85-3127`): **"Concierge" as centered Header S title → photo (124px, radius 8) → helper text ("We'll email recommendations of trusted local businesses based on your specific needs.") → full-width Button S "Reach Out"**. "Let us help you plan" DELETED. The Figma shows the standard 32px Button S — **supersedes H4's larger CTA** on this card (community banner's larger CTA, H9, stands). |
 | A2 | H1 (Match block) | Match Home block becomes an **image-left** banner (same shape as Ask-the-community) using `assets/Match-cover-logo.svg` as the left image. Title/copy/CTA unchanged. Technical: the SVG imports as a component via the metro transformer and must live under `src/` (broad `assets/*` gitignore breaks EAS uploads — same reason the nav icons moved); `Banner` needs an SVG-component slot alongside the raster `image` prop. |
+
+## 13. Post-round: Directory search precision (owner, 2026-07-09)
+
+**Problem (observed on device):** searching "lawn" returns businesses that never mention lawn (web design, dryer-vent cleaning). Root cause: `directory_search` (migration 0013) ORs three `word_similarity(...) > 0.3` trigram branches over name/description/about_text — on short queries, any long profile containing a trigram-adjacent word (e.g. "Lawrenceville") false-matches.
+
+**Decisions (owner):**
+- **SR1 — Word match only.** Keep the full-text branch (`search_tsv/about_tsv @@ websearch_to_tsquery`) as the sole predicate: results must contain the query word, stemmed ("lawn" ↔ "lawns"), case-insensitive. Trigram branches removed from the WHERE (rank may still use similarity as a tie-break signal or drop it). No typo tolerance — accepted.
+- **SR2 — Directory only.** The Shmoozer deck (`directory_swipe_deck`, 0016) keeps its current matching; revisit only if deck quality bothers on device.
+
+**Acceptance:** "lawn" returns only businesses whose name/description/about contains lawn/lawns; no-results state shows otherwise. Existing `useDirectorySearch` client behavior unchanged (RPC signature stays).
+
+**Constraint note:** requires a NEW Supabase migration (next number) re-creating `directory_search` — the first server-side change of this round, owner-initiated. Local `supabase test db`/pgTAP if present should be run.
