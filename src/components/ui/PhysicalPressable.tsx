@@ -16,6 +16,11 @@ import { useTheme } from "@/theme/ThemeProvider";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
+// Press-in only fires after this delay, so starting a SCROLL on a card no
+// longer depresses it — the ScrollView claims the gesture first (SR4). A real
+// tap holds still past the delay and gets the full travel animation.
+const PRESS_DELAY_MS = 120;
+
 interface PhysicalPressableProps {
   onPress: () => void;
   /** Travel distance toward the shadow (matches the hard-shadow offset). */
@@ -73,6 +78,7 @@ export function PhysicalPressable({
       <AnimatedPressable
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel}
+        unstable_pressDelay={PRESS_DELAY_MS}
         onPress={onPress}
         onPressIn={() => {
           pressed.value = withTiming(1, { duration: 80 });

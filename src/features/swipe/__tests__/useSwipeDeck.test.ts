@@ -41,7 +41,6 @@ function makeRepo(over: Partial<SwipeRepository> = {}): SwipeRepository {
       .mockResolvedValue({ ok: true, data: [card("a"), card("b")] }),
     saveContact: jest.fn(),
     submitLead: jest.fn(),
-    fetchMatches: jest.fn(),
     ...over,
   };
 }
@@ -68,14 +67,26 @@ describe("useSwipeDeck", () => {
     expect(result.current.loading).toBe(false);
   });
 
-  it("advances through cards then reports empty", async () => {
+  it("advances through cards then reports exhausted, not empty (ST6)", async () => {
     const { result } = await render(task, makeRepo());
     await flush();
     await act(async () => result.current.advance());
     expect(result.current.current?.id).toBe("b");
+    expect(result.current.exhausted).toBe(false);
     await act(async () => result.current.advance());
     expect(result.current.current).toBeNull();
+    expect(result.current.exhausted).toBe(true);
+    expect(result.current.empty).toBe(false);
+  });
+
+  it("reports empty when the deck loads zero cards (ST5)", async () => {
+    const { result } = await render(task, {
+      ...makeRepo(),
+      fetchDeck: jest.fn().mockResolvedValue({ ok: true, data: [] }),
+    });
+    await flush();
     expect(result.current.empty).toBe(true);
+    expect(result.current.exhausted).toBe(false);
   });
 
   it("stays idle with no task", async () => {
@@ -85,6 +96,7 @@ describe("useSwipeDeck", () => {
     expect(repo.createTask).not.toHaveBeenCalled();
     expect(result.current.current).toBeNull();
     expect(result.current.empty).toBe(false);
+    expect(result.current.exhausted).toBe(false);
   });
 
   it("surfaces a deck fetch error", async () => {

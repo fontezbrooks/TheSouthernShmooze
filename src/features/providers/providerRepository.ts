@@ -13,7 +13,7 @@ export const PINNED_NAMES = [
 ] as const;
 
 /** Page size for "See More" (and the pinned count). */
-export const PAGE_SIZE = 3;
+export const PAGE_SIZE = 5;
 
 /** A Postgres `in` list literal, e.g. `("a","b")` with embedded quotes escaped. */
 function inList(values: readonly string[]): string {

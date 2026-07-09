@@ -6,12 +6,9 @@ import { getSupabase } from "@/lib/supabase";
 import { ok, err, type Result } from "@/lib/result";
 import {
   toDeckCard,
-  toMatch,
   type BudgetBand,
   type DeckCard,
-  type MyLeadRow,
   type SwipeDeckRow,
-  type SwipeMatch,
   type SwipeTask,
 } from "./swipeTypes";
 
@@ -47,7 +44,6 @@ export interface SwipeRepository {
     businessUid: string,
     confidence: number,
   ): Promise<Result<SubmitOutcome>>;
-  fetchMatches(sessionToken: string): Promise<Result<SwipeMatch[]>>;
 }
 
 /** Read `{ status, reason }` from an RPC jsonb result. */
@@ -131,19 +127,6 @@ export const swipeRepository: SwipeRepository = {
       return err(reason ?? "We couldn’t send that match.");
     } catch {
       return err("Network error sending that match.");
-    }
-  },
-
-  async fetchMatches(sessionToken) {
-    try {
-      const { data, error } = await getSupabase().rpc("get_my_swipe_leads", {
-        p_session_token: sessionToken,
-      });
-      if (error) return err("We couldn’t load your matches right now.");
-      const rows = (data ?? []) as MyLeadRow[];
-      return ok(rows.map(toMatch));
-    } catch {
-      return err("Network error loading your matches.");
     }
   },
 };

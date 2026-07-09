@@ -151,25 +151,3 @@ describe("submitLead", () => {
     expect(res).toEqual({ ok: false, error: "contact not verified" });
   });
 });
-
-describe("fetchMatches", () => {
-  it("maps lead rows to matches", async () => {
-    mockRpc.mockResolvedValue({
-      data: [
-        {
-          business_uid: "u1",
-          name: "Roof Co",
-          logo_url: null,
-          confidence: 80,
-          status: "sent",
-          created_at: "2026-06-30",
-        },
-      ],
-      error: null,
-    });
-    const res = await swipeRepository.fetchMatches("sess");
-    expect(res.ok).toBe(true);
-    if (!res.ok) return;
-    expect(res.data[0].name).toBe("Roof Co");
-  });
-});

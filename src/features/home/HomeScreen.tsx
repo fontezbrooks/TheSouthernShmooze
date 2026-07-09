@@ -8,6 +8,9 @@ import { SearchBarButton } from "@/features/directory/SearchBar";
 import { CertifiedProviders } from "@/features/providers/CertifiedProviders";
 import { openLink } from "@/lib/openLink";
 import { LINKS } from "@/lib/links";
+// Lives under src/ (not assets/) so the EAS uploader bundles it — see the nav
+// icons note in app/(tabs)/_layout.tsx.
+import MatchCoverLogo from "./match-cover-logo.svg";
 
 /** Home tab — help banner → concierge, certified providers, community banner. */
 export function HomeScreen() {
@@ -28,13 +31,19 @@ export function HomeScreen() {
         keyboardShouldPersistTaps="handled"
       >
         {/* Entry point to the Directory search — focus the input on arrival so the
-            user can type immediately (no second tap). */}
-        <SearchBarButton onPress={() => router.push("/directory?focus=1")} />
+            user can type immediately (no second tap); `from=home` shows the back
+            chevron in the Directory search row (H11). */}
+        <SearchBarButton
+          onPress={() => router.push("/directory?focus=1&from=home")}
+        />
 
+        {/* Top card per owner Figma 85:3127 (amendment A1): centered "Concierge"
+            title, photo, helper text, standard Button S. */}
         <Banner
           layout="imageTop"
           image={bannerHelp}
-          title="Let us help you plan"
+          title="Concierge"
+          titleAlign="center"
           subtitle="We'll email recommendations of trusted local businesses based on your specific needs."
           cta={{ label: "Reach Out" }}
           onPress={() => router.push("/concierge")}
@@ -42,13 +51,38 @@ export function HomeScreen() {
 
         <CertifiedProviders onCallPress={callBusiness} />
 
+        {/* Match block (H1, SR3 grid layout) — logo + title row, full-width CTA.
+            Copy: draft, owner approves at PR. */}
+        <Banner
+          layout="titleRow"
+          imageNode={<MatchCoverLogo width={120} height={86} />}
+          title="Find Your Perfect Local Match"
+          subtitle="Tell us what you need, then swipe to match with trusted local businesses."
+          cta={{ label: "Start Matching" }}
+          ctaSize="lg"
+          onPress={() => router.push("/swipe")}
+        />
+
         <Banner
           layout="imageLeft"
           image={bannerCommunity}
           title="Ask the community"
+          // Much tighter leading than the 42px token default; 36 keeps just enough
+          // headroom for Shrikhand ascenders (see typography.ts) — verify on device.
+          titleLineHeight={36}
           subtitle="Get recommendations and connect with locals."
           cta={{ label: "Join the Facebook Group" }}
+          ctaSize="lg"
           onPress={() => openLink(LINKS.facebook)}
+        />
+
+        {/* Newsletter block (H1) — replaces the Newsletter tab. Copy: draft, owner approves at PR. */}
+        <Banner
+          layout="imageTop"
+          title="The Newsletter"
+          subtitle="Local finds and happenings, delivered straight to your inbox."
+          cta={{ label: "Subscribe" }}
+          onPress={() => openLink(LINKS.newsletter)}
         />
       </ScrollView>
     </ImageBackground>

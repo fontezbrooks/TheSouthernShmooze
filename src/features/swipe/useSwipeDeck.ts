@@ -11,8 +11,10 @@ export interface SwipeDeckState {
   taskId: string | null;
   loading: boolean;
   error: string | null;
-  /** Settled with no card left (distinct from loading / error). */
+  /** Deck loaded with ZERO cards — "no matches" (ST5). */
   empty: boolean;
+  /** Deck had cards and the user swiped through them all — end of deck (ST6). */
+  exhausted: boolean;
   /** Drop the current card (after a left or right swipe is resolved). */
   advance: () => void;
 }
@@ -32,16 +34,18 @@ export function useSwipeDeck(
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [settled, setSettled] = useState(false);
+  const [hadCards, setHadCards] = useState(false);
 
   useEffect(() => {
     if (!task || !sessionToken) return;
     let alive = true;
-    setLoading(true);
-    setError(null);
-    setSettled(false);
-    setCards([]);
-    setTaskId(null);
     (async () => {
+      setLoading(true);
+      setError(null);
+      setSettled(false);
+      setCards([]);
+      setHadCards(false);
+      setTaskId(null);
       const t = await repo.createTask(task, sessionToken);
       if (!alive) return;
       if (!t.ok) {
@@ -53,8 +57,12 @@ export function useSwipeDeck(
       setTaskId(t.data);
       const deck = await repo.fetchDeck(task, sessionToken, []);
       if (!alive) return;
-      if (deck.ok) setCards(interleaveFeatured(deck.data));
-      else setError(deck.error);
+      if (deck.ok) {
+        setCards(interleaveFeatured(deck.data));
+        setHadCards(deck.data.length > 0);
+      } else {
+        setError(deck.error);
+      }
       setLoading(false);
       setSettled(true);
     })();
@@ -66,7 +74,9 @@ export function useSwipeDeck(
   const advance = useCallback(() => setCards((prev) => prev.slice(1)), []);
 
   const current = cards[0] ?? null;
-  const empty = settled && !loading && error === null && current === null;
+  const done = settled && !loading && error === null && current === null;
+  const empty = done && !hadCards;
+  const exhausted = done && hadCards;
 
-  return { cards, current, taskId, loading, error, empty, advance };
+  return { cards, current, taskId, loading, error, empty, exhausted, advance };
 }

@@ -1,7 +1,8 @@
 import type { ComponentType } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { Tabs } from "expo-router";
+import { Tabs, useRouter, type Href } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Feather from "@expo/vector-icons/Feather";
 import { useTheme } from "@/theme/ThemeProvider";
 import { openLink } from "@/lib/openLink";
 import { LINKS } from "@/lib/links";
@@ -12,7 +13,6 @@ import HomeIcon from "@/components/ui/icons/home-05.svg";
 import PhoneCallIcon from "@/components/ui/icons/phone-call-01.svg";
 import HeartHandIcon from "@/components/ui/icons/heart-hand.svg";
 import UsersIcon from "@/components/ui/icons/users-03.svg";
-import SocialSpreadIcon from "@/components/ui/icons/socialSpread.svg";
 
 type SvgIcon = ComponentType<{
   width?: number;
@@ -20,15 +20,28 @@ type SvgIcon = ComponentType<{
   color?: string;
 }>;
 
+/** Interim Match tab glyph (approved, design §8): Feather heart adapted to the SvgIcon contract. */
+function MatchTabIcon({
+  width = 24,
+  color,
+}: {
+  width?: number;
+  height?: number;
+  color?: string;
+}) {
+  return <Feather name="heart" size={width} color={color} />;
+}
+
 /**
  * The 5 nav destinations (Figma NavBar). `route` items navigate to a registered
- * tab screen; `link` items open an external URL (Community → Facebook group,
- * Newsletter → Substack) without navigating — the same destinations as the
- * Home/Community banners, reached a different way.
+ * tab screen; `link` items open an external URL (Community → Facebook group)
+ * without navigating; `push` items push a stack screen over the tabs (Match →
+ * the swipe deck). Newsletter moved from the tab bar to a Home block.
  */
 type TabItem =
   | { key: string; label: string; icon: SvgIcon; kind: "route" }
-  | { key: string; label: string; icon: SvgIcon; kind: "link"; href: string };
+  | { key: string; label: string; icon: SvgIcon; kind: "link"; href: string }
+  | { key: string; label: string; icon: SvgIcon; kind: "push"; href: Href };
 
 const TABS: TabItem[] = [
   { key: "index", label: "Home", icon: HomeIcon, kind: "route" },
@@ -41,13 +54,7 @@ const TABS: TabItem[] = [
     kind: "link",
     href: LINKS.facebook,
   },
-  {
-    key: "newsletter",
-    label: "Newsletter",
-    icon: SocialSpreadIcon,
-    kind: "link",
-    href: LINKS.newsletter,
-  },
+  { key: "match", label: "Match", icon: MatchTabIcon, kind: "push", href: "/swipe" },
 ];
 
 /**
@@ -66,9 +73,10 @@ interface TabBarProps {
   };
 }
 
-/** Custom 5-tab bar (cream, rust hairline). Route tabs navigate; link tabs open external URLs. */
+/** Custom 5-tab bar (cream, rust hairline). Route tabs navigate; link tabs open external URLs; push tabs stack a screen. */
 function AppTabBar({ state, navigation }: TabBarProps) {
   const t = useTheme();
+  const router = useRouter();
   const insets = useSafeAreaInsets();
   const activeRoute = state.routes[state.index]?.name;
 
@@ -90,6 +98,10 @@ function AppTabBar({ state, navigation }: TabBarProps) {
           const onPress = () => {
             if (tab.kind === "link") {
               openLink(tab.href);
+              return;
+            }
+            if (tab.kind === "push") {
+              router.push(tab.href);
               return;
             }
             const route = state.routes.find((r) => r.name === tab.key);

@@ -1,14 +1,13 @@
 import {
   View,
   Text,
-  Pressable,
-  ScrollView,
+  FlatList,
   ActivityIndicator,
   StyleSheet,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/theme/ThemeProvider";
-import { Icon } from "@/components/ui/Icon";
+import { Button } from "@/components/ui/Button";
 import { StrokedHeading } from "@/components/ui/StrokedHeading";
 import { BusinessCard } from "./BusinessCard";
 import { useProviders } from "./useProviders";
@@ -17,18 +16,31 @@ interface CertifiedProvidersProps {
   onCallPress: (phone: string) => void;
 }
 
-/** Home section: header + horizontal row of provider cards + "See More". */
+/**
+ * Home section: header (+ "View all" pill) and a horizontal rail of provider
+ * cards. The rail auto-appends the next PAGE_SIZE batch as the user nears the
+ * end — no "See More" tile (July 2026 round, H6/H7). Layout and placement are
+ * unchanged from the ScrollView version.
+ */
 export function CertifiedProviders({ onCallPress }: CertifiedProvidersProps) {
   const t = useTheme();
   const router = useRouter();
-  const { pinned, loading, error } = useProviders();
-  const cards = pinned;
+  const { pinned, more, loading, loadingMore, error, loadMore } =
+    useProviders();
+  const cards = [...pinned, ...more];
 
   const openBiz = (sourceUid: string) => router.push(`/business/${sourceUid}`);
 
   return (
     <View style={styles.section}>
-      <StrokedHeading variant="displayXS">Certified Providers</StrokedHeading>
+      <View style={styles.headerRow}>
+        <StrokedHeading variant="displayXS">Certified Providers</StrokedHeading>
+        <Button
+          label="View all"
+          variant="pill"
+          onPress={() => router.push("/directory")}
+        />
+      </View>
 
       {loading ? (
         <ActivityIndicator color={t.colors.rust} style={styles.loading} />
@@ -37,39 +49,32 @@ export function CertifiedProviders({ onCallPress }: CertifiedProvidersProps) {
           {error ?? "No providers to show yet."}
         </Text>
       ) : (
-        <ScrollView
+        <FlatList
+          testID="providers-rail"
           horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.row}
-        >
-          {cards.map((b) => (
+          data={cards}
+          keyExtractor={(b) => b.id}
+          renderItem={({ item }) => (
             <BusinessCard
-              key={b.id}
-              business={b}
+              business={item}
               onCallPress={onCallPress}
               onCardPress={openBiz}
             />
-          ))}
-
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="See more providers in the directory"
-            onPress={() => router.push("/directory")}
-            style={[
-              styles.seeMore,
-              {
-                backgroundColor: t.colors.rust,
-                borderColor: t.colors.rustDark,
-                borderRadius: t.radii.card,
-              },
-            ]}
-          >
-            <Text style={[t.typography.seeMore, { color: t.colors.bg }]}>
-              See More
-            </Text>
-            <Icon name="arrowRight" size={18} color={t.colors.bg} />
-          </Pressable>
-        </ScrollView>
+          )}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.row}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            loadingMore ? (
+              <ActivityIndicator
+                color={t.colors.rust}
+                style={styles.footer}
+                accessibilityLabel="Loading more providers"
+              />
+            ) : null
+          }
+        />
       )}
 
       {error && cards.length > 0 ? (
@@ -86,16 +91,14 @@ export function CertifiedProviders({ onCallPress }: CertifiedProvidersProps) {
 
 const styles = StyleSheet.create({
   section: { gap: 12 },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
   loading: { alignSelf: "flex-start", marginVertical: 12 },
   // paddingBottom/Right clear the cards' hard shadow (offset 4,4) so the
-  // horizontal ScrollView doesn't clip it.
+  // horizontal list doesn't clip it.
   row: { gap: 16, paddingRight: 16, paddingBottom: 12 },
-  seeMore: {
-    width: 120,
-    borderWidth: 2,
-    padding: 24,
-    justifyContent: "center",
-    alignItems: "flex-start",
-    gap: 8,
-  },
+  footer: { alignSelf: "center", paddingHorizontal: 16 },
 });

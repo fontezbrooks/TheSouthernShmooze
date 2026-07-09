@@ -11,7 +11,6 @@ import type { DirectoryBusinessRow } from "@/lib/database";
 
 export type BudgetBand = "lt_1000" | "1000_5000" | "gt_5000";
 export type Timing = "asap" | "this_week" | "flexible";
-export type LeadStatus = "sent" | "confirmed" | "closed";
 
 /** The need a Seeker states once per session; attached to every lead it produces. */
 export interface SwipeTask {
@@ -61,33 +60,18 @@ export function toDeckCard(row: SwipeDeckRow): DeckCard {
   };
 }
 
-/** A lead the Seeker has sent (Matches screen). */
-export interface SwipeMatch {
-  businessUid: string;
+// The Matches list was removed (July 2026 round, S9) — its client view-models
+// (SwipeMatch/MyLeadRow/toMatch) went with it. Server-side lead data and the
+// `get_my_swipe_leads` RPC are intentionally untouched.
+
+/** A right-swiped card awaiting the contact page (CP1) — travels via session context. */
+export interface PendingMatch {
+  card: DeckCard;
+  taskId: string;
+}
+
+/** Set by the contact page after a successful send; consumed by the deck (ST1/ST2). */
+export interface MatchResult {
   name: string;
-  logoUrl: string | null;
-  confidence: number;
-  status: LeadStatus;
-  createdAt: string;
-}
-
-/** Row shape returned by the `get_my_swipe_leads` RPC. */
-export interface MyLeadRow {
-  business_uid: string;
-  name: string | null;
-  logo_url: string | null;
-  confidence: number;
-  status: LeadStatus;
-  created_at: string;
-}
-
-export function toMatch(row: MyLeadRow): SwipeMatch {
-  return {
-    businessUid: row.business_uid,
-    name: row.name ?? "This business",
-    logoUrl: row.logo_url,
-    confidence: row.confidence,
-    status: row.status,
-    createdAt: row.created_at,
-  };
+  first: boolean;
 }

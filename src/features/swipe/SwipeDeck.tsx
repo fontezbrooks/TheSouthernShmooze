@@ -8,22 +8,32 @@ interface SwipeDeckProps {
   current: DeckCard | null;
   loading: boolean;
   error: string | null;
+  /** Deck loaded with zero cards (ST5). */
   empty: boolean;
+  /** Deck ran out after swiping (ST6 — hand off to the directory). */
+  exhausted: boolean;
   onPass: () => void;
   onLike: () => void;
   onNewSearch: () => void;
+  /** ST6 CTA — browse the full directory seeded with the search term. */
+  onBrowseDirectory: () => void;
+  /** Non-swipe tap on the card (profile quick view, S8). */
+  onCardPress: (card: DeckCard) => void;
 }
 
 /** Presentational deck: the draggable top card + Pass/Match controls, plus the
- * loading / error / empty states. */
+ * loading / error / no-matches (ST5) / end-of-deck (ST6) states. */
 export function SwipeDeck({
   current,
   loading,
   error,
   empty,
+  exhausted,
   onPass,
   onLike,
   onNewSearch,
+  onBrowseDirectory,
+  onCardPress,
 }: SwipeDeckProps) {
   const t = useTheme();
 
@@ -54,16 +64,38 @@ export function SwipeDeck({
     );
   }
 
-  if (empty || !current) {
+  // ST6 — swiped through everything: hand off into the regular directory.
+  if (exhausted) {
     return (
       <View style={styles.center}>
         <Text style={[t.typography.displayXS, styles.msg]}>
-          That’s everyone for now
+          That’s it for matches
         </Text>
         <Text
           style={[t.typography.body, styles.msg, { color: t.colors.muted }]}
         >
-          Widen your search or try a different keyword.
+          Here’s the regular directory — more local pros are waiting there.
+        </Text>
+        <Button
+          label="Browse the directory"
+          variant="solid"
+          onPress={onBrowseDirectory}
+        />
+      </View>
+    );
+  }
+
+  // ST5 — the search matched nothing at all.
+  if (empty || !current) {
+    return (
+      <View style={styles.center}>
+        <Text style={[t.typography.displayXS, styles.msg]}>
+          No matches yet
+        </Text>
+        <Text
+          style={[t.typography.body, styles.msg, { color: t.colors.muted }]}
+        >
+          Try a different keyword to find local pros.
         </Text>
         <Button label="New search" variant="solid" onPress={onNewSearch} />
       </View>
@@ -78,6 +110,7 @@ export function SwipeDeck({
           card={current}
           onSwipeLeft={onPass}
           onSwipeRight={onLike}
+          onPress={() => onCardPress(current)}
         />
       </View>
       <View style={styles.actions}>

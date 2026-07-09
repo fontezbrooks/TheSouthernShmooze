@@ -21,6 +21,8 @@ interface SwipeCardProps {
   card: DeckCard;
   onSwipeLeft: () => void;
   onSwipeRight: () => void;
+  /** Non-swipe tap on the card (profile quick view, S8). */
+  onPress?: () => void;
 }
 
 /**
@@ -29,7 +31,12 @@ interface SwipeCardProps {
  * cues that fade in with the drag. Remounted per card (keyed by id in the deck), so the
  * shared offset resets cleanly between cards. All motion runs on the UI thread (worklets).
  */
-export function SwipeCard({ card, onSwipeLeft, onSwipeRight }: SwipeCardProps) {
+export function SwipeCard({
+  card,
+  onSwipeLeft,
+  onSwipeRight,
+  onPress,
+}: SwipeCardProps) {
   const t = useTheme();
   const x = useSharedValue(0);
 
@@ -54,6 +61,12 @@ export function SwipeCard({ card, onSwipeLeft, onSwipeRight }: SwipeCardProps) {
         x.value = withSpring(0, SPRING);
       }
     });
+
+  // Tap = quick view (S8). Exclusive with the pan so a drag never fires it.
+  const tap = Gesture.Tap().onEnd((_e, success) => {
+    if (success && onPress) runOnJS(onPress)();
+  });
+  const gesture = onPress ? Gesture.Exclusive(pan, tap) : pan;
 
   const cardStyle = useAnimatedStyle(() => ({
     transform: [
@@ -88,7 +101,7 @@ export function SwipeCard({ card, onSwipeLeft, onSwipeRight }: SwipeCardProps) {
   }));
 
   return (
-    <GestureDetector gesture={pan}>
+    <GestureDetector gesture={gesture}>
       <Animated.View style={[styles.fill, cardStyle]}>
         <DeckCardView card={card} />
         <Animated.View

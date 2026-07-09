@@ -11,6 +11,11 @@ import ThumbsUpSvg from "./icons/thumbs-up.svg";
 import SaleSvg from "./icons/sale-03.svg";
 import StarSvg from "./icons/star-01.svg";
 import FileQuestionSvg from "./icons/fileQuestion.svg";
+// Brand glyphs (P6, owner-provided — design §8): fixed palette, `color` is a no-op.
+import BrandBbbSvg from "./icons/brand-bbb.svg";
+import BrandYelpSvg from "./icons/brand-yelp.svg";
+import BrandGoogleBusinessSvg from "./icons/brand-google-business.svg";
+import BrandGaSosSvg from "./icons/brand-ga-sos.svg";
 
 /** Semantic icon names. Most map to Feather; a few route to Figma-exported SVGs. */
 export type IconName =
@@ -23,6 +28,11 @@ export type IconName =
   | "calendar"
   | "plus"
   | "chevronDown"
+  | "chevronLeft"
+  | "heart"
+  | "globe"
+  | "facebook"
+  | "instagram"
   | "star"
   | "search"
   | "x"
@@ -33,7 +43,12 @@ export type IconName =
   | "briefcaseFilled"
   | "thumbsUp"
   | "discount"
-  | "fileQuestion";
+  | "fileQuestion"
+  // Brand marks (fixed palette — `color` prop ignored):
+  | "brandBbb"
+  | "brandYelp"
+  | "brandGoogleBusiness"
+  | "brandGaSos";
 
 const FEATHER: Record<string, React.ComponentProps<typeof Feather>["name"]> = {
   arrowRight: "arrow-right",
@@ -45,6 +60,11 @@ const FEATHER: Record<string, React.ComponentProps<typeof Feather>["name"]> = {
   calendar: "calendar",
   plus: "plus-circle",
   chevronDown: "chevron-down",
+  chevronLeft: "chevron-left",
+  heart: "heart",
+  globe: "globe",
+  facebook: "facebook",
+  instagram: "instagram",
   star: "star",
   search: "search",
   x: "x",
@@ -70,6 +90,10 @@ const CUSTOM: Partial<Record<IconName, ComponentType<GlyphProps>>> = {
   discount: svgGlyph(SaleSvg),
   starFilled: svgGlyph(StarSvg),
   fileQuestion: svgGlyph(FileQuestionSvg),
+  brandBbb: svgGlyph(BrandBbbSvg),
+  brandYelp: svgGlyph(BrandYelpSvg),
+  brandGoogleBusiness: svgGlyph(BrandGoogleBusinessSvg),
+  brandGaSos: svgGlyph(BrandGaSosSvg),
 };
 
 interface IconProps {

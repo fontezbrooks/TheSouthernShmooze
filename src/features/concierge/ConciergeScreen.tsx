@@ -1,4 +1,6 @@
 import {
+  View,
+  Text,
   ScrollView,
   ImageBackground,
   StyleSheet,
@@ -6,13 +8,15 @@ import {
   Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { useTheme } from "@/theme/ThemeProvider";
 import { daisyBackground } from "@/theme/assets";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { StrokedHeading } from "@/components/ui/StrokedHeading";
 import { LeadForm } from "@/features/lead-form/LeadForm";
 
-/** Concierge screen — "Let's Plan Something Awesome" + the lead form. */
+/** Concierge screen — "Concierge" brand kicker, "Let's Plan Something Awesome" + the lead form. */
 export function ConciergeScreen() {
+  const t = useTheme();
   const router = useRouter();
 
   return (
@@ -35,9 +39,13 @@ export function ConciergeScreen() {
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
         >
-          <StrokedHeading variant="displayL">
-            Let&apos;s Plan Something Awesome
-          </StrokedHeading>
+          <View style={styles.headingBlock}>
+            {/* Brand kicker (C1) — same overline treatment as the Home banner. */}
+            <Text style={t.typography.displayXS}>Concierge</Text>
+            <StrokedHeading variant="displayL">
+              Let&apos;s Plan Something Awesome
+            </StrokedHeading>
+          </View>
           <LeadForm />
         </ScrollView>
       </KeyboardAvoidingView>
@@ -47,6 +55,7 @@ export function ConciergeScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
+  headingBlock: { gap: 4 },
   content: {
     paddingHorizontal: 16,
     paddingTop: 16,

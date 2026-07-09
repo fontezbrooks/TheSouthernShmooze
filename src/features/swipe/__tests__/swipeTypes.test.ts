@@ -1,9 +1,4 @@
-import {
-  toDeckCard,
-  toMatch,
-  type MyLeadRow,
-  type SwipeDeckRow,
-} from "../swipeTypes";
+import { toDeckCard, type SwipeDeckRow } from "../swipeTypes";
 
 function deckRow(over: Partial<SwipeDeckRow> = {}): SwipeDeckRow {
   return {
@@ -46,22 +41,5 @@ describe("toDeckCard", () => {
 
   it("defaults matched_terms null to an empty array", () => {
     expect(toDeckCard(deckRow({ matched_terms: null })).matchedTerms).toEqual([]);
-  });
-});
-
-describe("toMatch", () => {
-  it("maps a lead row and falls back to a placeholder name", () => {
-    const row: MyLeadRow = {
-      business_uid: "uid",
-      name: null,
-      logo_url: null,
-      confidence: 60,
-      status: "sent",
-      created_at: "2026-06-30",
-    };
-    const m = toMatch(row);
-    expect(m.name).toBe("This business");
-    expect(m.status).toBe("sent");
-    expect(m.confidence).toBe(60);
   });
 });

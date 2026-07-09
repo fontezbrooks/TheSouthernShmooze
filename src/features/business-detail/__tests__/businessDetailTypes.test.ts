@@ -68,32 +68,41 @@ describe("toDetail", () => {
     expect(toDetail(detailRow({ address: null })).address).toBeNull();
   });
 
-  it("flattens socials with human labels for known keys + labelled links", () => {
+  it("flattens socials keeping raw keys + short pill labels, and labelled links", () => {
     const d = toDetail(detailRow({}));
     expect(d.socials).toEqual([
-      { key: "facebook", url: "https://facebook.com/x" },
-      { key: "Yelp", url: "https://yelp.com/x" },
+      { key: "fbk", label: "Facebook", url: "https://facebook.com/x" },
+      { key: "link", label: "Yelp", url: "https://yelp.com/x" },
     ]);
   });
 
-  it("maps every known social key to its human label", () => {
+  it("maps every known social key to its short pill label (P6)", () => {
     const d = toDetail(
       detailRow({
         socials: { bbb: "u", fbk: "u", goo: "u", igm: "u", ylp: "u" },
       }),
     );
+    expect(d.socials.map((s) => s.label)).toEqual([
+      "BBB",
+      "Facebook",
+      "Google Business",
+      "Instagram",
+      "Yelp",
+    ]);
     expect(d.socials.map((s) => s.key)).toEqual([
-      "Better Business Bureau",
-      "facebook",
-      "google business profile",
-      "instagram",
-      "yelp",
+      "bbb",
+      "fbk",
+      "goo",
+      "igm",
+      "ylp",
     ]);
   });
 
-  it("falls back to the raw key for unmapped socials", () => {
+  it("falls back to the raw key as the label for unmapped socials", () => {
     const d = toDetail(detailRow({ socials: { unknownkey: "u" } }));
-    expect(d.socials).toEqual([{ key: "unknownkey", url: "u" }]);
+    expect(d.socials).toEqual([
+      { key: "unknownkey", label: "unknownkey", url: "u" },
+    ]);
   });
 
   it("prefers large gallery URLs and drops empty ones", () => {
