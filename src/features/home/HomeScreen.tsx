@@ -51,10 +51,10 @@ export function HomeScreen() {
 
         <CertifiedProviders onCallPress={callBusiness} />
 
-        {/* Match block (H1, amendment A2) — logo-left entry into the swipe deck,
-            same shape as the community banner. Copy: draft, owner approves at PR. */}
+        {/* Match block (H1, SR3 grid layout) — logo + title row, full-width CTA.
+            Copy: draft, owner approves at PR. */}
         <Banner
-          layout="imageLeft"
+          layout="titleRow"
           imageNode={<MatchCoverLogo width={120} height={86} />}
           title="Find Your Perfect Local Match"
           subtitle="Tell us what you need, then swipe to match with trusted local businesses."

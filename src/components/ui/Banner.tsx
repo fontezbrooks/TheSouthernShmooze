@@ -10,8 +10,12 @@ interface BannerProps {
   image?: ImageSourcePropType;
   /** Component image (e.g. a transformer-imported SVG) rendered in the image slot instead of `image`. */
   imageNode?: ReactNode;
-  /** imageTop = photo across the top (Concierge top card); imageLeft = photo beside the copy (community/Match). */
-  layout: 'imageTop' | 'imageLeft';
+  /**
+   * imageTop = photo across the top (Concierge top card); imageLeft = photo
+   * beside the copy (community); titleRow = logo + title share the top row,
+   * subtitle and a full-width CTA span below (Match block, SR3).
+   */
+  layout: 'imageTop' | 'imageLeft' | 'titleRow';
   /** Figma 85:3127 centers the top-card "Concierge" title. Default left. */
   titleAlign?: 'left' | 'center';
   /** CTA is visual only — the whole banner is the tap target. */
@@ -76,6 +80,7 @@ export function Banner({
 }: BannerProps) {
   const t = useTheme();
   const isTop = layout === 'imageTop';
+  const isTitleRow = layout === 'titleRow';
 
   const titleNode = (
     <Text
@@ -109,7 +114,7 @@ export function Banner({
       radius={t.radii.card}
       shadowColor={t.colors.rustDark}
       style={[
-        isTop ? styles.wrapTop : styles.wrapLeft,
+        isTop || isTitleRow ? styles.wrapTop : styles.wrapLeft,
         { backgroundColor: t.colors.rust, borderColor: t.colors.rustDark, borderRadius: t.radii.card },
       ]}
     >
@@ -118,6 +123,16 @@ export function Banner({
         <>
           {titleNode}
           {imageSlot}
+          {subtitleNode}
+          <BannerCta label={cta.label} size={ctaSize} fullWidth />
+        </>
+      ) : isTitleRow ? (
+        // SR3 grid: [logo | title] row → helper text → full-width CTA.
+        <>
+          <View style={styles.titleRow}>
+            {imageSlot}
+            <View style={styles.titleRowText}>{titleNode}</View>
+          </View>
           {subtitleNode}
           <BannerCta label={cta.label} size={ctaSize} fullWidth />
         </>
@@ -158,6 +173,13 @@ const styles = StyleSheet.create({
   rightCol: { flex: 1, gap: 16, alignItems: 'flex-start' },
   copy: { gap: 4, width: '100%' },
   titleCenter: { textAlign: 'center', alignSelf: 'stretch' },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    alignSelf: 'stretch',
+  },
+  titleRowText: { flex: 1 },
   imageTop: { width: '100%', height: 124, borderRadius: 8 },
   imageLeft: { width: 88, height: 169 },
   cta: {

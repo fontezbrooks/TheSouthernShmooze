@@ -162,3 +162,8 @@ Voice reference (current app copy): *"It's a match! We've sent your details."*, 
 **Acceptance:** "lawn" returns only businesses whose name/description/about contains lawn/lawns; no-results state shows otherwise. Existing `useDirectorySearch` client behavior unchanged (RPC signature stays).
 
 **Constraint note:** requires a NEW Supabase migration (next number) re-creating `directory_search` — the first server-side change of this round, owner-initiated. Local `supabase test db`/pgTAP if present should be run.
+
+## 14. Post-round: Match card grid + scroll-press fix (owner, 2026-07-09)
+
+- **SR3 — Match card grid layout (experimental, may revert).** Owner picked option A of three previews: **logo + title share the top row; explainer text full width below; full-width CTA at the bottom.** Implemented as a new Banner `layout="titleRow"` variant so reverting = switching the prop back to `imageLeft`.
+- **SR4 — cards must not depress on scroll.** All physical cards (business cards, banners, match CTA) animate press-in the moment a finger touches down, so starting a scroll on a card depresses it until the ScrollView steals the gesture. Fix: a ~120ms press delay in `PhysicalPressable` — the single shared pressable — so only a genuine tap (finger still down and not scrolling) triggers the travel. Accepted trade-off: tap feedback ~0.1s later (native-typical).
