@@ -165,6 +165,7 @@ assets/*
 !assets/banner-community.png
 !assets/icon.png
 !assets/NewImage.png
+!assets/np1.jpg
 
 # OS / tooling artifacts
 .DS_Store
