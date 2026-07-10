@@ -67,16 +67,36 @@ describe("useSwipeDeck", () => {
     expect(result.current.loading).toBe(false);
   });
 
-  it("advances through cards then reports exhausted, not empty (ST6)", async () => {
+  it("mirrors the engine index, then reports exhausted, not empty (ST6)", async () => {
     const { result } = await render(task, makeRepo());
     await flush();
-    await act(async () => result.current.advance());
+    // The engine advances itself; the hook only mirrors the index it reports.
+    expect(result.current.cards.map((c) => c.id)).toEqual(["a", "b"]);
+    await act(async () => result.current.setIndex(1));
     expect(result.current.current?.id).toBe("b");
+    expect(result.current.cards).toHaveLength(2); // full deck stays intact
     expect(result.current.exhausted).toBe(false);
-    await act(async () => result.current.advance());
+    await act(async () => result.current.setIndex(2));
     expect(result.current.current).toBeNull();
     expect(result.current.exhausted).toBe(true);
     expect(result.current.empty).toBe(false);
+  });
+
+  it("resets the mirrored index when a new task loads", async () => {
+    const repo = makeRepo();
+    const { result, rerender } = await renderHook(
+      ({ t }: { t: SwipeTask | null }) => useSwipeDeck(t, "sess", repo),
+      { initialProps: { t: task } },
+    );
+    await flush();
+    await act(async () => result.current.setIndex(2));
+    expect(result.current.exhausted).toBe(true);
+
+    const nextTask = { ...task, keyword: "gutters" };
+    await act(async () => rerender({ t: nextTask }));
+    await flush();
+    expect(result.current.current?.id).toBe("a");
+    expect(result.current.exhausted).toBe(false);
   });
 
   it("reports empty when the deck loads zero cards (ST5)", async () => {
