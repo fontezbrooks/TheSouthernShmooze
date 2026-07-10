@@ -9,17 +9,18 @@ import type { RefObject } from "react";
 import type { DeckCard } from "./swipeTypes";
 
 /**
- * Deck engine tuning — parity with the retired hand-rolled SwipeCard:
- * same commit threshold (0.28 × width), same spring, single visible card
- * (no stack), pan engages after a clear horizontal move so taps stay taps.
- * Rotation: the old card tilted 10° at a FULL screen-width drag, i.e. 2.8°
- * at the threshold — the engine clamps at the threshold, so 2.8° is the
- * parity value (same tilt slope while dragging).
+ * Deck engine tuning. Gesture feel is parity with the retired hand-rolled
+ * SwipeCard: same commit threshold (0.28 × width), same spring, pan engages
+ * after a clear horizontal move so taps stay taps. Rotation: the old card
+ * tilted 10° at a FULL screen-width drag, i.e. 2.8° at the threshold — the
+ * engine clamps at the threshold, so 2.8° is the parity value.
+ * Presentation: a visible stack of up to 3 cards (owner request, device
+ * round 2) — the engine simply shows fewer when fewer remain.
  */
 const DECK_CONFIG: Partial<SwipeDeckConfig> = {
-  visibleCards: 1,
-  stackOffsetY: 0,
-  stackScaleStep: 0,
+  visibleCards: 3,
+  stackOffsetY: 14,
+  stackScaleStep: 0.05,
   maxRotationRad: (10 * Math.PI) / 180 / (1 / 0.28),
   swipeThresholdRatio: 0.28,
   exitDistanceRatio: 1.5,

@@ -11,7 +11,7 @@
         "@expo-google-fonts/shrikhand": "^0.4.1",
         "@expo/metro-runtime": "~56.0.15",
         "@expo/vector-icons": "^15.0.2",
-        "@fontezbrooks/swipedaddy": "git+ssh://git@github.com/fontezbrooks/swipeDaddy.git#v0.2.1",
+        "@fontezbrooks/swipedaddy": "git+ssh://git@github.com/fontezbrooks/swipeDaddy.git#v0.2.2",
         "@hookform/resolvers": "^5.4.0",
         "@react-native-community/datetimepicker": "9.1.0",
         "@supabase/supabase-js": "^2.108.2",
@@ -338,7 +338,7 @@
 
     "@expo/xcpretty": ["@expo/xcpretty@4.4.4", "", { "dependencies": { "@babel/code-frame": "^7.20.0", "chalk": "^4.1.0", "js-yaml": "^4.1.0" }, "bin": { "excpretty": "build/cli.js" } }, "sha512-4aQzz9vgxcNXFfo/iyNgDDYfsU5XGKKxWxZopw0cVotHiW+U8IJbIxMaxsINs6bHhtkG3StKNPcOrn3eBuxKPw=="],
 
-    "@fontezbrooks/swipedaddy": ["@fontezbrooks/swipedaddy@git+ssh://git@github.com/fontezbrooks/swipeDaddy.git#fbf8163176cde5116f06e734b12e26d7b1805130", { "peerDependencies": { "react": ">=19.0.0", "react-native": ">=0.79.0", "react-native-gesture-handler": ">=2.24.0", "react-native-reanimated": ">=4.0.0", "react-native-worklets": ">=0.4.0" } }, "fbf8163176cde5116f06e734b12e26d7b1805130"],
+    "@fontezbrooks/swipedaddy": ["@fontezbrooks/swipedaddy@git+ssh://git@github.com/fontezbrooks/swipeDaddy.git#2e8af29066d68e877a2c25518f54497c67a7bcc4", { "peerDependencies": { "react": ">=19.0.0", "react-native": ">=0.79.0", "react-native-gesture-handler": ">=2.24.0", "react-native-reanimated": ">=4.0.0", "react-native-worklets": ">=0.4.0" } }, "2e8af29066d68e877a2c25518f54497c67a7bcc4"],
 
     "@hookform/resolvers": ["@hookform/resolvers@5.4.0", "", { "dependencies": { "@standard-schema/utils": "^0.3.0" }, "peerDependencies": { "react-hook-form": "^7.55.0" } }, "sha512-EIsqr/t/qbinPIhGjMdtvutIN1Kk4uwbROE9/UQ93CAVGR7GkA7Y92+fX80OzXi/OB67jVFYwKGO1WzkxmkFZw=="],
 
