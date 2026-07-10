@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { swipeRepository, type SwipeRepository } from "./swipeRepository";
 import { interleaveFeatured } from "./featured";
 import type { DeckCard, SwipeTask } from "./swipeTypes";
 
 export interface SwipeDeckState {
-  /** Remaining cards (front = current). */
+  /** The full deck (the swipe engine owns the position, not this hook). */
   cards: DeckCard[];
   current: DeckCard | null;
   /** The created task id leads attach to (null until the task is registered). */
@@ -15,13 +15,14 @@ export interface SwipeDeckState {
   empty: boolean;
   /** Deck had cards and the user swiped through them all — end of deck (ST6). */
   exhausted: boolean;
-  /** Drop the current card (after a left or right swipe is resolved). */
-  advance: () => void;
+  /** Mirror of the deck engine's active index — wire to `onActiveIndexChange`. */
+  setIndex: (index: number) => void;
 }
 
 /**
  * Drives the swipe deck for a given task: registers the task, fetches a confidence-ranked
- * deck (featured interleaved into labeled slots), and pops cards as the Seeker swipes.
+ * deck (featured interleaved into labeled slots), and mirrors the deck engine's position
+ * (the swipeDaddy deck advances itself; this hook only tracks the index it reports).
  * Result-based; injectable repo for tests. A null task leaves the deck idle.
  */
 export function useSwipeDeck(
@@ -30,6 +31,7 @@ export function useSwipeDeck(
   repo: SwipeRepository = swipeRepository,
 ): SwipeDeckState {
   const [cards, setCards] = useState<DeckCard[]>([]);
+  const [index, setIndex] = useState(0);
   const [taskId, setTaskId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,6 +46,7 @@ export function useSwipeDeck(
       setError(null);
       setSettled(false);
       setCards([]);
+      setIndex(0);
       setHadCards(false);
       setTaskId(null);
       const t = await repo.createTask(task, sessionToken);
@@ -71,12 +74,10 @@ export function useSwipeDeck(
     };
   }, [task, sessionToken, repo]);
 
-  const advance = useCallback(() => setCards((prev) => prev.slice(1)), []);
-
-  const current = cards[0] ?? null;
+  const current = cards[index] ?? null;
   const done = settled && !loading && error === null && current === null;
   const empty = done && !hadCards;
   const exhausted = done && hadCards;
 
-  return { cards, current, taskId, loading, error, empty, exhausted, advance };
+  return { cards, current, taskId, loading, error, empty, exhausted, setIndex };
 }

@@ -1,10 +1,35 @@
 import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
+import { SwipeDeck as SwipeDaddyDeck } from "@fontezbrooks/swipedaddy";
 import { useTheme } from "@/theme/ThemeProvider";
 import { Button } from "@/components/ui/Button";
-import { SwipeCard } from "./SwipeCard";
+import { DeckCardView } from "./DeckCardView";
+import { SwipeStamps } from "./SwipeStamps";
+import type { SwipeDeckConfig, SwipeDeckRef } from "@fontezbrooks/swipedaddy";
+import type { RefObject } from "react";
 import type { DeckCard } from "./swipeTypes";
 
+/**
+ * Deck engine tuning — parity with the retired hand-rolled SwipeCard:
+ * same commit threshold (0.28 × width), same spring, single visible card
+ * (no stack), pan engages after a clear horizontal move so taps stay taps.
+ * Rotation: the old card tilted 10° at a FULL screen-width drag, i.e. 2.8°
+ * at the threshold — the engine clamps at the threshold, so 2.8° is the
+ * parity value (same tilt slope while dragging).
+ */
+const DECK_CONFIG: Partial<SwipeDeckConfig> = {
+  visibleCards: 1,
+  stackOffsetY: 0,
+  stackScaleStep: 0,
+  maxRotationRad: (10 * Math.PI) / 180 / (1 / 0.28),
+  swipeThresholdRatio: 0.28,
+  exitDistanceRatio: 1.5,
+  spring: { damping: 20, stiffness: 220, mass: 0.7 },
+  activationOffsetX: 12,
+};
+
 interface SwipeDeckProps {
+  /** Full deck — the engine owns the position; don't slice it. */
+  cards: DeckCard[];
   current: DeckCard | null;
   loading: boolean;
   error: string | null;
@@ -12,8 +37,17 @@ interface SwipeDeckProps {
   empty: boolean;
   /** Deck ran out after swiping (ST6 — hand off to the directory). */
   exhausted: boolean;
+  /** Remounts the engine when the search is replaced wholesale (new task). */
+  deckKey: string;
+  /** Engine controls — the screen commits a confirmed match through it. */
+  deckRef: RefObject<SwipeDeckRef | null>;
+  /** Mirror of the engine's active index (→ useSwipeDeck.setIndex). */
+  onIndexChange: (index: number) => void;
+  /** A left swipe committed (gesture or Pass button) — pass flash (ST3). */
   onPass: () => void;
-  onLike: () => void;
+  /** Right-swipe INTENT (gesture or Match button) — the card stays put;
+   * the contact page decides the commit. */
+  onLike: (card: DeckCard) => void;
   onNewSearch: () => void;
   /** ST6 CTA — browse the full directory seeded with the search term. */
   onBrowseDirectory: () => void;
@@ -21,14 +55,18 @@ interface SwipeDeckProps {
   onCardPress: (card: DeckCard) => void;
 }
 
-/** Presentational deck: the draggable top card + Pass/Match controls, plus the
+/** Presentational deck: the swipeDaddy engine + Pass/Match controls, plus the
  * loading / error / no-matches (ST5) / end-of-deck (ST6) states. */
 export function SwipeDeck({
+  cards,
   current,
   loading,
   error,
   empty,
   exhausted,
+  deckKey,
+  deckRef,
+  onIndexChange,
   onPass,
   onLike,
   onNewSearch,
@@ -86,7 +124,7 @@ export function SwipeDeck({
   }
 
   // ST5 — the search matched nothing at all.
-  if (empty || !current) {
+  if (empty || cards.length === 0) {
     return (
       <View style={styles.center}>
         <Text style={[t.typography.displayXS, styles.msg]}>
@@ -105,25 +143,36 @@ export function SwipeDeck({
   return (
     <View style={styles.wrap}>
       <View style={styles.deck}>
-        <SwipeCard
-          key={current.id}
-          card={current}
-          onSwipeLeft={onPass}
-          onSwipeRight={onLike}
-          onPress={() => onCardPress(current)}
+        <SwipeDaddyDeck
+          key={deckKey}
+          ref={deckRef}
+          data={cards}
+          keyExtractor={(card) => card.id}
+          renderCard={(card, _index, progress) => (
+            <>
+              <DeckCardView card={card} />
+              <SwipeStamps progress={progress} />
+            </>
+          )}
+          onSwipeRightIntent={(card) => onLike(card)}
+          onSwipeLeft={() => onPass()}
+          onCardPress={(card) => onCardPress(card)}
+          onActiveIndexChange={onIndexChange}
+          config={DECK_CONFIG}
+          cardStyle={styles.cardSlot}
         />
       </View>
       <View style={styles.actions}>
         <Button
           label="Pass"
           variant="outline"
-          onPress={onPass}
+          onPress={() => deckRef.current?.swipeLeft()}
           style={styles.action}
         />
         <Button
           label="Match"
           variant="solid"
-          onPress={onLike}
+          onPress={() => current && onLike(current)}
           style={styles.action}
         />
       </View>
@@ -132,11 +181,13 @@ export function SwipeDeck({
 }
 
 const styles = StyleSheet.create({
-  // Top-align the card (a little breathing room under the header) with the actions
-  // stacked just below it — no big empty gap above, and a clear gap before the buttons
-  // so the card never crowds them.
+  // The engine positions cards absolutely, so the deck slot must be sized:
+  // it takes the space between the header/term pill and the action row (the
+  // old intrinsic-height card sat at the top of this same area).
   wrap: { flex: 1, paddingHorizontal: 16, paddingTop: 12 },
-  deck: {},
+  deck: { flex: 1 },
+  // Fill the slot; the card face (DeckCardView) sizes itself at the top.
+  cardSlot: { width: "100%", height: "100%" },
   actions: {
     flexDirection: "row",
     justifyContent: "center",

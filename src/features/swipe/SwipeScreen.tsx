@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -16,7 +16,8 @@ import { useSwipeDeck } from "./useSwipeDeck";
 import { SwipeDeck } from "./SwipeDeck";
 import { FiltersModal } from "./FiltersModal";
 import { ProfileQuickView } from "./ProfileQuickView";
-import type { SwipeTask } from "./swipeTypes";
+import type { SwipeDeckRef } from "@fontezbrooks/swipedaddy";
+import type { DeckCard, SwipeTask } from "./swipeTypes";
 
 /** How long the transient "Passed" flash stays up (ST3). */
 const PASS_FLASH_MS = 900;
@@ -33,6 +34,11 @@ export function SwipeScreen() {
   const insets = useSafeAreaInsets();
   const session = useSwipeSession();
   const deck = useSwipeDeck(session.task, session.sessionToken);
+  // Deck engine controls (swipedaddy): buttons and the post-confirmation
+  // commit drive the deck through this ref.
+  const deckRef = useRef<SwipeDeckRef | null>(null);
+  // New search = wholesale deck replacement → remount the engine.
+  const deckKey = useMemo(() => JSON.stringify(session.task), [session.task]);
 
   const [filtersOpen, setFiltersOpen] = useState(false);
   /** Error feedback only — success feedback lives in the ST2/ST4 states. */
@@ -61,23 +67,24 @@ export function SwipeScreen() {
   // card stays current (cancel).
   const confirmation = session.matchResult;
   const keepSwiping = () => {
-    deck.advance();
+    // Commit the confirmed match: the engine flings the card and advances
+    // (a gesture right-swipe only ever springs back — intent mode).
+    deckRef.current?.swipeRight();
     session.clearMatchResult();
   };
 
-  const onLike = () => {
-    const card = deck.current;
-    if (!card || !deck.taskId) return;
+  const onLike = (card: DeckCard) => {
+    if (!deck.taskId) return;
     // Confirm every Match: the routed contact page — nothing sends silently.
     setBanner(null);
     session.setPending({ card, taskId: deck.taskId });
     router.push("/match-contact");
   };
 
+  // A left swipe already committed in the engine — this is just the ST3 flash.
   const onPass = () => {
     setBanner(null);
     setPassed(true);
-    deck.advance();
   };
 
   const newSearch = () => {
@@ -170,37 +177,53 @@ export function SwipeScreen() {
       {intakeOpen ? (
         // Dimmed placeholder under the intake overlay.
         <View style={[styles.flex, styles.dimmed]} />
-      ) : confirmation ? (
-        // ST2 (and ST1 celebratory variant): match confirmation card.
-        <View style={[styles.flex, styles.center, styles.confirmWrap]}>
-          <Text style={[t.typography.displayXS, styles.centerText]}>
-            {confirmation.first ? "Your first match!" : "It’s a match!"}
-          </Text>
-          <Text
-            style={[
-              t.typography.body,
-              styles.centerText,
-              { color: t.colors.textSoft },
-            ]}
-          >
-            We’ve sent your details to {confirmation.name} — they’ll reach out
-            to you.
-          </Text>
-          <Button label="Keep swiping" variant="solid" onPress={keepSwiping} />
-        </View>
       ) : (
-        <SwipeDeck
-          current={deck.current}
-          loading={deck.loading}
-          error={deck.error}
-          empty={deck.empty}
-          exhausted={deck.exhausted}
-          onPass={onPass}
-          onLike={onLike}
-          onNewSearch={newSearch}
-          onBrowseDirectory={browseDirectory}
-          onCardPress={(card) => setQuickViewUid(card.sourceUid)}
-        />
+        <>
+          {/* The deck stays MOUNTED under the confirmation (display:none) —
+              unmounting would reset the engine's position; "Keep swiping"
+              commits the matched card through deckRef. */}
+          <View style={confirmation ? styles.hidden : styles.flex}>
+            <SwipeDeck
+              cards={deck.cards}
+              current={deck.current}
+              loading={deck.loading}
+              error={deck.error}
+              empty={deck.empty}
+              exhausted={deck.exhausted}
+              deckKey={deckKey}
+              deckRef={deckRef}
+              onIndexChange={deck.setIndex}
+              onPass={onPass}
+              onLike={onLike}
+              onNewSearch={newSearch}
+              onBrowseDirectory={browseDirectory}
+              onCardPress={(card) => setQuickViewUid(card.sourceUid)}
+            />
+          </View>
+          {confirmation ? (
+            // ST2 (and ST1 celebratory variant): match confirmation card.
+            <View style={[styles.flex, styles.center, styles.confirmWrap]}>
+              <Text style={[t.typography.displayXS, styles.centerText]}>
+                {confirmation.first ? "Your first match!" : "It’s a match!"}
+              </Text>
+              <Text
+                style={[
+                  t.typography.body,
+                  styles.centerText,
+                  { color: t.colors.textSoft },
+                ]}
+              >
+                We’ve sent your details to {confirmation.name} — they’ll reach
+                out to you.
+              </Text>
+              <Button
+                label="Keep swiping"
+                variant="solid"
+                onPress={keepSwiping}
+              />
+            </View>
+          ) : null}
+        </>
       )}
 
       {/* ST3: lightweight transient pass feedback — non-blocking. */}
@@ -273,6 +296,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   dimmed: { opacity: 0.4 },
+  hidden: { display: "none" },
   confirmWrap: { gap: 12, paddingHorizontal: 24 },
   centerText: { textAlign: "center" },
   passToast: {
