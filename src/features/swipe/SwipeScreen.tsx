@@ -226,23 +226,27 @@ export function SwipeScreen() {
         </>
       )}
 
-      {/* ST3: lightweight transient pass feedback — non-blocking. */}
+      {/* ST3: lightweight transient pass feedback — non-blocking. Styled as
+          the link-pill family: surface pill, rustDark border, hard 4px
+          offset shadow (same treatment as SearchBar/profile link pills). */}
       {passed ? (
-        <View
-          pointerEvents="none"
-          style={[
-            styles.passToast,
-            {
-              backgroundColor: t.colors.surface,
-              borderColor: t.colors.neutral800,
-            },
-          ]}
-        >
-          <Text
-            style={[t.typography.captionSemi, { color: t.colors.neutral800 }]}
+        <View pointerEvents="none" style={styles.passToast}>
+          <View
+            style={[styles.passShadow, { backgroundColor: t.colors.rustDark }]}
+          />
+          <View
+            style={[
+              styles.passPill,
+              {
+                backgroundColor: t.colors.surface,
+                borderColor: t.colors.rustDark,
+              },
+            ]}
           >
-            Passed
-          </Text>
+            <Text style={[t.typography.captionSemi, { color: t.colors.text }]}>
+              Passed
+            </Text>
+          </View>
         </View>
       ) : null}
 
@@ -303,6 +307,16 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 120,
     alignSelf: "center",
+  },
+  passShadow: {
+    position: "absolute",
+    left: 4,
+    top: 4,
+    right: -4,
+    bottom: -4,
+    borderRadius: 999,
+  },
+  passPill: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 999,

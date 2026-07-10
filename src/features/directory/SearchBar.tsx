@@ -158,13 +158,13 @@ const styles = StyleSheet.create({
     borderRadius: 100,
   },
   // Center the text in the 48px pill: no default vertical padding, lineHeight
-  // matched to the body font size (the 24px token leading sat the text low), and
-  // Android's extra font padding stripped. Listed AFTER t.typography.body so the
-  // lineHeight override wins.
+  // tightened below the 24px body token (which sat the text low) but ABOVE the
+  // font size — a 16px line box clipped the font's ascenders at the top
+  // (device report). Listed AFTER t.typography.body so the override wins.
   input: {
     flex: 1,
     paddingVertical: 0,
-    lineHeight: 16,
+    lineHeight: 20,
     textAlignVertical: "center",
     includeFontPadding: false,
   },

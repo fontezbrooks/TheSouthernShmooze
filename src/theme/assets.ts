@@ -16,5 +16,5 @@ export const splashLogo = require("../../assets/splash-logo.png");
 // Home banner photos — "Let us help you plan" Concierge photo (July 2026 design
 // round: NewImage.png replaces banner-help.png) and "Ask the community" Facebook
 // screenshot (88×169, image-on-left).
-export const bannerHelp = require("../../assets/NewImage.png");
+export const bannerHelp = require("../../assets/np1.jpg");
 export const bannerCommunity = require("../../assets/banner-community.png");
