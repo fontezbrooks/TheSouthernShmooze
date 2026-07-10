@@ -11,7 +11,8 @@
     "prebuild": "expo prebuild",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
-    "test": "jest"
+    "test": "jest",
+    "eas-build-pre-install": "bash ./scripts/eas-build-pre-install.sh"
   },
   "dependencies": {
     "@expo-google-fonts/bitter": "^0.4.1",
