@@ -181,11 +181,12 @@ export function SwipeDeck({
 }
 
 const styles = StyleSheet.create({
-  // The engine positions cards absolutely, so the deck slot must be sized:
-  // it takes the space between the header/term pill and the action row (the
-  // old intrinsic-height card sat at the top of this same area).
+  // The engine positions cards absolutely, so the deck slot must be sized.
+  // The cap keeps the slot close to the card face's natural height so the
+  // action row sits just under the card (device feedback: uncapped flex
+  // pushed Pass/Match to the screen bottom, over the home indicator).
   wrap: { flex: 1, paddingHorizontal: 16, paddingTop: 12 },
-  deck: { flex: 1 },
+  deck: { flex: 1, maxHeight: 520 },
   // Fill the slot; the card face (DeckCardView) sizes itself at the top.
   cardSlot: { width: "100%", height: "100%" },
   actions: {
@@ -194,6 +195,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 16,
     marginTop: 24,
+    marginBottom: 12,
   },
   action: { flex: 1 },
   center: {
