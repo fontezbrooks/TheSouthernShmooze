@@ -46,6 +46,6 @@ const styles = StyleSheet.create({
     gap: 6,
     height: 40,
     paddingHorizontal: 14,
-    borderWidth: 2,
+    borderWidth: StyleSheet.hairlineWidth,
   },
 });

@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
     width: LOGO_SIZE,
     height: LOGO_SIZE,
     borderRadius: 16,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
   },
   divider: { height: StyleSheet.hairlineWidth, alignSelf: "stretch" },
   linksWrap: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
