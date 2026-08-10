@@ -11,6 +11,17 @@ import {
   Bitter_600SemiBold,
   Bitter_800ExtraBold,
 } from "@expo-google-fonts/bitter";
+import {
+  Fraunces_600SemiBold,
+  Fraunces_700Bold,
+  Fraunces_900Black,
+} from "@expo-google-fonts/fraunces";
+import {
+  PublicSans_400Regular,
+  PublicSans_600SemiBold,
+  PublicSans_700Bold,
+} from "@expo-google-fonts/public-sans";
+import { Caveat_500Medium, Caveat_600SemiBold } from "@expo-google-fonts/caveat";
 import { ThemeProvider } from "@/theme/ThemeProvider";
 import { SwipeSessionProvider } from "@/features/swipe/SwipeSessionProvider";
 import { AnimatedSplash } from "@/features/splash/AnimatedSplash";
@@ -24,6 +35,14 @@ export default function RootLayout() {
     Bitter_400Regular,
     Bitter_600SemiBold,
     Bitter_800ExtraBold,
+    Fraunces_600SemiBold,
+    Fraunces_700Bold,
+    Fraunces_900Black,
+    PublicSans_400Regular,
+    PublicSans_600SemiBold,
+    PublicSans_700Bold,
+    Caveat_500Medium,
+    Caveat_600SemiBold,
   });
 
   // Gate render until fonts resolve (or fail) so headings never flash a fallback
