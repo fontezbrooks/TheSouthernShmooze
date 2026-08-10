@@ -167,4 +167,19 @@ describe("submitConciergeLead (FR-4.1 completion)", () => {
   it("newSubmissionId delegates to expo-crypto randomUUID", () => {
     expect(newSubmissionId()).toBe("test-uuid");
   });
+
+  it("rejects a completion id equal to the partial id (would collide with its PK)", async () => {
+    const { client, insert } = makeClient();
+    mockedGetSupabase.mockReturnValue(client as never);
+
+    const result = await submitConciergeLead(
+      stepOne,
+      stepTwo,
+      "same-id",
+      "same-id",
+    );
+
+    expect(result.ok).toBe(false);
+    expect(insert).not.toHaveBeenCalled();
+  });
 });

@@ -10,8 +10,14 @@ import type {
 /** Postgres unique-violation (duplicate primary key). */
 const PG_UNIQUE_VIOLATION = "23505";
 
-/** Generate a stable submission id — create ONCE per logical submission and
- * reuse across retries so a committed-but-lost insert is not duplicated. */
+/**
+ * Generate a stable row id. Each insert target gets its OWN id: one for the
+ * partial row (created when step 1 first advances) and a DIFFERENT one for
+ * the completion row (created when the user first submits step 2). Reuse the
+ * same id only when retrying that same insert — never share one id across
+ * both rows, or the completion insert would collide with the partial's
+ * primary key and be misread as an already-committed completion.
+ */
 export const newSubmissionId = (): string => randomUUID();
 
 /**
@@ -59,6 +65,14 @@ export async function submitConciergeLead(
   partialId: string | null,
   id: string,
 ): Promise<Result<{ id: string }>> {
+  // Guard the id contract: reusing the partial row's id here would collide
+  // with its primary key and misread the 23505 as a committed completion
+  // (no complete row, no owner email, false success). Fail fast instead.
+  if (partialId !== null && id === partialId) {
+    return err(
+      "Something went wrong submitting your request. Please try again.",
+    );
+  }
   try {
     const supabase = getSupabase();
     const row: LeadInsert = {
