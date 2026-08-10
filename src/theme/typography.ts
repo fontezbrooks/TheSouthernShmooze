@@ -1,5 +1,5 @@
 import type { TextStyle } from "react-native";
-import { colors, fonts } from "./tokens";
+import { brandColors, brandFonts, colors, fonts } from "./tokens";
 
 /**
  * Named text styles mapped 1:1 to the Figma "Components and Styles" type ramp.
@@ -100,3 +100,92 @@ export const typography = {
 } satisfies Record<string, TextStyle>;
 
 export type TypographyVariant = keyof typeof typography;
+
+/* ------------------------------------------------------------------------- *
+ * 2026 rebrand ramp — Fraunces display / Public Sans body / Caveat accent.
+ * Desktop anchors measured on the live site (report.md §8.5: H1 59/64,
+ * H2 44/49, H3 18.4/24, body 17.3, accent Caveat 24, buttons 14.4 pill),
+ * scaled for mobile. Additive during migration (E2–E7); `typography` above
+ * remains until every screen has moved over.
+ * ------------------------------------------------------------------------- */
+
+export const brandTypography = {
+  /** Hero — screen-level headline (site H1). */
+  displayXL: {
+    fontFamily: brandFonts.display,
+    fontSize: 40,
+    lineHeight: 46,
+    letterSpacing: -0.4,
+    color: brandColors.text,
+  },
+  /** Section headline (site H2). */
+  displayL: {
+    fontFamily: brandFonts.display,
+    fontSize: 30,
+    lineHeight: 35,
+    letterSpacing: -0.3,
+    color: brandColors.text,
+  },
+  /** Sub-section headline. */
+  displayM: {
+    fontFamily: brandFonts.display,
+    fontSize: 24,
+    lineHeight: 29,
+    color: brandColors.text,
+  },
+  /** Card/feature title (site H3). */
+  displayS: {
+    fontFamily: brandFonts.display,
+    fontSize: 18,
+    lineHeight: 23,
+    color: brandColors.text,
+  },
+
+  /** Body Regular. */
+  body: {
+    fontFamily: brandFonts.body,
+    fontSize: 16,
+    lineHeight: 24,
+    color: brandColors.textSoft,
+  },
+  /** Body emphasized. */
+  bodySemi: {
+    fontFamily: brandFonts.bodySemi,
+    fontSize: 16,
+    lineHeight: 24,
+    color: brandColors.text,
+  },
+
+  /** Button label — Public Sans bold, pairs with pill radius. */
+  button: {
+    fontFamily: brandFonts.bodyBold,
+    fontSize: 15,
+    lineHeight: 20,
+    color: brandColors.bg,
+  },
+
+  /** Caption / meta. */
+  caption: {
+    fontFamily: brandFonts.body,
+    fontSize: 12,
+    lineHeight: 18,
+    color: brandColors.textSoft,
+  },
+  /** Chip/badge label. */
+  chip: {
+    fontFamily: brandFonts.bodyBold,
+    fontSize: 11,
+    lineHeight: 14,
+    color: brandColors.text,
+  },
+
+  /** Handwritten accent — porch-note flourishes. */
+  accent: {
+    fontFamily: brandFonts.accent,
+    fontSize: 22,
+    lineHeight: 28,
+    color: brandColors.text,
+  },
+} satisfies Record<string, TextStyle>;
+
+export type BrandTypographyVariant = keyof typeof brandTypography;

@@ -1,6 +1,17 @@
 import { createContext, useContext, type ReactNode } from "react";
-import { colors, radii, spacing, durations, fonts, shadow } from "./tokens";
-import { typography } from "./typography";
+import {
+  brandColors,
+  brandFonts,
+  brandRadii,
+  brandShadow,
+  colors,
+  radii,
+  spacing,
+  durations,
+  fonts,
+  shadow,
+} from "./tokens";
+import { brandTypography, typography } from "./typography";
 
 const theme = {
   colors,
@@ -10,6 +21,14 @@ const theme = {
   fonts,
   shadow,
   typography,
+  /** 2026 rebrand namespace — screens migrate here in E2–E7. */
+  brand: {
+    colors: brandColors,
+    radii: brandRadii,
+    shadow: brandShadow,
+    fonts: brandFonts,
+    typography: brandTypography,
+  },
 } as const;
 
 export type Theme = typeof theme;
