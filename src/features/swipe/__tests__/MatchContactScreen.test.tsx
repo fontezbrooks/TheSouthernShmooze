@@ -116,7 +116,9 @@ describe("MatchContactScreen (CP1–CP3)", () => {
 
     expect(getByText("It’s a match!")).toBeTruthy();
     expect(
-      getByText("Share your details and they’ll reach out to you."),
+      getByText(
+        "Share your details and your Shmooze preferred partner will reach out to you.",
+      ),
     ).toBeTruthy();
     expect(getByText("roofing")).toBeTruthy();
   });
@@ -143,7 +145,7 @@ describe("MatchContactScreen (CP1–CP3)", () => {
     mockSession = makeSession();
     const { getByText } = await render(<MatchContactScreen />);
 
-    await fireEvent.press(getByText("Send match"));
+    await fireEvent.press(getByText("Send request"));
 
     await waitFor(() => expect(mockSubmitLead).toHaveBeenCalled());
     expect(mockSaveContact).toHaveBeenCalled();
@@ -162,7 +164,7 @@ describe("MatchContactScreen (CP1–CP3)", () => {
     mockSubmitLead.mockResolvedValue({ ok: false, error: "send failed" });
     const { getByText, findByText } = await render(<MatchContactScreen />);
 
-    await fireEvent.press(getByText("Send match"));
+    await fireEvent.press(getByText("Send request"));
 
     expect(await findByText("send failed")).toBeTruthy();
     expect(mockSession.setMatchResult).not.toHaveBeenCalled();

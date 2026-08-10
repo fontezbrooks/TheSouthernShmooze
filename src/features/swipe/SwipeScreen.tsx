@@ -213,8 +213,8 @@ export function SwipeScreen() {
                   { color: t.colors.textSoft },
                 ]}
               >
-                We’ve sent your details to {confirmation.name} — they’ll reach
-                out to you.
+                Your request is in — {confirmation.name}, your Shmooze
+                preferred partner, will reach out to you.
               </Text>
               <Button
                 label="Keep swiping"

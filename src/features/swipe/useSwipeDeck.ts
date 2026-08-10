@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { swipeRepository, type SwipeRepository } from "./swipeRepository";
-import { interleaveFeatured } from "./featured";
+import { orderDeck } from "./featured";
 import type { DeckCard, SwipeTask } from "./swipeTypes";
 
 export interface SwipeDeckState {
@@ -61,7 +61,7 @@ export function useSwipeDeck(
       const deck = await repo.fetchDeck(task, sessionToken, []);
       if (!alive) return;
       if (deck.ok) {
-        setCards(interleaveFeatured(deck.data));
+        setCards(orderDeck(deck.data));
         setHadCards(deck.data.length > 0);
       } else {
         setError(deck.error);

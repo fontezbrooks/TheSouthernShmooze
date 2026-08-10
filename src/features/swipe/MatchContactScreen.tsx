@@ -107,10 +107,13 @@ export function MatchContactScreen() {
             </View>
           ) : null}
 
-          {/* CP2 (approved draft A). */}
+          {/* CP2 — concierge-request framing (design.md §E4, Q6): a right-swipe
+              IS a concierge request with this business pinned as the partner.
+              Copy: draft, owner approves at PR. */}
           <Text style={t.typography.displayS}>It’s a match!</Text>
           <Text style={[t.typography.body, { color: t.colors.textSoft }]}>
-            Share your details and they’ll reach out to you.
+            Share your details and your Shmooze preferred partner will reach
+            out to you.
           </Text>
 
           {sendError ? (
