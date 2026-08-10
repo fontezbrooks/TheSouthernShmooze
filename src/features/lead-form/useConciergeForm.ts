@@ -47,6 +47,13 @@ export function useConciergeForm() {
   const completionId = useRef<string | null>(null);
   // Set only when the partial insert succeeded — safe to reference as a FK.
   const savedPartialId = useRef<string | null>(null);
+  // In-flight partial insert — awaited before completing so a fast submit on
+  // a slow connection still links the partial (review: PR #32).
+  const partialInFlight = useRef<Promise<void> | null>(null);
+  // Snapshot of the last-submitted step-1 payload: materially edited values
+  // get a FRESH partial id (a reused id would duplicate-key against the old
+  // row and silently keep stale job data — review: PR #32).
+  const lastPartialPayload = useRef<string | null>(null);
 
   // The submit callbacks are BUILT inside the event handlers (not during
   // render) so the react-hooks compiler analysis doesn't flag the ref reads.
@@ -55,9 +62,19 @@ export function useConciergeForm() {
       setStep("contact");
       // Best-effort capture (FR-4.2): never blocks the user; a failure just
       // means the completion won't reference a partial row.
-      partialId.current ??= newSubmissionId();
-      const result = await submitPartialLead(values, partialId.current);
-      if (result.ok) savedPartialId.current = result.data.id;
+      const payload = JSON.stringify(values);
+      let id = partialId.current;
+      if (id === null || payload !== lastPartialPayload.current) {
+        id = newSubmissionId();
+        partialId.current = id;
+        savedPartialId.current = null;
+        lastPartialPayload.current = payload;
+      }
+      const inFlight = submitPartialLead(values, id).then((result) => {
+        if (result.ok) savedPartialId.current = result.data.id;
+      });
+      partialInFlight.current = inFlight;
+      await inFlight;
     })();
 
   const back = () => setStep("job");
@@ -74,6 +91,9 @@ export function useConciergeForm() {
     return stepTwoForm.handleSubmit(async (values) => {
       setStatus("submitting");
       setErrorMessage(null);
+
+      // Let an in-flight partial land first so its id can be referenced.
+      if (partialInFlight.current) await partialInFlight.current;
 
       completionId.current ??= newSubmissionId();
       const result = await submitConciergeLead(

@@ -133,6 +133,70 @@ describe("useConciergeForm", () => {
     expect(ids[0]).toBe(ids[1]);
   });
 
+  it("awaits an in-flight partial so a fast submit still links it", async () => {
+    let resolvePartial!: (v: { ok: true; data: { id: string } }) => void;
+    mockedPartial.mockReturnValue(
+      new Promise((r) => {
+        resolvePartial = r;
+      }) as never,
+    );
+    const { result } = await renderHook(() => useConciergeForm());
+
+    await act(async () => {
+      result.current.stepOneForm.setValue("trade", stepOne.trade);
+      result.current.stepOneForm.setValue("zip", stepOne.zip);
+      // Advance without awaiting — the partial stays in flight.
+      result.current.advance();
+      await Promise.resolve();
+    });
+
+    await act(async () => {
+      const form = result.current.stepTwoForm;
+      for (const [k, v] of Object.entries(stepTwo)) {
+        form.setValue(k as never, v as never);
+      }
+      const submitting = result.current.submit();
+      resolvePartial({ ok: true, data: { id: "slow-partial" } });
+      await submitting;
+    });
+
+    expect(mockedComplete.mock.calls[0][2]).toBe("slow-partial");
+  });
+
+  it("mints a fresh partial id when step-1 values change after going back", async () => {
+    const { result } = await renderHook(() => useConciergeForm());
+    await fillStepOne(result);
+    const firstId = mockedPartial.mock.calls[0][1];
+
+    await act(async () => {
+      result.current.back();
+    });
+    await act(async () => {
+      result.current.stepOneForm.setValue("zip", "30044");
+      await result.current.advance();
+    });
+
+    const secondId = mockedPartial.mock.calls[1][1];
+    expect(secondId).not.toBe(firstId);
+    expect(mockedPartial.mock.calls[1][0]).toEqual(
+      expect.objectContaining({ zip: "30044" }),
+    );
+  });
+
+  it("reuses the same partial id when step-1 values are unchanged", async () => {
+    const { result } = await renderHook(() => useConciergeForm());
+    await fillStepOne(result);
+    await act(async () => {
+      result.current.back();
+    });
+    await act(async () => {
+      await result.current.advance();
+    });
+
+    const ids = mockedPartial.mock.calls.map((c) => c[1]);
+    expect(ids[0]).toBe(ids[1]);
+  });
+
   it("back returns to the job step", async () => {
     const { result } = await renderHook(() => useConciergeForm());
     await fillStepOne(result);

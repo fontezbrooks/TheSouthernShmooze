@@ -39,7 +39,11 @@ export function ConciergeForm({ onBackHome }: ConciergeFormProps) {
 
   if (step === "job") {
     return (
-      <View style={styles.form}>
+      // Keyed per step: without keys React reuses the position-matched
+      // TextFields across steps (zip→lastName, notes→email) and RHF's
+      // Controller doesn't survive a live control/name swap — typed text
+      // vanishes. The key forces a clean remount per step.
+      <View key="step-job" style={styles.form}>
         <Text
           style={[t.brand.typography.bodySemi, { color: t.brand.colors.text }]}
         >
@@ -89,7 +93,7 @@ export function ConciergeForm({ onBackHome }: ConciergeFormProps) {
 
   const submitting = status === "submitting";
   return (
-    <View style={styles.form}>
+    <View key="step-contact" style={styles.form}>
       <Text
         style={[t.brand.typography.bodySemi, { color: t.brand.colors.text }]}
       >
