@@ -233,9 +233,12 @@ export const FAQ_CONTENT: Record<FaqAudience, readonly FaqTopic[]> = {
           q: "What makes Shmooze leads different?",
           a: "They come warm, from a community that already trusts the Shmooze, so you are not a cold stranger fighting on price.",
         },
+        // Qualified vs the site: the 2-hour claim window is part of the
+        // rotation system that lands at launch (L4) — no hard deadline
+        // promise until it ships (review: PR #35).
         {
           q: "How quickly do I need to respond to a lead?",
-          a: "You have 2 hours to claim a lead before it rotates to the next pro. That is enough time to finish what you are doing and still call back, but the homeowner is waiting, so the sooner you reach out the better your odds of winning the job.",
+          a: "Fast. As lead rotation rolls out, you will have a 2-hour window to claim a lead before it moves to the next pro. Either way, the homeowner is waiting — the sooner you reach out, the better your odds of winning the job.",
         },
       ],
     },
@@ -271,9 +274,12 @@ export const FAQ_CONTENT: Record<FaqAudience, readonly FaqTopic[]> = {
           q: "How do I get more reviews?",
           a: "Growth Studio can set up automated review requests, and the community runs review campaigns that reward the most-reviewed businesses.",
         },
+        // Qualified vs the site: ratings/badges/deals describe the WEBSITE
+        // profile; in-app registry profiles gain them with the at-launch
+        // profile-depth work (review: PR #35).
         {
           q: "What shows on my business profile?",
-          a: "Your logo, trade, service area, live Google rating and reviews, earned badges, any member deal, and a Leave a Review button.",
+          a: "Your profile on the Southern Shmooze website shows your logo, trade, service area, live Google rating and reviews, earned badges, any member deal, and a Leave a Review button. In-app registry profiles show your core business details today, with ratings and badges rolling out.",
         },
         {
           q: "What are the earned badges?",
