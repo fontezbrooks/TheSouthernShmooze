@@ -83,6 +83,43 @@ describe("buildLeadEmailHtml", () => {
     );
   });
 
+  it("renders concierge trade/zip/newsletter rows (0019 two-step payload)", () => {
+    const conciergeLead: LeadRecord = {
+      ...lead,
+      address: null,
+      budget: [],
+      project_start_date: null,
+      trade: "Plumbing",
+      zip: "30303",
+      newsletter_opt_in: true,
+    };
+    const html = buildLeadEmailHtml(conciergeLead, null);
+    expect(html).toContain("<strong>Trade:</strong> Plumbing");
+    expect(html).toContain("<strong>Zip:</strong> 30303");
+    expect(html).toContain("<strong>Newsletter:</strong> Yes");
+  });
+
+  it("renders newsletter No when opted out, empty on legacy payloads", () => {
+    const optedOut = buildLeadEmailHtml(
+      { ...lead, newsletter_opt_in: false },
+      null,
+    );
+    expect(optedOut).toContain("<strong>Newsletter:</strong> No");
+    const legacy = buildLeadEmailHtml(lead, null);
+    expect(legacy).toContain("<strong>Newsletter:</strong> </p>");
+  });
+
+  it("tolerates null contact fields without throwing (nullable since 0019)", () => {
+    const html = buildLeadEmailHtml(
+      { ...lead, first_name: null, last_name: null, project_details: null },
+      null,
+    );
+    expect(html).toContain("<strong>Name:</strong> </p>");
+    expect(buildSubject({ ...lead, first_name: null, last_name: null })).toBe(
+      "New Concierge submission",
+    );
+  });
+
   it("leaves the file row empty when there is no file", () => {
     const html = buildLeadEmailHtml(lead, null);
     expect(html).toContain("<strong>File Upload:</strong> </p>");

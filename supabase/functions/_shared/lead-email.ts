@@ -3,20 +3,29 @@
 // `notify-lead` Edge Function imports it at runtime. Mirrors the layout of the
 // Squarespace form-submission email the team is used to.
 
-/** The shape of a `leads` row as delivered by the AFTER INSERT trigger payload. */
+/**
+ * The shape of a `leads` row as delivered by the AFTER INSERT trigger payload.
+ * Since 0019 (two-step concierge) contact/detail columns are nullable and the
+ * row may carry trade/zip/newsletter_opt_in; the trigger only fires for
+ * stage='complete' rows, so contact fields are present in practice.
+ */
 export interface LeadRecord {
   id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  address: string;
+  first_name: string | null;
+  last_name: string | null;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
   /** DB array column; single-select form stores one value (or empty). */
   budget: string[] | null;
   /** `YYYY-MM-DD` or null. */
   project_start_date: string | null;
-  project_details: string;
+  project_details: string | null;
   file_path: string | null;
+  /** Concierge two-step fields (0019); absent on legacy payloads. */
+  trade?: string | null;
+  zip?: string | null;
+  newsletter_opt_in?: boolean;
 }
 
 /** Budget enum value → human label (mirrors the app's BUDGET_OPTIONS / Figma). */
@@ -71,7 +80,7 @@ export function escapeHtml(value: string): string {
 
 /** Email subject line. */
 export function buildSubject(lead: LeadRecord): string {
-  const name = `${lead.first_name} ${lead.last_name}`.trim();
+  const name = `${lead.first_name ?? ""} ${lead.last_name ?? ""}`.trim();
   return name
     ? `New Concierge submission — ${name}`
     : "New Concierge submission";
@@ -89,7 +98,9 @@ export function buildLeadEmailHtml(
   const row = (label: string, value: string) =>
     `<p style="margin:0 0 12px"><strong>${label}:</strong> ${value}</p>`;
 
-  const name = escapeHtml(`${lead.first_name} ${lead.last_name}`.trim());
+  const name = escapeHtml(
+    `${lead.first_name ?? ""} ${lead.last_name ?? ""}`.trim(),
+  );
   const details = escapeHtml(lead.project_details ?? "").replace(/\n/g, "<br>");
   const file = fileUrl
     ? `<a href="${fileUrl}">Download file</a>`
@@ -101,7 +112,10 @@ export function buildLeadEmailHtml(
     row("Name", name),
     row("Email", escapeHtml(lead.email ?? "")),
     row("Phone", escapeHtml(lead.phone ?? "")),
+    row("Trade", escapeHtml(lead.trade ?? "")),
+    row("Zip", escapeHtml(lead.zip ?? "")),
     row("Address", escapeHtml(lead.address ?? "")),
+    row("Newsletter", lead.newsletter_opt_in === undefined ? "" : lead.newsletter_opt_in ? "Yes" : "No"),
     row("Budget", escapeHtml(budgetLabel(lead.budget))),
     row("Project start date", escapeHtml(formatStartDate(lead.project_start_date))),
     row("Project Details", details),
