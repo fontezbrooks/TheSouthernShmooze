@@ -192,7 +192,7 @@ describe("SwipeDeck (engine adapter)", () => {
     const props = { ...makeProps(), exhausted: true, current: null };
     const { getByText } = await render(<SwipeDeck {...props} />);
 
-    fireEvent.press(getByText("Browse the directory"));
+    fireEvent.press(getByText("Browse the registry"));
 
     expect(props.onBrowseDirectory).toHaveBeenCalledTimes(1);
   });

@@ -113,10 +113,10 @@ export function SwipeDeck({
         <Text
           style={[t.typography.body, styles.msg, { color: t.colors.muted }]}
         >
-          Here’s the regular directory — more local pros are waiting there.
+          Here’s the registry — more local pros are waiting there.
         </Text>
         <Button
-          label="Browse the directory"
+          label="Browse the registry"
           variant="solid"
           onPress={onBrowseDirectory}
         />

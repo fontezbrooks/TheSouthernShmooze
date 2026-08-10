@@ -8,26 +8,32 @@ interface SearchEmptyStateProps {
 }
 
 /**
- * Directory search "no results" state (Figma 59:7303): a file-question icon, a
- * plain Bitter heading (NOT the Shrikhand display face), a full sentence of
- * guidance, and a rust "Ask the Community" button. Top-aligned under the search
- * bar, centered horizontally.
+ * Registry search "no results" state: a file-question icon, a Fraunces
+ * heading (rebrand, design.md §E2), a full sentence of guidance, and an
+ * "Ask the Community" button. Top-aligned under the search bar, centered
+ * horizontally.
  */
 export function SearchEmptyState({ onAskCommunity }: SearchEmptyStateProps) {
   const t = useTheme();
   return (
     <View style={styles.wrap}>
-      <Icon name="fileQuestion" size={32} color={t.colors.rustDark} />
+      <Icon name="fileQuestion" size={32} color={t.brand.colors.clay} />
       <View style={styles.text}>
         <Text
           style={[
             styles.heading,
-            { fontFamily: t.fonts.bodySemi, color: t.colors.black },
+            { fontFamily: t.brand.fonts.display, color: t.brand.colors.text },
           ]}
         >
           No results
         </Text>
-        <Text style={[t.typography.body, styles.body, { color: t.colors.muted }]}>
+        <Text
+          style={[
+            t.brand.typography.body,
+            styles.body,
+            { color: t.brand.colors.textSoft },
+          ]}
+        >
           Please try your search again or ask the community for their
           recommendations.
         </Text>
@@ -50,7 +56,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 64,
   },
   text: { alignItems: "center", gap: 4 },
-  // Header XS Bitter — Bitter SemiBold 24/1.25, slight negative tracking.
+  // Fraunces 700 24/1.25, slight negative tracking (brand displayM metrics).
   heading: {
     fontSize: 24,
     lineHeight: 30,
