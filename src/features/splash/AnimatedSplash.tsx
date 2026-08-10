@@ -11,6 +11,9 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useTheme } from '@/theme/ThemeProvider';
 import { daisyBackground, splashLogo } from '@/theme/assets';
+// Lives under src/ (not assets/) so the EAS uploader bundles it — see the
+// nav icons note in app/(tabs)/_layout.tsx.
+import AdsLogo from './ads-logo.svg';
 
 interface AnimatedSplashProps {
   /** Called once the splash has played and faded out. */
@@ -70,6 +73,8 @@ export function AnimatedSplash({ onFinish }: AnimatedSplashProps) {
     transform: [{ scale: daisyScale.value }],
   }));
   const logoStyle = useAnimatedStyle(() => ({ transform: [{ scale: logoScale.value }] }));
+  // Opacity only — reusing daisyStyle would also apply its 1.15→1 zoom.
+  const adsStyle = useAnimatedStyle(() => ({ opacity: daisyOpacity.value }));
 
   const logoSize = Math.min(width * 0.6, 240);
 
@@ -87,6 +92,18 @@ export function AnimatedSplash({ onFinish }: AnimatedSplashProps) {
       <Animated.View style={[styles.logoWrap, logoStyle]}>
         <Image source={splashLogo} resizeMode="contain" style={{ width: logoSize, height: logoSize }} />
       </Animated.View>
+      {/* App Daddy credit — white-fill SVG, so it sits on a dark ink pill for
+          legibility over the cream/daisy background. Fades in with the daisy
+          bloom: the FIRST painted frame stays identical to the native splash. */}
+      <Animated.View
+        style={[
+          styles.adsWrap,
+          { backgroundColor: t.brand.colors.text, borderRadius: t.brand.radii.pill },
+          adsStyle,
+        ]}
+      >
+        <AdsLogo width={128} height={40} />
+      </Animated.View>
     </Animated.View>
   );
 }
@@ -98,6 +115,13 @@ const styles = StyleSheet.create({
     zIndex: 100,
   },
   logoWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  adsWrap: {
+    marginTop: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
