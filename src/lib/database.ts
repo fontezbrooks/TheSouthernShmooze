@@ -10,16 +10,24 @@ export type LeadStatus = "new" | "contacted" | "closed";
 export interface LeadRow {
   id: string;
   created_at: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  address: string;
+  // Contact/detail columns nullable since 0019 (two-step concierge):
+  // required only when stage='complete' (DB `leads_complete_contact` check).
+  first_name: string | null;
+  last_name: string | null;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
   budget: BudgetValue[];
   project_start_date: string | null;
-  project_details: string;
+  project_details: string | null;
   file_path: string | null;
   status: LeadStatus;
+  // Two-step concierge columns (0019).
+  trade: string | null;
+  zip: string | null;
+  newsletter_opt_in: boolean;
+  stage: "partial" | "complete";
+  partial_id: string | null;
 }
 
 /** Columns the client supplies on insert. `status` is forced to 'new' by RLS/default. */
