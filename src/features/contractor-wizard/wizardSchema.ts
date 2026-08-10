@@ -2,7 +2,10 @@ import { z } from "zod";
 
 // Plain regex avoids zod-version churn around `.email()`.
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-const PHONE_RE = /^[\d\s()+.-]{7,}$/;
+// Allowed characters only — digit COUNT is enforced separately, or
+// "......." would pass as a phone number (review: PR #34).
+const PHONE_CHARS_RE = /^[\d\s()+.-]+$/;
+const MIN_PHONE_DIGITS = 7;
 
 /**
  * Check My Fit wizard (design.md §E5, site parity: /contractors form).
@@ -123,7 +126,10 @@ export const wizardSchema = z.object({
   phone: z
     .string()
     .trim()
-    .regex(PHONE_RE, "Please enter a valid phone number."),
+    .regex(PHONE_CHARS_RE, "Please enter a valid phone number.")
+    .refine((v) => v.replace(/\D/g, "").length >= MIN_PHONE_DIGITS, {
+      message: "Please enter a valid phone number.",
+    }),
   // Step 2 — business lookup (picking a Google listing is optional; the
   // typed name still submits and lands as "unverified", same as the site)
   business: z.string().trim().min(1, "Please enter your business name."),

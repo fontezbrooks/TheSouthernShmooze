@@ -148,6 +148,19 @@ describe("useContractorWizard", () => {
     expect(result.current.verdict?.offline).toBe(true);
   });
 
+  test("back is ignored while an advance is in flight", async () => {
+    const { result } = await renderHook(() => useContractorWizard());
+    await fillStep(result, 0);
+    await act(async () => {
+      // Back lands in the window where advance is awaiting validation —
+      // the in-flight guard must ignore it, so the advance wins.
+      const advancing = result.current.advance();
+      result.current.back();
+      await advancing;
+    });
+    expect(result.current.step).toBe(2);
+  });
+
   test("back steps down and stops at 1", async () => {
     const { result } = await renderHook(() => useContractorWizard());
     await fillStep(result, 0);

@@ -66,6 +66,16 @@ describe("wizardSchema", () => {
     ).toBe(false);
   });
 
+  test("rejects punctuation-only phone (needs 7+ digits)", () => {
+    expect(
+      wizardSchema.safeParse({ ...validValues, phone: "......." }).success,
+    ).toBe(false);
+    expect(
+      wizardSchema.safeParse({ ...validValues, phone: "(---) --- ----" })
+        .success,
+    ).toBe(false);
+  });
+
   test.each([
     "yearsInBusiness",
     "licensedInsured",

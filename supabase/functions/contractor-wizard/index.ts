@@ -17,10 +17,19 @@
 const DEFAULT_WORKER_BASE = "https://shmooze-worker.jonah-eda.workers.dev";
 const UPSTREAM_TIMEOUT_MS = 10000;
 
+// Browser targets (Expo web) preflight functions.invoke — without these
+// headers every response is blocked client-side (review: PR #34).
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+
 function json(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...CORS_HEADERS },
   });
 }
 
@@ -39,7 +48,7 @@ async function proxyFetch(url: string, init?: RequestInit): Promise<Response> {
     const body = await res.text();
     return new Response(body, {
       status: res.status,
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...CORS_HEADERS },
     });
   } finally {
     clearTimeout(timer);
@@ -47,6 +56,9 @@ async function proxyFetch(url: string, init?: RequestInit): Promise<Response> {
 }
 
 Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: CORS_HEADERS });
+  }
   if (req.method !== "POST") {
     return json(405, { error: "POST only" });
   }

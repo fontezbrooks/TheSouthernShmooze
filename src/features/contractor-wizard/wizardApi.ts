@@ -111,8 +111,19 @@ export async function verifyFit(values: WizardValues): Promise<FitVerdict> {
       invokeWizard({ action: "verify", payload }),
       timeout,
     ])) as Partial<FitVerdict> | null;
-    if (!data || typeof data.outcome !== "string") {
-      throw new Error("verify returned no outcome");
+    // Strict membership check: an unknown outcome string would otherwise
+    // render contradictory result copy (rejection text + join CTA) and be
+    // submitted upstream (review: PR #34).
+    const KNOWN_OUTCOMES: readonly FitVerdict["outcome"][] = [
+      "verified",
+      "unverified",
+      "not-yet",
+    ];
+    if (
+      !data ||
+      !KNOWN_OUTCOMES.includes(data.outcome as FitVerdict["outcome"])
+    ) {
+      throw new Error("verify returned no known outcome");
     }
     return {
       outcome: data.outcome as FitVerdict["outcome"],

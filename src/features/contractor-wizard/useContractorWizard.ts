@@ -114,7 +114,11 @@ export function useContractorWizard() {
   };
 
   const back = () => {
-    if (phase !== "form") return;
+    // Also blocked while an advance is in flight: phase is still "form"
+    // during the await of trigger/handleSubmit, and a Back landing in that
+    // window would race the pending setStep — or, on the final step, let
+    // verification submit after the user backed away (review: PR #34).
+    if (phase !== "form" || advancing.current) return;
     setStep((s) => Math.max(1, s - 1));
   };
 

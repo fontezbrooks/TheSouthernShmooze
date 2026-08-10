@@ -101,6 +101,16 @@ describe("verifyFit", () => {
     const res = await verifyFit(values);
     expect(res.outcome).toBe("unverified");
   });
+
+  test("unknown outcome string falls back to a PASS", async () => {
+    mockInvoke.mockResolvedValue({
+      data: { outcome: "error", rating: 1 },
+      error: null,
+    });
+    const res = await verifyFit(values);
+    expect(res.outcome).toBe("unverified");
+    expect(res.offline).toBe(true);
+  });
 });
 
 describe("fallbackVerdict", () => {
