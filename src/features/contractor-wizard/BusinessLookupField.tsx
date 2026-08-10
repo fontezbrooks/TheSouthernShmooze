@@ -37,7 +37,10 @@ export function BusinessLookupField({
   const [suggestions, setSuggestions] = useState<PlacePrediction[]>([]);
   const [searching, setSearching] = useState(false);
   // Typing after a pick means a new search — drop the stale place_id.
-  const lastPicked = useRef<string | null>(null);
+  // Seeded from form state: this keyed subtree REMOUNTS when the user
+  // navigates back to this step, and a null seed would read the untouched
+  // picked name as an edit and wipe the listing (review: PR #34).
+  const lastPicked = useRef<string | null>(placeId ? business : null);
 
   const queryActive =
     Boolean(business) && business.trim().length >= MIN_QUERY_LEN && !placeId;

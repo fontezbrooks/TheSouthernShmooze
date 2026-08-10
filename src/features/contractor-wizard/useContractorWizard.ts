@@ -42,6 +42,8 @@ export function useContractorWizard() {
   // Google Places billing session: one token folds the autocomplete
   // keystrokes into the Details call. Minted lazily, cleared on reset.
   const placeSession = useRef<string | null>(null);
+  // True while an advance (including the final verify+submit) is running.
+  const advancing = useRef(false);
 
   const getPlaceSession = () => {
     if (!placeSession.current) {
@@ -80,6 +82,19 @@ export function useContractorWizard() {
     })();
 
   const advance = async () => {
+    // Synchronous in-flight guard: a rapid double tap would otherwise run
+    // two concurrent advances past the awaits below — on the final step
+    // that means duplicate verify + application submits (review: PR #34).
+    if (advancing.current) return;
+    advancing.current = true;
+    try {
+      await doAdvance();
+    } finally {
+      advancing.current = false;
+    }
+  };
+
+  const doAdvance = async () => {
     const fields = [...STEP_FIELDS[step - 1]];
     const valid = await form.trigger(fields, { shouldFocus: true });
     if (!valid) return;

@@ -98,9 +98,14 @@ export async function verifyFit(values: WizardValues): Promise<FitVerdict> {
       yearsInBusiness: values.yearsInBusiness || "",
     },
   };
+  // Timer handle kept so the race loser doesn't leak a 9s timeout.
+  let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     const timeout = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error("verify timeout")), VERIFY_TIMEOUT_MS);
+      timer = setTimeout(
+        () => reject(new Error("verify timeout")),
+        VERIFY_TIMEOUT_MS,
+      );
     });
     const data = (await Promise.race([
       invokeWizard({ action: "verify", payload }),
@@ -123,6 +128,8 @@ export async function verifyFit(values: WizardValues): Promise<FitVerdict> {
     };
   } catch {
     return fallbackVerdict(values);
+  } finally {
+    clearTimeout(timer);
   }
 }
 

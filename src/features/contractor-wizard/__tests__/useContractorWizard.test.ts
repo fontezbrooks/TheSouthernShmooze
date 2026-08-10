@@ -85,6 +85,23 @@ describe("useContractorWizard", () => {
     );
   });
 
+  test("double-tapping the final advance runs verify + submit only once", async () => {
+    const { result } = await renderHook(() => useContractorWizard());
+    for (let i = 0; i < 6; i++) {
+      await fillStep(result, i);
+      await act(async () => {
+        await result.current.advance();
+      });
+    }
+    await fillStep(result, 6);
+    await act(async () => {
+      await Promise.all([result.current.advance(), result.current.advance()]);
+    });
+    expect(result.current.phase).toBe("result");
+    expect(verifyFitMock).toHaveBeenCalledTimes(1);
+    expect(submitMock).toHaveBeenCalledTimes(1);
+  });
+
   test("step 4 requires a website unless the no-website box is checked", async () => {
     const { result } = await renderHook(() => useContractorWizard());
     for (let i = 0; i < 3; i++) {
