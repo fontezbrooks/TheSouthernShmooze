@@ -71,6 +71,44 @@ export function FitResult({
           {headline}
         </Text>
         <Text style={t.brand.typography.body}>{summary}</Text>
+        {pass ? (
+          // Native membership recommendation, price-free (design.md §E5:
+          // level content in-app, checkout/pricing stays on the site — Q5).
+          <View
+            style={[
+              styles.levelBlock,
+              {
+                borderTopColor: t.brand.colors.line,
+              },
+            ]}
+          >
+            <Text
+              style={[
+                t.brand.typography.chip,
+                { color: t.brand.colors.textSoft },
+              ]}
+            >
+              OUR RECOMMENDED MEMBERSHIP LEVEL
+            </Text>
+            <Text
+              style={[
+                t.brand.typography.bodySemi,
+                { color: t.brand.colors.pine },
+              ]}
+            >
+              {verdict.recommendedLevel}
+            </Text>
+            <Text
+              style={[
+                t.brand.typography.caption,
+                { color: t.brand.colors.textSoft },
+              ]}
+            >
+              Your welcome page walks through what every level includes — no
+              card needed to look.
+            </Text>
+          </View>
+        ) : null}
       </View>
       {pass ? (
         <Button
@@ -97,5 +135,11 @@ const styles = StyleSheet.create({
     padding: 24,
     gap: 12,
     alignItems: "flex-start",
+  },
+  levelBlock: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    paddingTop: 12,
+    gap: 4,
+    alignSelf: "stretch",
   },
 });
