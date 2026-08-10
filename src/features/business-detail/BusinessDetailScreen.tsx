@@ -40,9 +40,10 @@ const SOCIAL_ICONS: Record<string, IconName> = {
 const LOGO_SIZE = 72;
 
 /**
- * Business-detail screen (July 2026 round, P1–P9): plain background, square
- * logo beside the name + badges, address on top, then links / gallery / phones
- * / description separated by dividers, with a sticky call bar at the bottom.
+ * Business-detail screen (July 2026 round P1–P9; restyled to the 2026 brand
+ * in E2b): plain Magnolia background, square logo beside the Fraunces name +
+ * badges, address on top, then links / gallery / phones / description
+ * separated by `line` dividers, with a sticky call bar at the bottom.
  * Renders only the data the profile actually has.
  */
 export function BusinessDetailScreen({ uid }: { uid: string }) {
@@ -105,18 +106,25 @@ export function BusinessDetailScreen({ uid }: { uid: string }) {
   };
 
   const divider = (
-    <View style={[styles.divider, { backgroundColor: t.colors.divider }]} />
+    <View
+      style={[styles.divider, { backgroundColor: t.brand.colors.line }]}
+    />
   );
 
   return (
-    // P2: plain Vanilla — no daisy background on the profile.
-    <View style={[styles.flex, { backgroundColor: t.colors.bg }]}>
+    // Rebrand (design.md §E2b): plain Magnolia base.
+    <View style={[styles.flex, { backgroundColor: t.brand.colors.bg }]}>
       <AppHeader showBack onBack={back} />
       {loading ? (
-        <ActivityIndicator style={styles.center} color={t.colors.rust} />
+        <ActivityIndicator style={styles.center} color={t.brand.colors.clay} />
       ) : !detail ? (
         <View style={styles.center}>
-          <Text style={[t.typography.body, { color: t.colors.textSoft }]}>
+          <Text
+            style={[
+              t.brand.typography.body,
+              { color: t.brand.colors.textSoft },
+            ]}
+          >
             {error ?? "This business could not be found."}
           </Text>
         </View>
@@ -134,12 +142,12 @@ export function BusinessDetailScreen({ uid }: { uid: string }) {
               {detail.logoUrl ? (
                 <Image
                   source={{ uri: detail.logoUrl }}
-                  style={[styles.logo, { borderColor: t.colors.rustDark }]}
+                  style={[styles.logo, { borderColor: t.brand.colors.line }]}
                   resizeMode="cover"
                 />
               ) : null}
               <View style={styles.headerCol}>
-                <Text style={t.typography.displayXS}>{detail.name}</Text>
+                <Text style={t.brand.typography.displayM}>{detail.name}</Text>
                 {detail.isCertified ? <CertifiedBadge /> : null}
               </View>
             </View>
@@ -147,7 +155,10 @@ export function BusinessDetailScreen({ uid }: { uid: string }) {
             {/* P5: address at the top. */}
             {detail.address ? (
               <Text
-                style={[t.typography.captionSemi, { color: t.colors.textSoft }]}
+                style={[
+                  t.brand.typography.caption,
+                  { color: t.brand.colors.textSoft },
+                ]}
               >
                 {detail.address}
               </Text>
@@ -158,7 +169,10 @@ export function BusinessDetailScreen({ uid }: { uid: string }) {
               <>
                 {divider}
                 <Text
-                  style={[t.typography.captionSemi, { color: t.colors.muted }]}
+                  style={[
+                    t.brand.typography.chip,
+                    { color: t.brand.colors.textSoft },
+                  ]}
                 >
                   Links
                 </Text>
@@ -180,7 +194,10 @@ export function BusinessDetailScreen({ uid }: { uid: string }) {
               <>
                 {divider}
                 <Text
-                  style={[t.typography.captionSemi, { color: t.colors.muted }]}
+                  style={[
+                    t.brand.typography.chip,
+                    { color: t.brand.colors.textSoft },
+                  ]}
                 >
                   Photos
                 </Text>
@@ -211,16 +228,24 @@ export function BusinessDetailScreen({ uid }: { uid: string }) {
                 onPress={() => openLink(`tel:${p.raw}`)}
                 style={styles.phoneRow}
               >
-                <Icon name="phone" size={16} color={t.colors.rust} />
+                <Icon name="phone" size={16} color={t.brand.colors.clay} />
                 <Text
-                  style={[t.typography.captionSemi, { color: t.colors.rust }]}
+                  style={[
+                    t.brand.typography.caption,
+                    { color: t.brand.colors.clay },
+                  ]}
                 >
                   {p.display}
                 </Text>
               </Pressable>
             ))}
             {description ? (
-              <Text style={[t.typography.body, { color: t.colors.textSoft }]}>
+              <Text
+                style={[
+                  t.brand.typography.body,
+                  { color: t.brand.colors.textSoft },
+                ]}
+              >
                 {description}
               </Text>
             ) : null}
@@ -232,8 +257,8 @@ export function BusinessDetailScreen({ uid }: { uid: string }) {
               style={[
                 styles.callBar,
                 {
-                  backgroundColor: t.colors.bg,
-                  borderTopColor: t.colors.divider,
+                  backgroundColor: t.brand.colors.bg,
+                  borderTopColor: t.brand.colors.line,
                   paddingBottom: insets.bottom + 12,
                 },
               ]}
@@ -264,16 +289,17 @@ const styles = StyleSheet.create({
   content: { padding: 16, gap: 12 },
   headerRow: { flexDirection: "row", alignItems: "center", gap: 12 },
   headerCol: { flex: 1, gap: 6 },
+  // 16 = brand radius "md" (static sheet can't read the theme).
   logo: {
     width: LOGO_SIZE,
     height: LOGO_SIZE,
-    borderRadius: 12,
-    borderWidth: 1,
+    borderRadius: 16,
+    borderWidth: StyleSheet.hairlineWidth,
   },
   divider: { height: StyleSheet.hairlineWidth, alignSelf: "stretch" },
   linksWrap: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
   gallery: { gap: 12, paddingVertical: 4, paddingRight: 8 },
-  galleryImg: { width: 180, height: 180, borderRadius: 12 },
+  galleryImg: { width: 180, height: 180, borderRadius: 16 },
   phoneRow: {
     flexDirection: "row",
     alignItems: "center",
