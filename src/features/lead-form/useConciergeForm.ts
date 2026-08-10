@@ -54,6 +54,10 @@ export function useConciergeForm() {
   // get a FRESH partial id (a reused id would duplicate-key against the old
   // row and silently keep stale job data — review: PR #32).
   const lastPartialPayload = useRef<string | null>(null);
+  // Same principle for the completion: a retry after edits must not reuse
+  // the committed id, or the duplicate-key "success" would confirm the NEW
+  // values while the stored lead keeps the OLD ones (review: PR #32).
+  const lastCompletionPayload = useRef<string | null>(null);
 
   // The submit callbacks are BUILT inside the event handlers (not during
   // render) so the react-hooks compiler analysis doesn't flag the ref reads.
@@ -110,12 +114,19 @@ export function useConciergeForm() {
       // Let an in-flight partial land first so its id can be referenced.
       if (partialInFlight.current) await partialInFlight.current;
 
-      completionId.current ??= newSubmissionId();
+      const jobValues = stepOneForm.getValues();
+      const payload = JSON.stringify([jobValues, values]);
+      let cid = completionId.current;
+      if (cid === null || payload !== lastCompletionPayload.current) {
+        cid = newSubmissionId();
+        completionId.current = cid;
+        lastCompletionPayload.current = payload;
+      }
       const result = await submitConciergeLead(
-        stepOneForm.getValues(),
+        jobValues,
         values,
         savedPartialId.current,
-        completionId.current,
+        cid,
       );
       if (result.ok) {
         setStatus("idle");
@@ -127,6 +138,21 @@ export function useConciergeForm() {
     })();
   };
 
+  /** Start a fresh request (post-success "Submit Another", tab re-entry). */
+  const reset = () => {
+    stepOneForm.reset(emptyStepOne);
+    stepTwoForm.reset(emptyStepTwo);
+    partialId.current = null;
+    completionId.current = null;
+    savedPartialId.current = null;
+    partialInFlight.current = null;
+    lastPartialPayload.current = null;
+    lastCompletionPayload.current = null;
+    setStatus("idle");
+    setErrorMessage(null);
+    setStep("job");
+  };
+
   return {
     step,
     status,
@@ -136,5 +162,6 @@ export function useConciergeForm() {
     advance,
     back,
     submit,
+    reset,
   };
 }

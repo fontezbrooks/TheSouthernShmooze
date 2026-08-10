@@ -247,6 +247,40 @@ describe("useConciergeForm", () => {
     expect(mockedComplete).not.toHaveBeenCalled();
   });
 
+  it("mints a fresh completion id when values change after a failed submit", async () => {
+    mockedComplete.mockResolvedValueOnce({ ok: false, error: "lost response" });
+    const { result } = await renderHook(() => useConciergeForm());
+    await fillStepOne(result);
+    await fillStepTwo(result);
+
+    await act(async () => {
+      result.current.stepTwoForm.setValue("phone", "4045550000");
+      await result.current.submit();
+    });
+
+    const ids = mockedComplete.mock.calls.map((c) => c[3]);
+    expect(ids[0]).not.toBe(ids[1]);
+  });
+
+  it("reset returns to the job step with cleared forms and fresh ids on the next flow", async () => {
+    const { result } = await renderHook(() => useConciergeForm());
+    await fillStepOne(result);
+    await fillStepTwo(result);
+    expect(result.current.step).toBe("success");
+
+    await act(async () => {
+      result.current.reset();
+    });
+
+    expect(result.current.step).toBe("job");
+    expect(result.current.stepOneForm.getValues("zip")).toBe("");
+    expect(result.current.stepTwoForm.getValues("email")).toBe("");
+
+    await fillStepOne(result);
+    const partialIds = mockedPartial.mock.calls.map((c) => c[1]);
+    expect(partialIds[0]).not.toBe(partialIds[1]);
+  });
+
   it("back returns to the job step", async () => {
     const { result } = await renderHook(() => useConciergeForm());
     await fillStepOne(result);

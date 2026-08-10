@@ -60,10 +60,11 @@ export function ConciergeForm({ onBackHome }: ConciergeFormProps) {
     advance,
     back,
     submit,
+    reset,
   } = useConciergeForm();
 
   if (step === "success") {
-    return <PartnerReveal onBackHome={onBackHome} />;
+    return <PartnerReveal onBackHome={onBackHome} onSubmitAnother={reset} />;
   }
 
   if (step === "job") {

@@ -14,6 +14,8 @@ import type { DirectoryBusiness } from "@/features/providers/providerTypes";
 
 interface PartnerRevealProps {
   onBackHome: () => void;
+  /** Clears the completed flow so another request can start (tab-preserved screens re-render success otherwise). */
+  onSubmitAnother: () => void;
 }
 
 /**
@@ -23,7 +25,10 @@ interface PartnerRevealProps {
  * conciergeRotation data lands at-launch (L4). Best-effort: if the fetch
  * fails, the confirmation copy still stands on its own.
  */
-export function PartnerReveal({ onBackHome }: PartnerRevealProps) {
+export function PartnerReveal({
+  onBackHome,
+  onSubmitAnother,
+}: PartnerRevealProps) {
   const t = useTheme();
   const [loading, setLoading] = useState(true);
   const [partner, setPartner] = useState<DirectoryBusiness | null>(null);
@@ -112,6 +117,11 @@ export function PartnerReveal({ onBackHome }: PartnerRevealProps) {
         ) : null}
       </View>
       <Button label="Back Home" variant="primary" onPress={onBackHome} />
+      <Button
+        label="Submit Another Request"
+        variant="wide"
+        onPress={onSubmitAnother}
+      />
     </View>
   );
 }
