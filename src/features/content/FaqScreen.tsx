@@ -80,6 +80,7 @@ export function FaqScreen() {
                 <Text
                   style={[
                     t.brand.typography.bodySemi,
+                    styles.tabLabel,
                     {
                       color: selected ? t.colors.white : t.brand.colors.text,
                     },
@@ -174,11 +175,17 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   tabs: { flexDirection: "row", gap: 8, marginBottom: 4 },
+  // flex: 1 + centered, wrappable labels: intrinsic widths overflow a
+  // 320pt viewport, worse at accessibility font sizes (review: PR #35).
   tab: {
+    flex: 1,
     paddingVertical: 8,
-    paddingHorizontal: 14,
+    paddingHorizontal: 8,
     borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
+  tabLabel: { textAlign: "center" },
   topicCard: {
     borderWidth: StyleSheet.hairlineWidth,
     paddingHorizontal: 16,
