@@ -1,6 +1,5 @@
 import {
   View,
-  Text,
   ScrollView,
   ImageBackground,
   StyleSheet,
@@ -12,6 +11,7 @@ import { useTheme } from "@/theme/ThemeProvider";
 import { daisyBackground } from "@/theme/assets";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { StrokedHeading } from "@/components/ui/StrokedHeading";
+import { StrokedText } from "@/components/ui/StrokedText";
 import { ConciergeForm } from "@/features/lead-form/ConciergeForm";
 
 /** Concierge screen — "Concierge" brand kicker + the two-step Find My Pro flow (E3b). */
@@ -41,7 +41,7 @@ export function ConciergeScreen() {
         >
           <View style={styles.headingBlock}>
             {/* Brand kicker (C1) — same overline treatment as the Home banner. */}
-            <Text style={t.typography.displayXS}>Concierge</Text>
+            <StrokedText style={t.typography.displayXS}>Concierge</StrokedText>
             <StrokedHeading variant="displayL">Find My Pro</StrokedHeading>
           </View>
           <ConciergeForm

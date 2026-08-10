@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { type Control, useWatch } from "react-hook-form";
 import { useTheme } from "@/theme/ThemeProvider";
+import { StrokedText } from "@/components/ui/StrokedText";
 import { TextField } from "@/features/lead-form/fields/TextField";
 import { suggestPlaces, type PlacePrediction } from "./wizardApi";
 import type { WizardValues } from "./wizardSchema";
@@ -90,14 +91,14 @@ export function BusinessLookupField({
         required
       />
       {searching && queryActive ? (
-        <Text
+        <StrokedText
           style={[
             t.brand.typography.caption,
             { color: t.brand.colors.textSoft },
           ]}
         >
           Searching Google…
-        </Text>
+        </StrokedText>
       ) : null}
       {queryActive &&
       suggestionsFor === business.trim() &&
@@ -141,14 +142,14 @@ export function BusinessLookupField({
         </View>
       ) : null}
       {placeId ? (
-        <Text
+        <StrokedText
           style={[t.brand.typography.caption, { color: t.brand.colors.pine }]}
           accessibilityLiveRegion="polite"
         >
-          Google listing confirmed{placeAddress ? ` — ${placeAddress}` : ""}.
-        </Text>
+          {`Google listing confirmed${placeAddress ? ` — ${placeAddress}` : ""}.`}
+        </StrokedText>
       ) : (
-        <Text
+        <StrokedText
           style={[
             t.brand.typography.caption,
             { color: t.brand.colors.textSoft },
@@ -156,7 +157,7 @@ export function BusinessLookupField({
         >
           Can&apos;t find your listing? Keep typing your business name and
           continue — we&apos;ll match it later.
-        </Text>
+        </StrokedText>
       )}
     </View>
   );

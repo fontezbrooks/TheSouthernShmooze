@@ -1,6 +1,5 @@
 import {
   View,
-  Text,
   ScrollView,
   ImageBackground,
   StyleSheet,
@@ -16,6 +15,7 @@ import { useTheme } from "@/theme/ThemeProvider";
 import { daisyBackground } from "@/theme/assets";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { StrokedHeading } from "@/components/ui/StrokedHeading";
+import { StrokedText } from "@/components/ui/StrokedText";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { TextField } from "@/features/lead-form/fields/TextField";
@@ -72,7 +72,9 @@ export function ContractorWizardScreen() {
       case 1:
         return (
           <View key="step-contact" style={styles.step}>
-            <Text style={stepTitleStyle(t)}>First, who are you?</Text>
+            <StrokedText style={stepTitleStyle(t)}>
+              First, who are you?
+            </StrokedText>
             <TextField
               control={form.control}
               name="contact"
@@ -103,7 +105,9 @@ export function ContractorWizardScreen() {
       case 2:
         return (
           <View key="step-business" style={styles.step}>
-            <Text style={stepTitleStyle(t)}>Find your business on Google</Text>
+            <StrokedText style={stepTitleStyle(t)}>
+              Find your business on Google
+            </StrokedText>
             <BusinessLookupField
               control={form.control}
               placeId={placeId}
@@ -117,7 +121,7 @@ export function ContractorWizardScreen() {
       case 3:
         return (
           <View key="step-trade" style={styles.step}>
-            <Text style={stepTitleStyle(t)}>About your trade</Text>
+            <StrokedText style={stepTitleStyle(t)}>About your trade</StrokedText>
             <TextField
               control={form.control}
               name="trade"
@@ -142,7 +146,9 @@ export function ContractorWizardScreen() {
       case 4:
         return (
           <View key="step-area" style={styles.step}>
-            <Text style={stepTitleStyle(t)}>Where do you work?</Text>
+            <StrokedText style={stepTitleStyle(t)}>
+              Where do you work?
+            </StrokedText>
             <TextField
               control={form.control}
               name="serviceArea"
@@ -184,15 +190,15 @@ export function ContractorWizardScreen() {
                       <Icon name="check" size={12} color={t.brand.colors.bg} />
                     ) : null}
                   </View>
-                  <Text
+                  <StrokedText
+                    containerStyle={styles.checkLabel}
                     style={[
                       t.brand.typography.caption,
-                      styles.checkLabel,
                       { color: t.brand.colors.textSoft },
                     ]}
                   >
                     I don&apos;t have a website yet
-                  </Text>
+                  </StrokedText>
                 </Pressable>
               )}
             />
@@ -201,7 +207,9 @@ export function ContractorWizardScreen() {
       case 5:
         return (
           <View key="step-marketing" style={styles.step}>
-            <Text style={stepTitleStyle(t)}>How business comes in</Text>
+            <StrokedText style={stepTitleStyle(t)}>
+              How business comes in
+            </StrokedText>
             <OptionRows
               control={form.control}
               name="leadSource"
@@ -219,7 +227,9 @@ export function ContractorWizardScreen() {
       case 6:
         return (
           <View key="step-reviews" style={styles.step}>
-            <Text style={stepTitleStyle(t)}>Reviews & what you want</Text>
+            <StrokedText style={stepTitleStyle(t)}>
+              Reviews & what you want
+            </StrokedText>
             <OptionRows
               control={form.control}
               name="reviewsRange"
@@ -237,17 +247,17 @@ export function ContractorWizardScreen() {
       default:
         return (
           <View key="step-pains" style={styles.step}>
-            <Text style={stepTitleStyle(t)}>
+            <StrokedText style={stepTitleStyle(t)}>
               Which of these sound like you?
-            </Text>
-            <Text
+            </StrokedText>
+            <StrokedText
               style={[
                 t.brand.typography.caption,
                 { color: t.brand.colors.textSoft },
               ]}
             >
               Optional — pick any that fit.
-            </Text>
+            </StrokedText>
             <Controller
               control={form.control}
               name="painPoints"
@@ -290,15 +300,15 @@ export function ContractorWizardScreen() {
                             />
                           ) : null}
                         </View>
-                        <Text
+                        <StrokedText
+                          containerStyle={styles.checkLabel}
                           style={[
                             t.brand.typography.body,
-                            styles.checkLabel,
                             { color: t.brand.colors.text },
                           ]}
                         >
                           {p.label}
-                        </Text>
+                        </StrokedText>
                       </Pressable>
                     );
                   })}
@@ -315,22 +325,22 @@ export function ContractorWizardScreen() {
       return (
         <View style={styles.analyzing} accessibilityLiveRegion="polite">
           <ActivityIndicator size="large" color={t.brand.colors.clay} />
-          <Text
+          <StrokedText
             style={[
               t.brand.typography.bodySemi,
               { color: t.brand.colors.text },
             ]}
           >
             Checking your fit…
-          </Text>
-          <Text
+          </StrokedText>
+          <StrokedText
             style={[
               t.brand.typography.caption,
               { color: t.brand.colors.textSoft },
             ]}
           >
             Looking at your Google reviews and service area.
-          </Text>
+          </StrokedText>
         </View>
       );
     }
@@ -347,12 +357,12 @@ export function ContractorWizardScreen() {
     const isLast = step === stepCount;
     return (
       <>
-        <Text
+        <StrokedText
           style={[t.brand.typography.chip, { color: t.brand.colors.textSoft }]}
           accessibilityLabel={`Step ${step} of ${stepCount}`}
         >
-          STEP {step} OF {stepCount}
-        </Text>
+          {`STEP ${step} OF ${stepCount}`}
+        </StrokedText>
         {stepBody()}
         <View style={styles.actions}>
           {step > 1 ? (
@@ -385,16 +395,18 @@ export function ContractorWizardScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.headingBlock}>
-            <Text style={t.typography.displayXS}>For local pros</Text>
+            <StrokedText style={t.typography.displayXS}>
+              For local pros
+            </StrokedText>
             <StrokedHeading variant="displayL">Check My Fit</StrokedHeading>
-            <Text
+            <StrokedText
               style={[
                 t.brand.typography.caption,
                 { color: t.brand.colors.textSoft },
               ]}
             >
               Free, takes about 2 minutes. No card required.
-            </Text>
+            </StrokedText>
           </View>
           {body()}
         </ScrollView>

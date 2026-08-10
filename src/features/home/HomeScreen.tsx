@@ -18,6 +18,7 @@ import { LINKS } from "@/lib/links";
 // Lives under src/ (not assets/) so the EAS uploader bundles it — see the nav
 // icons note in app/(tabs)/_layout.tsx.
 import MatchCoverLogo from "./match-cover-logo.svg";
+import SmilyPeachLogo from "./smily-peach.svg";
 
 /** Home tab — help banner → concierge, certified providers, community banner. */
 export function HomeScreen() {
@@ -70,6 +71,18 @@ export function HomeScreen() {
           onPress={() => router.push("/swipe")}
         />
 
+        {/* Contractor entry (E5) — Check My Fit wizard; swapped above the
+            community banner + SmilyPeach icon per owner (polish round). */}
+        <Banner
+          layout="titleRow"
+          imageNode={<SmilyPeachLogo width={96} height={94} />}
+          title="Are You a Local Pro?"
+          subtitle="See if you're a fit for the Shmooze registry — free, takes about 2 minutes."
+          cta={{ label: "Check My Fit" }}
+          ctaSize="lg"
+          onPress={() => router.push("/contractor-wizard")}
+        />
+
         <Banner
           layout="imageLeft"
           image={bannerCommunity}
@@ -81,15 +94,6 @@ export function HomeScreen() {
           cta={{ label: "Join the Facebook Group" }}
           ctaSize="lg"
           onPress={() => openLink(LINKS.facebook)}
-        />
-
-        {/* Contractor entry (E5) — Check My Fit wizard. Copy: draft, owner approves at PR. */}
-        <Banner
-          layout="imageTop"
-          title="Are You a Local Pro?"
-          subtitle="See if you're a fit for the Shmooze registry — free, takes about 2 minutes."
-          cta={{ label: "Check My Fit" }}
-          onPress={() => router.push("/contractor-wizard")}
         />
 
         {/* Newsletter block (H1) — replaces the Newsletter tab. Copy: draft, owner approves at PR. */}
