@@ -6,6 +6,7 @@ import {
   type FieldValues,
 } from "react-hook-form";
 import { useTheme } from "@/theme/ThemeProvider";
+import { StrokedText } from "@/components/ui/StrokedText";
 
 interface OptionRowsProps<T extends FieldValues> {
   control: Control<T>;
@@ -33,14 +34,14 @@ export function OptionRows<T extends FieldValues>({
       name={name}
       render={({ field, fieldState }) => (
         <View style={styles.block}>
-          <Text
+          <StrokedText
             style={[
               t.brand.typography.bodySemi,
               { color: t.brand.colors.text },
             ]}
           >
             {label}
-          </Text>
+          </StrokedText>
           <View style={styles.rows}>
             {options.map((opt) => {
               const selected = field.value === opt.value;
@@ -85,11 +86,11 @@ export function OptionRows<T extends FieldValues>({
             })}
           </View>
           {fieldState.error ? (
-            <Text
+            <StrokedText
               style={[t.brand.typography.caption, { color: t.colors.error }]}
             >
-              {fieldState.error.message}
-            </Text>
+              {fieldState.error.message ?? "Required"}
+            </StrokedText>
           ) : null}
         </View>
       )}

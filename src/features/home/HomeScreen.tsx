@@ -1,16 +1,10 @@
-import {
-  ScrollView,
-  ImageBackground,
-  StyleSheet,
-  View,
-  Text,
-  Pressable,
-} from "react-native";
+import { ScrollView, ImageBackground, StyleSheet, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/theme/ThemeProvider";
 import { daisyBackground, bannerHelp, bannerCommunity } from "@/theme/assets";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Banner } from "@/components/ui/Banner";
+import { LinkPill } from "@/components/ui/LinkPill";
 import { SearchBarButton } from "@/features/directory/SearchBar";
 import { CertifiedProviders } from "@/features/providers/CertifiedProviders";
 import { openLink } from "@/lib/openLink";
@@ -18,6 +12,7 @@ import { LINKS } from "@/lib/links";
 // Lives under src/ (not assets/) so the EAS uploader bundles it — see the nav
 // icons note in app/(tabs)/_layout.tsx.
 import MatchCoverLogo from "./match-cover-logo.svg";
+import SmilyPeachLogo from "./smily-peach.svg";
 
 /** Home tab — help banner → concierge, certified providers, community banner. */
 export function HomeScreen() {
@@ -70,6 +65,18 @@ export function HomeScreen() {
           onPress={() => router.push("/swipe")}
         />
 
+        {/* Contractor entry (E5) — Check My Fit wizard; swapped above the
+            community banner + SmilyPeach icon per owner (polish round). */}
+        <Banner
+          layout="titleRow"
+          imageNode={<SmilyPeachLogo width={96} height={94} />}
+          title="Are You a Local Pro?"
+          subtitle="See if you're a fit for the Shmooze registry — free, takes about 2 minutes."
+          cta={{ label: "Check My Fit" }}
+          ctaSize="lg"
+          onPress={() => router.push("/contractor-wizard")}
+        />
+
         <Banner
           layout="imageLeft"
           image={bannerCommunity}
@@ -83,15 +90,6 @@ export function HomeScreen() {
           onPress={() => openLink(LINKS.facebook)}
         />
 
-        {/* Contractor entry (E5) — Check My Fit wizard. Copy: draft, owner approves at PR. */}
-        <Banner
-          layout="imageTop"
-          title="Are You a Local Pro?"
-          subtitle="See if you're a fit for the Shmooze registry — free, takes about 2 minutes."
-          cta={{ label: "Check My Fit" }}
-          onPress={() => router.push("/contractor-wizard")}
-        />
-
         {/* Newsletter block (H1) — replaces the Newsletter tab. Copy: draft, owner approves at PR. */}
         <Banner
           layout="imageTop"
@@ -101,35 +99,20 @@ export function HomeScreen() {
           onPress={() => openLink(LINKS.newsletter)}
         />
 
-        {/* Content links (E6): FAQ + About, compact footer row. Pressables
-            with a 44pt minimum target (a11y review: PR #35). */}
+        {/* Content links (E6): FAQ + About footer row — LinkPills so they
+            read as buttons over the daisy background (owner polish round);
+            44pt minimum target kept (a11y review: PR #35). */}
         <View style={styles.contentLinks}>
-          <Pressable
-            accessibilityRole="link"
+          <LinkPill
+            label="FAQ"
             accessibilityLabel="Frequently asked questions"
             onPress={() => router.push("/faq")}
-            style={styles.contentLink}
-            hitSlop={8}
-          >
-            <Text
-              style={[t.typography.caption, { color: t.brand.colors.clay }]}
-            >
-              FAQ
-            </Text>
-          </Pressable>
-          <Pressable
-            accessibilityRole="link"
+          />
+          <LinkPill
+            label="About the Shmooze"
             accessibilityLabel="About The Southern Shmooze"
             onPress={() => router.push("/about")}
-            style={styles.contentLink}
-            hitSlop={8}
-          >
-            <Text
-              style={[t.typography.caption, { color: t.brand.colors.clay }]}
-            >
-              About the Shmooze
-            </Text>
-          </Pressable>
+          />
         </View>
       </ScrollView>
     </ImageBackground>
@@ -147,13 +130,6 @@ const styles = StyleSheet.create({
   contentLinks: {
     flexDirection: "row",
     justifyContent: "center",
-    gap: 24,
-  },
-  contentLink: {
-    minHeight: 44,
-    minWidth: 44,
-    paddingHorizontal: 12,
-    alignItems: "center",
-    justifyContent: "center",
+    gap: 16,
   },
 });

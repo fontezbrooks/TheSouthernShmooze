@@ -13,6 +13,7 @@ import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "@/theme/ThemeProvider";
 import { Icon } from "@/components/ui/Icon";
+import { LinkPill } from "@/components/ui/LinkPill";
 import { PhysicalPressable } from "@/components/ui/PhysicalPressable";
 import { CategoryChips } from "@/features/providers/CategoryChips";
 import { openLink } from "@/lib/openLink";
@@ -164,19 +165,13 @@ export function DirectoryScreen() {
                   {s.error}
                 </Text>
               ) : null}
-              {/* Contractor entry (design.md §E5: home + registry footer). */}
-              <Text
-                accessibilityRole="link"
-                accessibilityLabel="I run a business — Check My Fit"
+              {/* Contractor entry (design.md §E5: home + registry footer) —
+                  LinkPill so it reads as a button (owner polish round). */}
+              <LinkPill
+                label="I run a business — Check My Fit"
                 onPress={() => router.push("/contractor-wizard")}
-                style={[
-                  t.typography.caption,
-                  styles.proFooter,
-                  { color: t.brand.colors.clay },
-                ]}
-              >
-                I run a business — Check My Fit
-              </Text>
+                style={styles.proFooter}
+              />
             </View>
           }
         />
@@ -210,5 +205,5 @@ const styles = StyleSheet.create({
   list: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 44, gap: 16 },
   footer: { paddingVertical: 24 },
   error: { textAlign: "center", paddingVertical: 24 },
-  proFooter: { textAlign: "center", paddingVertical: 16 },
+  proFooter: { alignSelf: "center", marginVertical: 16 },
 });

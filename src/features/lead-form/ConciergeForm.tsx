@@ -1,7 +1,8 @@
-import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+import { View, TextInput, Pressable, StyleSheet } from "react-native";
 import { Controller } from "react-hook-form";
 import { useTheme } from "@/theme/ThemeProvider";
 import { Button } from "@/components/ui/Button";
+import { StrokedText } from "@/components/ui/StrokedText";
 import { Icon } from "@/components/ui/Icon";
 import { CategoryChips } from "@/features/providers/CategoryChips";
 import { SUGGESTED_CATEGORIES } from "@/features/providers/categories";
@@ -74,11 +75,11 @@ export function ConciergeForm({ onBackHome }: ConciergeFormProps) {
       // Controller doesn't survive a live control/name swap — typed text
       // vanishes. The key forces a clean remount per step.
       <View key="step-job" style={styles.form}>
-        <Text
+        <StrokedText
           style={[t.brand.typography.bodySemi, { color: t.brand.colors.text }]}
         >
           What do you need done?
-        </Text>
+        </StrokedText>
         <Controller
           control={stepOneForm.control}
           name="trade"
@@ -90,14 +91,14 @@ export function ConciergeForm({ onBackHome }: ConciergeFormProps) {
                 onSelect={field.onChange}
               />
               {fieldState.error ? (
-                <Text
+                <StrokedText
                   style={[
                     t.brand.typography.caption,
                     { color: t.colors.error },
                   ]}
                 >
-                  {fieldState.error.message}
-                </Text>
+                  {fieldState.error.message ?? "Required"}
+                </StrokedText>
               ) : null}
             </View>
           )}
@@ -125,11 +126,11 @@ export function ConciergeForm({ onBackHome }: ConciergeFormProps) {
   const submitting = status === "submitting";
   return (
     <View key="step-contact" style={styles.form}>
-      <Text
+      <StrokedText
         style={[t.brand.typography.bodySemi, { color: t.brand.colors.text }]}
       >
         How should your pro reach you?
-      </Text>
+      </StrokedText>
       <TextField
         control={stepTwoForm.control}
         name="firstName"
@@ -190,16 +191,16 @@ export function ConciergeForm({ onBackHome }: ConciergeFormProps) {
                 <Icon name="check" size={12} color={t.brand.colors.bg} />
               ) : null}
             </View>
-            <Text
+            <StrokedText
+              containerStyle={styles.optInLabel}
               style={[
                 t.brand.typography.caption,
-                styles.optInLabel,
                 { color: t.brand.colors.textSoft },
               ]}
             >
               Send me occasional Shmooze tips and trusted local pro
               recommendations. No spam, unsubscribe anytime.
-            </Text>
+            </StrokedText>
           </Pressable>
         )}
       />
@@ -211,11 +212,11 @@ export function ConciergeForm({ onBackHome }: ConciergeFormProps) {
           style={[styles.banner, { borderColor: t.brand.colors.clay }]}
           accessibilityLiveRegion="assertive"
         >
-          <Text
+          <StrokedText
             style={[t.brand.typography.body, { color: t.brand.colors.clay }]}
           >
             {errorMessage}
-          </Text>
+          </StrokedText>
         </View>
       ) : null}
 
