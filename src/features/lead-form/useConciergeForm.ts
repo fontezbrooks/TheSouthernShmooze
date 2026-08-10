@@ -58,6 +58,10 @@ export function useConciergeForm() {
   // the committed id, or the duplicate-key "success" would confirm the NEW
   // values while the stored lead keeps the OLD ones (review: PR #32).
   const lastCompletionPayload = useRef<string | null>(null);
+  // The RESOLVER-TRANSFORMED step-1 values from the last advance. The raw
+  // form state (getValues) skips zod's trim — a pasted " 30303 " would pass
+  // step 1 yet violate the DB zip check at completion (review: PR #32).
+  const validatedJob = useRef<ConciergeStepOneValues | null>(null);
 
   // The submit callbacks are BUILT inside the event handlers (not during
   // render) so the react-hooks compiler analysis doesn't flag the ref reads.
@@ -71,6 +75,7 @@ export function useConciergeForm() {
       return Promise.resolve();
     }
     return stepOneForm.handleSubmit(async (values) => {
+      validatedJob.current = values;
       setStep("contact");
       // Best-effort capture (FR-4.2): never blocks the user; a failure just
       // means the completion won't reference a partial row.
@@ -121,7 +126,16 @@ export function useConciergeForm() {
       // Let an in-flight partial land first so its id can be referenced.
       if (partialInFlight.current) await partialInFlight.current;
 
-      const jobValues = stepOneForm.getValues();
+      const jobValues = validatedJob.current;
+      if (!jobValues) {
+        // Unreachable via the UI (contact step requires a successful
+        // advance) — fail visibly rather than submit unvalidated job data.
+        setStatus("error");
+        setErrorMessage(
+          "Something went wrong submitting your request. Please try again.",
+        );
+        return;
+      }
       const payload = JSON.stringify([jobValues, values]);
       let cid = completionId.current;
       if (cid === null || payload !== lastCompletionPayload.current) {
@@ -155,6 +169,7 @@ export function useConciergeForm() {
     partialInFlight.current = null;
     lastPartialPayload.current = null;
     lastCompletionPayload.current = null;
+    validatedJob.current = null;
     setStatus("idle");
     setErrorMessage(null);
     setStep("job");

@@ -314,6 +314,25 @@ describe("useConciergeForm", () => {
     expect(result.current.step).toBe("success");
   });
 
+  it("completes with the resolver-transformed job values, not raw form state", async () => {
+    const { result } = await renderHook(() => useConciergeForm());
+
+    await act(async () => {
+      result.current.stepOneForm.setValue("trade", stepOne.trade);
+      // Padded paste: zod trims it during advance; raw form state keeps it.
+      result.current.stepOneForm.setValue("zip", " 30303 ");
+      await result.current.advance();
+    });
+    await fillStepTwo(result);
+
+    expect(mockedPartial.mock.calls[0][0]).toEqual(
+      expect.objectContaining({ zip: "30303" }),
+    );
+    expect(mockedComplete.mock.calls[0][0]).toEqual(
+      expect.objectContaining({ zip: "30303" }),
+    );
+  });
+
   it("back returns to the job step", async () => {
     const { result } = await renderHook(() => useConciergeForm());
     await fillStepOne(result);
