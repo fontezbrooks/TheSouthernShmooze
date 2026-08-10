@@ -1,4 +1,10 @@
-import { ScrollView, ImageBackground, StyleSheet } from "react-native";
+import {
+  ScrollView,
+  ImageBackground,
+  StyleSheet,
+  View,
+  Text,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/theme/ThemeProvider";
 import { daisyBackground, bannerHelp, bannerCommunity } from "@/theme/assets";
@@ -93,6 +99,34 @@ export function HomeScreen() {
           cta={{ label: "Subscribe" }}
           onPress={() => openLink(LINKS.newsletter)}
         />
+
+        {/* Content links (E6): FAQ + About, compact footer row. */}
+        <View style={styles.contentLinks}>
+          <Text
+            accessibilityRole="link"
+            accessibilityLabel="Frequently asked questions"
+            onPress={() => router.push("/faq")}
+            style={[
+              t.typography.caption,
+              styles.contentLink,
+              { color: t.brand.colors.clay },
+            ]}
+          >
+            FAQ
+          </Text>
+          <Text
+            accessibilityRole="link"
+            accessibilityLabel="About The Southern Shmooze"
+            onPress={() => router.push("/about")}
+            style={[
+              t.typography.caption,
+              styles.contentLink,
+              { color: t.brand.colors.clay },
+            ]}
+          >
+            About the Shmooze
+          </Text>
+        </View>
       </ScrollView>
     </ImageBackground>
   );
@@ -106,4 +140,10 @@ const styles = StyleSheet.create({
     paddingBottom: 44,
     gap: 24,
   },
+  contentLinks: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 32,
+  },
+  contentLink: { paddingVertical: 8 },
 });
