@@ -222,6 +222,11 @@ export const brandFonts = {
   body: "PublicSans_400Regular",
   bodySemi: "PublicSans_600SemiBold",
   bodyBold: "PublicSans_700Bold",
+  /**
+   * Caveat 500, deliberately: the site's CSS computes weight 400, but its
+   * Google Fonts URL loads only Caveat 500/600/700, so browsers map 400 to
+   * the 500 face — 500 is what actually renders.
+   */
   accent: "Caveat_500Medium",
   accentSemi: "Caveat_600SemiBold",
 } as const;

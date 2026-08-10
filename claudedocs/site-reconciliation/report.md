@@ -194,7 +194,7 @@ Registry cards link **cross-origin** to `https://shmooze-worker.jonah-eda.worker
 - Notable: "What happens if my rating is under 4.0?" (a certification rating threshold exists), "What are the earned badges?", "How are concierge leads assigned?"
 
 ### 8.5 Measured type ramp (desktop)
-H1 Fraunces 700 59.2/64 · H2 Fraunces 700 44/49 · H3 Fraunces 700 18.4/24 · body Public Sans 400 17.3 (`ink-soft`) · accent Caveat 400 24 · buttons Public Sans 700 14.4, pill (999), clay bg `#A8472B`, magnolia text, padding 10×18.
+H1 Fraunces 700 59.2/64 · H2 Fraunces 700 44/49 · H3 Fraunces 700 18.4/24 · body Public Sans 400 17.3 (`ink-soft`) · accent Caveat 24 (computed weight 400, but the site loads only Caveat 500/600/700 — browsers map 400 to the 500 face, so **500 is the rendered weight**) · buttons Public Sans 700 14.4, pill (999), clay bg `#A8472B`, magnolia text, padding 10×18.
 
 Screenshots: `assets/home-full.jpeg`, `assets/registry.jpeg`.
 
