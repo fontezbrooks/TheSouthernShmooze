@@ -9,8 +9,16 @@ import {
 import { useTheme } from "@/theme/ThemeProvider";
 import { Icon } from "@/components/ui/Icon";
 import type { BudgetValue } from "@/lib/database";
-import { BUDGET_OPTIONS } from "../leadSchema";
 import { InputContainer } from "./InputContainer";
+
+export const BUDGET_OPTIONS: ReadonlyArray<{
+  value: BudgetValue;
+  label: string;
+}> = [
+  { value: "lt_1000", label: "< $1,000" },
+  { value: "1000_5000", label: "$1,000 – $5,000" },
+  { value: "gt_5000", label: "> $5,000" },
+];
 
 interface BudgetSelectProps<T extends FieldValues> {
   control: Control<T>;

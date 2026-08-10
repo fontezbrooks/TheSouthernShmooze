@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// Plain regex avoids zod-version churn around `.email()` (same as leadSchema).
+// Plain regex avoids zod-version churn around `.email()`.
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 /**
