@@ -1,5 +1,9 @@
 import { getSupabase } from "@/lib/supabase";
-import { submitPartialLead, submitConciergeLead } from "../submitConcierge";
+import {
+  submitPartialLead,
+  submitConciergeLead,
+  newSubmissionId,
+} from "../submitConcierge";
 import type {
   ConciergeStepOneValues,
   ConciergeStepTwoValues,
@@ -42,7 +46,7 @@ describe("submitPartialLead (FR-4.2)", () => {
     const { client, insert } = makeClient();
     mockedGetSupabase.mockReturnValue(client as never);
 
-    const result = await submitPartialLead(stepOne);
+    const result = await submitPartialLead(stepOne, "test-uuid");
 
     expect(result).toEqual({ ok: true, data: { id: "test-uuid" } });
     expect(client.from).toHaveBeenCalledWith("leads");
@@ -59,7 +63,7 @@ describe("submitPartialLead (FR-4.2)", () => {
     const { client, insert } = makeClient();
     mockedGetSupabase.mockReturnValue(client as never);
 
-    await submitPartialLead({ ...stepOne, notes: "" });
+    await submitPartialLead({ ...stepOne, notes: "" }, "test-uuid");
 
     expect(insert).toHaveBeenCalledWith(
       expect.objectContaining({ project_details: null }),
@@ -70,7 +74,7 @@ describe("submitPartialLead (FR-4.2)", () => {
     const { client } = makeClient({ insertError: { message: "boom" } });
     mockedGetSupabase.mockReturnValue(client as never);
 
-    const result = await submitPartialLead(stepOne);
+    const result = await submitPartialLead(stepOne, "test-uuid");
 
     expect(result.ok).toBe(false);
   });
@@ -80,7 +84,7 @@ describe("submitPartialLead (FR-4.2)", () => {
       throw new Error("offline");
     });
 
-    const result = await submitPartialLead(stepOne);
+    const result = await submitPartialLead(stepOne, "test-uuid");
 
     expect(result).toEqual({
       ok: false,
@@ -94,7 +98,7 @@ describe("submitConciergeLead (FR-4.1 completion)", () => {
     const { client, insert } = makeClient();
     mockedGetSupabase.mockReturnValue(client as never);
 
-    const result = await submitConciergeLead(stepOne, stepTwo, "partial-id");
+    const result = await submitConciergeLead(stepOne, stepTwo, "partial-id", "test-uuid");
 
     expect(result).toEqual({ ok: true, data: { id: "test-uuid" } });
     expect(insert).toHaveBeenCalledWith({
@@ -116,7 +120,7 @@ describe("submitConciergeLead (FR-4.1 completion)", () => {
     const { client, insert } = makeClient();
     mockedGetSupabase.mockReturnValue(client as never);
 
-    const result = await submitConciergeLead(stepOne, stepTwo, null);
+    const result = await submitConciergeLead(stepOne, stepTwo, null, "test-uuid");
 
     expect(result.ok).toBe(true);
     expect(insert).toHaveBeenCalledWith(
@@ -128,8 +132,39 @@ describe("submitConciergeLead (FR-4.1 completion)", () => {
     const { client } = makeClient({ insertError: { message: "boom" } });
     mockedGetSupabase.mockReturnValue(client as never);
 
-    const result = await submitConciergeLead(stepOne, stepTwo, null);
+    const result = await submitConciergeLead(stepOne, stepTwo, null, "test-uuid");
 
     expect(result.ok).toBe(false);
+  });
+
+  it("treats a duplicate-key retry as success (idempotent completion)", async () => {
+    const { client } = makeClient({
+      insertError: { code: "23505", message: "duplicate key value" },
+    });
+    mockedGetSupabase.mockReturnValue(client as never);
+
+    const result = await submitConciergeLead(
+      stepOne,
+      stepTwo,
+      "partial-id",
+      "test-uuid",
+    );
+
+    expect(result).toEqual({ ok: true, data: { id: "test-uuid" } });
+  });
+
+  it("treats a duplicate-key partial retry as success too", async () => {
+    const { client } = makeClient({
+      insertError: { code: "23505", message: "duplicate key value" },
+    });
+    mockedGetSupabase.mockReturnValue(client as never);
+
+    const result = await submitPartialLead(stepOne, "test-uuid");
+
+    expect(result).toEqual({ ok: true, data: { id: "test-uuid" } });
+  });
+
+  it("newSubmissionId delegates to expo-crypto randomUUID", () => {
+    expect(newSubmissionId()).toBe("test-uuid");
   });
 });
