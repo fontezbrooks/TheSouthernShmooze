@@ -92,13 +92,19 @@ export function AnimatedSplash({ onFinish }: AnimatedSplashProps) {
       <Animated.View style={[styles.logoWrap, logoStyle]}>
         <Image source={splashLogo} resizeMode="contain" style={{ width: logoSize, height: logoSize }} />
       </Animated.View>
-      {/* App Daddy credit — white-fill SVG, so it sits on a dark ink pill for
+      {/* App Daddy credit — white-fill SVG, so it sits on a dark rust pill for
           legibility over the cream/daisy background. Fades in with the daisy
-          bloom: the FIRST painted frame stays identical to the native splash. */}
+          bloom, and is ABSOLUTE-positioned below the mascot: in the flex flow
+          its (transparent) footprint would push the mascot ~38pt above the
+          native splash position on the first frame (review: PR #37). */}
       <Animated.View
         style={[
           styles.adsWrap,
-          { backgroundColor: t.brand.colors.text, borderRadius: t.brand.radii.pill },
+          {
+            top: height / 2 + logoSize / 2 + 20,
+            backgroundColor: t.colors.rustDark,
+            borderRadius: t.brand.radii.pill,
+          },
           adsStyle,
         ]}
       >
@@ -119,7 +125,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   adsWrap: {
-    marginTop: 20,
+    position: 'absolute',
+    alignSelf: 'center',
     paddingHorizontal: 16,
     paddingVertical: 8,
     alignItems: 'center',

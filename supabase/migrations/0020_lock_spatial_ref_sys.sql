@@ -12,6 +12,15 @@
 -- the function owner), and geography-type operations don't consult
 -- spatial_ref_sys at query time.
 
+-- PostGIS also grants SELECT to PUBLIC, which anon/authenticated inherit —
+-- revoking only the direct role grants would leave read access intact
+-- (review: PR #37). NOTE: REVOKE only removes grants made by roles the
+-- executing role can act for; verify with the query below after `db push`
+-- and dismiss the advisor finding if the PUBLIC grant is extension-owned:
+--   select grantee, privilege_type
+--   from information_schema.role_table_grants
+--   where table_name = 'spatial_ref_sys';
+revoke all on table public.spatial_ref_sys from public;
 revoke all on table public.spatial_ref_sys from anon, authenticated;
 
 -- Best-effort RLS enable — quiets the advisor where ownership permits;
