@@ -131,7 +131,7 @@ export function LeadCaptureForm({
       {busy ? (
         <ActivityIndicator color={t.colors.rust} />
       ) : (
-        <Button label="Send match" variant="primary" onPress={submit} />
+        <Button label="Send request" variant="primary" onPress={submit} />
       )}
       <Button label="Cancel" variant="pill" tone="black" onPress={onCancel} />
     </View>

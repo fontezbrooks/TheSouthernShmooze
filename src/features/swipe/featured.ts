@@ -9,6 +9,17 @@ export const FEATURED_EVERY_N = 5;
  * Featured cards are BOOSTED in position only — their true confidence is unchanged. Pure
  * and immutable: returns a new array, never mutates the input.
  */
+/**
+ * Deck ordering entry point (design.md §E4). Current heuristic: featured
+ * interleaving only. AT-LAUNCH (L4) `conciergeRotation` plugs in HERE —
+ * once the registry feed carries the flag, rotation members take priority
+ * slots ahead of the featured cadence (Q6: right-swipe = concierge request,
+ * so the deck order IS the concierge routing order).
+ */
+export function orderDeck(cards: DeckCard[]): DeckCard[] {
+  return interleaveFeatured(cards);
+}
+
 export function interleaveFeatured(
   cards: DeckCard[],
   everyN: number = FEATURED_EVERY_N,

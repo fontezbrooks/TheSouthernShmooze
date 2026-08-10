@@ -1,4 +1,4 @@
-import { interleaveFeatured } from "../featured";
+import { interleaveFeatured, orderDeck } from "../featured";
 import type { DeckCard } from "../swipeTypes";
 
 function card(id: string, isFeatured = false): DeckCard {
@@ -64,5 +64,16 @@ describe("interleaveFeatured", () => {
     const snapshot = input.map((c) => c.id);
     interleaveFeatured(input);
     expect(input.map((c) => c.id)).toEqual(snapshot);
+  });
+});
+
+describe("orderDeck (design.md §E4 ordering hook)", () => {
+  it("applies the current heuristic (featured interleave) without mutating", () => {
+    const input = [card("o1"), card("o2"), card("f1", true)];
+    const out = orderDeck(input);
+    expect(out.map((c) => c.id)).toEqual(
+      interleaveFeatured(input).map((c) => c.id),
+    );
+    expect(out).not.toBe(input);
   });
 });
