@@ -35,6 +35,10 @@ export function BusinessLookupField({
   const t = useTheme();
   const business = useWatch({ control, name: "business" });
   const [suggestions, setSuggestions] = useState<PlacePrediction[]>([]);
+  // The query the current suggestions answer — results for a superseded
+  // query must not stay tappable, or a stale row binds an unrelated
+  // placeId to the application (review: PR #34).
+  const [suggestionsFor, setSuggestionsFor] = useState("");
   const [searching, setSearching] = useState(false);
   // Typing after a pick means a new search — drop the stale place_id.
   // Seeded from form state: this keyed subtree REMOUNTS when the user
@@ -55,11 +59,13 @@ export function BusinessLookupField({
     // synchronous setState in an effect body); stale suggestions are hidden
     // by the queryActive render gate rather than cleared eagerly.
     const timer = setTimeout(async () => {
+      const query = business.trim();
       setSearching(true);
-      const res = await suggestPlaces(business.trim(), session);
+      const res = await suggestPlaces(query, session);
       if (!alive) return;
       setSearching(false);
       setSuggestions(res.ok ? res.data.slice(0, 5) : []);
+      setSuggestionsFor(query);
     }, DEBOUNCE_MS);
     return () => {
       alive = false;
@@ -93,7 +99,9 @@ export function BusinessLookupField({
           Searching Google…
         </Text>
       ) : null}
-      {queryActive && suggestions.length > 0 ? (
+      {queryActive &&
+      suggestionsFor === business.trim() &&
+      suggestions.length > 0 ? (
         <View
           style={[
             styles.list,

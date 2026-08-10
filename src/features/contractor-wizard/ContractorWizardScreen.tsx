@@ -9,6 +9,7 @@ import {
   Pressable,
   ActivityIndicator,
 } from "react-native";
+import { useEffect, useRef } from "react";
 import { Controller, useWatch } from "react-hook-form";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -57,6 +58,14 @@ export function ContractorWizardScreen() {
 
   const goBack = () =>
     router.canGoBack() ? router.back() : router.replace("/");
+
+  // One ScrollView spans all steps — without a reset, a long step leaves
+  // the next one opened at the previous bottom offset, hiding its heading
+  // (worst on optional step 7, reachable-to-submit unseen; review: PR #34).
+  const scrollRef = useRef<ScrollView>(null);
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
+  }, [step, phase]);
 
   const stepBody = () => {
     switch (step) {
@@ -371,6 +380,7 @@ export function ContractorWizardScreen() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView
+          ref={scrollRef}
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
         >
