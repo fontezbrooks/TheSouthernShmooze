@@ -1,16 +1,10 @@
-import {
-  ScrollView,
-  ImageBackground,
-  StyleSheet,
-  View,
-  Text,
-  Pressable,
-} from "react-native";
+import { ScrollView, ImageBackground, StyleSheet, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/theme/ThemeProvider";
 import { daisyBackground, bannerHelp, bannerCommunity } from "@/theme/assets";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Banner } from "@/components/ui/Banner";
+import { LinkPill } from "@/components/ui/LinkPill";
 import { SearchBarButton } from "@/features/directory/SearchBar";
 import { CertifiedProviders } from "@/features/providers/CertifiedProviders";
 import { openLink } from "@/lib/openLink";
@@ -105,35 +99,20 @@ export function HomeScreen() {
           onPress={() => openLink(LINKS.newsletter)}
         />
 
-        {/* Content links (E6): FAQ + About, compact footer row. Pressables
-            with a 44pt minimum target (a11y review: PR #35). */}
+        {/* Content links (E6): FAQ + About footer row — LinkPills so they
+            read as buttons over the daisy background (owner polish round);
+            44pt minimum target kept (a11y review: PR #35). */}
         <View style={styles.contentLinks}>
-          <Pressable
-            accessibilityRole="link"
+          <LinkPill
+            label="FAQ"
             accessibilityLabel="Frequently asked questions"
             onPress={() => router.push("/faq")}
-            style={styles.contentLink}
-            hitSlop={8}
-          >
-            <Text
-              style={[t.typography.caption, { color: t.brand.colors.clay }]}
-            >
-              FAQ
-            </Text>
-          </Pressable>
-          <Pressable
-            accessibilityRole="link"
+          />
+          <LinkPill
+            label="About the Shmooze"
             accessibilityLabel="About The Southern Shmooze"
             onPress={() => router.push("/about")}
-            style={styles.contentLink}
-            hitSlop={8}
-          >
-            <Text
-              style={[t.typography.caption, { color: t.brand.colors.clay }]}
-            >
-              About the Shmooze
-            </Text>
-          </Pressable>
+          />
         </View>
       </ScrollView>
     </ImageBackground>
@@ -151,13 +130,6 @@ const styles = StyleSheet.create({
   contentLinks: {
     flexDirection: "row",
     justifyContent: "center",
-    gap: 24,
-  },
-  contentLink: {
-    minHeight: 44,
-    minWidth: 44,
-    paddingHorizontal: 12,
-    alignItems: "center",
-    justifyContent: "center",
+    gap: 16,
   },
 });
