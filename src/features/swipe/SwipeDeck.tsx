@@ -116,7 +116,7 @@ export function SwipeDeck({
           Here’s the regular directory — more local pros are waiting there.
         </Text>
         <Button
-          label="Browse the directory"
+          label="Browse the registry"
           variant="solid"
           onPress={onBrowseDirectory}
         />

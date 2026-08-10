@@ -85,8 +85,8 @@ export function DirectoryScreen() {
     router.push(`/business/${sourceUid}`);
 
   return (
-    // No daisy background on the directory tab — plain Vanilla per RC2 (40:7272).
-    <View style={[styles.flex, { backgroundColor: t.colors.bg }]}>
+    // Registry tab wears the rebrand: plain Magnolia base (design.md §E2).
+    <View style={[styles.flex, { backgroundColor: t.brand.colors.bg }]}>
       <View style={[styles.searchWrap, { paddingTop: insets.top + 8 }]}>
         <View style={styles.searchRow}>
           {showBack ? (
@@ -96,7 +96,7 @@ export function DirectoryScreen() {
               onPress={() => router.back()}
               hitSlop={12}
             >
-              <Icon name="chevronLeft" size={28} color={t.colors.rust} />
+              <Icon name="chevronLeft" size={28} color={t.brand.colors.clay} />
             </Pressable>
           ) : null}
           <View style={styles.searchBarFlex}>
@@ -118,8 +118,8 @@ export function DirectoryScreen() {
             style={[
               styles.matchBtn,
               {
-                backgroundColor: t.colors.rust,
-                borderColor: t.colors.rustDark,
+                backgroundColor: t.brand.colors.clay,
+                borderColor: t.brand.colors.clayDark,
               },
             ]}
           >
@@ -132,8 +132,8 @@ export function DirectoryScreen() {
       {s.loading ? (
         <ActivityIndicator
           style={styles.center}
-          color={t.colors.rust}
-          accessibilityLabel="Loading directory"
+          color={t.brand.colors.clay}
+          accessibilityLabel="Loading registry"
         />
       ) : s.mode === "no-results" ? (
         <SearchEmptyState onAskCommunity={() => openLink(LINKS.facebook)} />
@@ -148,7 +148,10 @@ export function DirectoryScreen() {
           keyboardShouldPersistTaps="handled"
           ListFooterComponent={
             s.searching && s.items.length === 0 ? (
-              <ActivityIndicator color={t.colors.rust} style={styles.footer} />
+              <ActivityIndicator
+                color={t.brand.colors.clay}
+                style={styles.footer}
+              />
             ) : s.error ? (
               <Text
                 style={[

@@ -36,7 +36,7 @@ export function BusinessCardHorizontal({
       {business.logoUrl ? (
         <Image
           source={{ uri: business.logoUrl }}
-          style={[styles.logo, { borderColor: t.colors.inputBorder }]}
+          style={[styles.logo, { borderColor: t.brand.colors.line }]}
           resizeMode="cover"
         />
       ) : (
@@ -44,10 +44,13 @@ export function BusinessCardHorizontal({
           style={[
             styles.logo,
             styles.placeholder,
-            { borderColor: t.colors.inputBorder, backgroundColor: t.colors.bg },
+            {
+              borderColor: t.brand.colors.line,
+              backgroundColor: t.brand.colors.porchCream,
+            },
           ]}
         >
-          <Icon name="briefcaseFilled" size={40} color={t.colors.rustDark} />
+          <Icon name="briefcaseFilled" size={40} color={t.brand.colors.pine} />
         </View>
       )}
 
@@ -60,11 +63,20 @@ export function BusinessCardHorizontal({
         ) : null}
 
         <View style={styles.copy}>
-          <Text style={t.typography.cardTitle} numberOfLines={2}>
+          <Text
+            style={[
+              t.typography.cardTitle,
+              { fontFamily: t.brand.fonts.bodyBold, color: t.brand.colors.text },
+            ]}
+            numberOfLines={2}
+          >
             {business.name}
           </Text>
           <Text
-            style={[t.typography.caption, { color: t.colors.textSoft }]}
+            style={[
+              t.brand.typography.caption,
+              { color: t.brand.colors.textSoft },
+            ]}
             numberOfLines={2}
             ellipsizeMode="tail"
           >

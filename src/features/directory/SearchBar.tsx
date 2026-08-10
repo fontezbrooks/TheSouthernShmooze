@@ -10,10 +10,11 @@ import { useTheme } from "@/theme/ThemeProvider";
 import { Icon } from "@/components/ui/Icon";
 
 const PLACEHOLDER = "Search by service type...";
-/** Hard offset drop shadow (Figma: 4px 4px 0 #602A00) — same physical look as the buttons. */
-const SHADOW_OFFSET = 4;
 
-/** Static hard-shadow frame shared by the input and the button variant. */
+/**
+ * Rebrand pill frame (design.md §E2): white surface, hairline `line` border,
+ * soft brand card shadow — replaces the legacy 4px hard-offset shell.
+ */
 function Shell({
   children,
   pressableProps,
@@ -24,14 +25,11 @@ function Shell({
   const t = useTheme();
   const pill: ViewStyle[] = [
     styles.pill,
-    { backgroundColor: t.colors.surface, borderColor: t.colors.rustDark },
+    t.brand.shadow.card,
+    { backgroundColor: t.brand.colors.surface, borderColor: t.brand.colors.line },
   ];
   return (
     <View style={styles.outer}>
-      <View
-        pointerEvents="none"
-        style={[styles.shadow, { backgroundColor: t.colors.rustDark }]}
-      />
       {pressableProps ? (
         <Pressable
           accessibilityRole="button"
@@ -90,20 +88,24 @@ export function SearchBar({
   const t = useTheme();
   return (
     <Shell>
-      <Icon name="search" size={18} color={t.colors.rust} />
+      <Icon name="search" size={18} color={t.brand.colors.clay} />
       <TextInput
         ref={inputRef}
-        style={[t.typography.body, styles.input, { color: t.colors.text }]}
+        style={[
+          t.brand.typography.body,
+          styles.input,
+          { color: t.brand.colors.text },
+        ]}
         value={value}
         onChangeText={onChangeText}
         onFocus={onFocus}
         onBlur={onBlur}
         placeholder={PLACEHOLDER}
-        placeholderTextColor={t.colors.muted}
+        placeholderTextColor={t.brand.colors.textSoft}
         returnKeyType="search"
         autoCorrect={false}
         autoCapitalize="none"
-        accessibilityLabel="Search the directory"
+        accessibilityLabel="Search the registry"
       />
       {value.length > 0 ? (
         <ClearButton
@@ -125,11 +127,15 @@ export function SearchBarButton({ onPress }: { onPress: () => void }) {
   const t = useTheme();
   return (
     <Shell
-      pressableProps={{ onPress, accessibilityLabel: "Search the directory" }}
+      pressableProps={{ onPress, accessibilityLabel: "Search the registry" }}
     >
-      <Icon name="search" size={18} color={t.colors.rust} />
+      <Icon name="search" size={18} color={t.brand.colors.clay} />
       <Text
-        style={[t.typography.body, styles.input, { color: t.colors.muted }]}
+        style={[
+          t.brand.typography.body,
+          styles.input,
+          { color: t.brand.colors.textSoft },
+        ]}
       >
         {PLACEHOLDER}
       </Text>
@@ -139,23 +145,14 @@ export function SearchBarButton({ onPress }: { onPress: () => void }) {
 
 const styles = StyleSheet.create({
   outer: { position: "relative", width: "100%" },
-  shadow: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    borderRadius: 100,
-    transform: [{ translateX: SHADOW_OFFSET }, { translateY: SHADOW_OFFSET }],
-  },
   pill: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
     height: 48,
     paddingHorizontal: 12,
-    borderWidth: 2,
-    borderRadius: 100,
+    borderWidth: 1,
+    borderRadius: 999,
   },
   // Center the text in the 48px pill: no default vertical padding, lineHeight
   // tightened below the 24px body token (which sat the text low) but ABOVE the

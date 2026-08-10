@@ -34,7 +34,7 @@ export function CertifiedProviders({ onCallPress }: CertifiedProvidersProps) {
   return (
     <View style={styles.section}>
       <View style={styles.headerRow}>
-        <StrokedHeading variant="displayXS">Certified Providers</StrokedHeading>
+        <StrokedHeading variant="displayXS">Shmooze Certified</StrokedHeading>
         <Button
           label="View all"
           variant="pill"

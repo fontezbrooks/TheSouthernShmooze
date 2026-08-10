@@ -45,7 +45,7 @@ type TabItem =
 
 const TABS: TabItem[] = [
   { key: "index", label: "Home", icon: HomeIcon, kind: "route" },
-  { key: "directory", label: "Directory", icon: PhoneCallIcon, kind: "route" },
+  { key: "directory", label: "Registry", icon: PhoneCallIcon, kind: "route" },
   { key: "concierge", label: "Concierge", icon: HeartHandIcon, kind: "route" },
   {
     key: "community",
@@ -143,7 +143,7 @@ export default function TabsLayout() {
       tabBar={(props) => <AppTabBar {...props} />}
     >
       <Tabs.Screen name="index" options={{ title: "Home" }} />
-      <Tabs.Screen name="directory" options={{ title: "Directory" }} />
+      <Tabs.Screen name="directory" options={{ title: "Registry" }} />
       <Tabs.Screen name="concierge" options={{ title: "Concierge" }} />
     </Tabs>
   );
