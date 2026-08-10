@@ -22,15 +22,17 @@ export function LinkButton({ icon, label, onPress }: LinkButtonProps) {
       style={[
         styles.pill,
         {
-          backgroundColor: t.colors.surface,
-          borderColor: t.colors.rustDark,
-          borderRadius: t.radii.pill,
+          backgroundColor: t.brand.colors.surface,
+          borderColor: t.brand.colors.line,
+          borderRadius: t.brand.radii.pill,
         },
-        t.shadow.hard,
+        t.brand.shadow.card,
       ]}
     >
-      <Icon name={icon} size={18} color={t.colors.rustDark} />
-      <Text style={[t.typography.captionSemi, { color: t.colors.text }]}>
+      <Icon name={icon} size={18} color={t.brand.colors.clay} />
+      <Text
+        style={[t.brand.typography.chip, { color: t.brand.colors.text }]}
+      >
         {label}
       </Text>
     </Pressable>
