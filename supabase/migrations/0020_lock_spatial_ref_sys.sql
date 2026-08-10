@@ -14,12 +14,10 @@
 
 -- PostGIS also grants SELECT to PUBLIC, which anon/authenticated inherit —
 -- revoking only the direct role grants would leave read access intact
--- (review: PR #37). NOTE: REVOKE only removes grants made by roles the
--- executing role can act for; verify with the query below after `db push`
--- and dismiss the advisor finding if the PUBLIC grant is extension-owned:
---   select grantee, privilege_type
---   from information_schema.role_table_grants
---   where table_name = 'spatial_ref_sys';
+-- (review: PR #37). REVOKE only removes grants made by roles the executing
+-- role can act for, so these can silently no-op when the grant is
+-- extension-owned — the assertion at the end of this file catches that
+-- instead of letting the migration record a false success.
 revoke all on table public.spatial_ref_sys from public;
 revoke all on table public.spatial_ref_sys from anon, authenticated;
 
@@ -31,6 +29,27 @@ begin
 exception
   when insufficient_privilege then
     raise notice
-      'spatial_ref_sys owned by extension owner — RLS not enabled; grants revoked above, dismiss the advisor finding.';
+      'spatial_ref_sys owned by extension owner — RLS not enabled; relying on the grant revokes above.';
+end
+$$;
+
+-- Assert the migration actually closed the surface (review: PR #37). The
+-- table is protected if EITHER the Data API roles lost SELECT (revokes took
+-- effect) OR RLS is enabled (no policies = deny-all through PostgREST).
+-- Only when BOTH protections failed do we fail the migration, so `db push`
+-- cannot record a lockdown that never happened.
+do $$
+begin
+  if (has_table_privilege('anon', 'public.spatial_ref_sys', 'select')
+      or has_table_privilege('authenticated', 'public.spatial_ref_sys', 'select'))
+     and not (select relrowsecurity
+              from pg_class
+              where oid = 'public.spatial_ref_sys'::regclass) then
+    raise exception
+      'spatial_ref_sys is still readable by Data API roles and RLS is off — '
+      'both the REVOKE and the RLS enable were blocked by extension ownership. '
+      'Run the revoke as the table owner (supabase_admin) via the dashboard, '
+      'or contact Supabase support; then re-run this migration.';
+  end if;
 end
 $$;
