@@ -96,7 +96,14 @@ export function useConciergeForm() {
     })();
   };
 
-  const back = () => setStep("job");
+  // No-op while a submission is in flight: editing the job mid-submit would
+  // let the pending completion resume with NEW job values but the OLD
+  // contact snapshot, and possibly race the replacement partial
+  // (review: PR #32). The UI also disables the button.
+  const back = () => {
+    if (status === "submitting") return;
+    setStep("job");
+  };
 
   const submit = () => {
     // Honeypot BEFORE validation: the schema rejects any non-empty `company`,

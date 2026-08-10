@@ -220,7 +220,12 @@ export function ConciergeForm({ onBackHome }: ConciergeFormProps) {
       ) : null}
 
       <View style={styles.actions}>
-        <Button label="Back" variant="wide" onPress={back} />
+        <Button
+          label="Back"
+          variant="wide"
+          onPress={back}
+          disabled={submitting}
+        />
         <Button
           label={submitting ? "Submitting…" : "See My Match"}
           variant="primary"

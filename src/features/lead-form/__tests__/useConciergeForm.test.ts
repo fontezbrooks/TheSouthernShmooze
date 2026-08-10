@@ -281,6 +281,39 @@ describe("useConciergeForm", () => {
     expect(partialIds[0]).not.toBe(partialIds[1]);
   });
 
+  it("back is a no-op while a submission is in flight", async () => {
+    let resolveComplete!: (v: { ok: true; data: { id: string } }) => void;
+    mockedComplete.mockReturnValue(
+      new Promise((r) => {
+        resolveComplete = r;
+      }) as never,
+    );
+    const { result } = await renderHook(() => useConciergeForm());
+    await fillStepOne(result);
+
+    await act(async () => {
+      const form = result.current.stepTwoForm;
+      for (const [k, v] of Object.entries(stepTwo)) {
+        form.setValue(k as never, v as never);
+      }
+      // Submit without resolving — stays in flight.
+      result.current.submit();
+      await Promise.resolve();
+    });
+    expect(result.current.status).toBe("submitting");
+
+    await act(async () => {
+      result.current.back();
+    });
+    expect(result.current.step).toBe("contact");
+
+    await act(async () => {
+      resolveComplete({ ok: true, data: { id: "complete-row" } });
+      await Promise.resolve();
+    });
+    expect(result.current.step).toBe("success");
+  });
+
   it("back returns to the job step", async () => {
     const { result } = await renderHook(() => useConciergeForm());
     await fillStepOne(result);
