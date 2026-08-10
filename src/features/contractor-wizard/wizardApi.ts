@@ -125,6 +125,15 @@ export async function verifyFit(values: WizardValues): Promise<FitVerdict> {
     ) {
       throw new Error("verify returned no known outcome");
     }
+    // A verified verdict quotes its numbers in the result copy — accepting
+    // one without them would render "undefined stars across null reviews"
+    // and submit it as verified (review: PR #34).
+    if (
+      data.outcome === "verified" &&
+      (typeof data.rating !== "number" || typeof data.reviewCount !== "number")
+    ) {
+      throw new Error("verified verdict missing rating data");
+    }
     return {
       outcome: data.outcome as FitVerdict["outcome"],
       rating: typeof data.rating === "number" ? data.rating : null,

@@ -147,22 +147,37 @@ export function DirectoryScreen() {
           contentContainerStyle={styles.list}
           keyboardShouldPersistTaps="handled"
           ListFooterComponent={
-            s.searching && s.items.length === 0 ? (
-              <ActivityIndicator
-                color={t.brand.colors.clay}
-                style={styles.footer}
-              />
-            ) : s.error ? (
+            <View>
+              {s.searching && s.items.length === 0 ? (
+                <ActivityIndicator
+                  color={t.brand.colors.clay}
+                  style={styles.footer}
+                />
+              ) : s.error ? (
+                <Text
+                  style={[
+                    t.typography.caption,
+                    styles.error,
+                    { color: t.colors.error },
+                  ]}
+                >
+                  {s.error}
+                </Text>
+              ) : null}
+              {/* Contractor entry (design.md §E5: home + registry footer). */}
               <Text
+                accessibilityRole="link"
+                accessibilityLabel="I run a business — Check My Fit"
+                onPress={() => router.push("/contractor-wizard")}
                 style={[
                   t.typography.caption,
-                  styles.error,
-                  { color: t.colors.error },
+                  styles.proFooter,
+                  { color: t.brand.colors.clay },
                 ]}
               >
-                {s.error}
+                I run a business — Check My Fit
               </Text>
-            ) : null
+            </View>
           }
         />
       )}
@@ -195,4 +210,5 @@ const styles = StyleSheet.create({
   list: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 44, gap: 16 },
   footer: { paddingVertical: 24 },
   error: { textAlign: "center", paddingVertical: 24 },
+  proFooter: { textAlign: "center", paddingVertical: 16 },
 });
