@@ -12,9 +12,9 @@ import { useTheme } from "@/theme/ThemeProvider";
 import { daisyBackground } from "@/theme/assets";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { StrokedHeading } from "@/components/ui/StrokedHeading";
-import { LeadForm } from "@/features/lead-form/LeadForm";
+import { ConciergeForm } from "@/features/lead-form/ConciergeForm";
 
-/** Concierge screen — "Concierge" brand kicker, "Let's Plan Something Awesome" + the lead form. */
+/** Concierge screen — "Concierge" brand kicker + the two-step Find My Pro flow (E3b). */
 export function ConciergeScreen() {
   const t = useTheme();
   const router = useRouter();
@@ -42,11 +42,13 @@ export function ConciergeScreen() {
           <View style={styles.headingBlock}>
             {/* Brand kicker (C1) — same overline treatment as the Home banner. */}
             <Text style={t.typography.displayXS}>Concierge</Text>
-            <StrokedHeading variant="displayL">
-              Let&apos;s Plan Something Awesome
-            </StrokedHeading>
+            <StrokedHeading variant="displayL">Find My Pro</StrokedHeading>
           </View>
-          <LeadForm />
+          <ConciergeForm
+            onBackHome={() =>
+              router.canGoBack() ? router.back() : router.replace("/")
+            }
+          />
         </ScrollView>
       </KeyboardAvoidingView>
     </ImageBackground>

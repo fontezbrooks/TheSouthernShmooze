@@ -19,6 +19,7 @@ import BrandGaSosSvg from "./icons/brand-ga-sos.svg";
 
 /** Semantic icon names. Most map to Feather; a few route to Figma-exported SVGs. */
 export type IconName =
+  | "check"
   | "arrowRight"
   | "arrowLeft"
   | "phone"
@@ -68,6 +69,7 @@ const FEATHER: Record<string, React.ComponentProps<typeof Feather>["name"]> = {
   star: "star",
   search: "search",
   x: "x",
+  check: "check",
 };
 
 type GlyphProps = { size?: number; color?: string };
