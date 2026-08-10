@@ -197,6 +197,56 @@ describe("useConciergeForm", () => {
     expect(ids[0]).toBe(ids[1]);
   });
 
+  it("ignores a stale partial resolving after an edited re-advance superseded it", async () => {
+    let resolveFirst!: (v: { ok: true; data: { id: string } }) => void;
+    mockedPartial
+      .mockReturnValueOnce(
+        new Promise((r) => {
+          resolveFirst = r;
+        }) as never,
+      )
+      .mockResolvedValueOnce({ ok: true, data: { id: "fresh-partial" } });
+    const { result } = await renderHook(() => useConciergeForm());
+
+    await act(async () => {
+      result.current.stepOneForm.setValue("trade", stepOne.trade);
+      result.current.stepOneForm.setValue("zip", stepOne.zip);
+      // First advance — its partial stays in flight.
+      result.current.advance();
+      await Promise.resolve();
+    });
+    await act(async () => {
+      result.current.back();
+    });
+    await act(async () => {
+      result.current.stepOneForm.setValue("zip", "30044");
+      await result.current.advance();
+    });
+    await act(async () => {
+      // Stale first insert resolves LAST — must not win.
+      resolveFirst({ ok: true, data: { id: "stale-partial" } });
+      await Promise.resolve();
+    });
+    await fillStepTwo(result);
+
+    expect(mockedComplete.mock.calls[0][2]).toBe("fresh-partial");
+  });
+
+  it("honeypot filled at step 1 pretends success without a partial insert", async () => {
+    const { result } = await renderHook(() => useConciergeForm());
+
+    await act(async () => {
+      result.current.stepTwoForm.setValue("company", "bot-filled");
+      result.current.stepOneForm.setValue("trade", stepOne.trade);
+      result.current.stepOneForm.setValue("zip", stepOne.zip);
+      await result.current.advance();
+    });
+
+    expect(result.current.step).toBe("success");
+    expect(mockedPartial).not.toHaveBeenCalled();
+    expect(mockedComplete).not.toHaveBeenCalled();
+  });
+
   it("back returns to the job step", async () => {
     const { result } = await renderHook(() => useConciergeForm());
     await fillStepOne(result);

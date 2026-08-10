@@ -14,6 +14,35 @@ interface ConciergeFormProps {
 }
 
 /**
+ * Hidden honeypot input — mounted on BOTH steps so a bot filling every
+ * field is caught before even the partial insert (step 1) as well as the
+ * completion (step 2). Bound to the contact form's `company` field.
+ */
+function HoneypotField({
+  control,
+}: {
+  control: ReturnType<typeof useConciergeForm>["stepTwoForm"]["control"];
+}) {
+  return (
+    <Controller
+      control={control}
+      name="company"
+      render={({ field }) => (
+        <TextInput
+          value={field.value ?? ""}
+          onChangeText={field.onChange}
+          style={styles.honeypot}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+          autoComplete="off"
+          autoCorrect={false}
+        />
+      )}
+    />
+  );
+}
+
+/**
  * Two-step "Find My Pro" flow (design.md §E3b, FR-4.1). Step 1 captures the
  * job (trade chips + zip + notes) and fires the partial lead on advance;
  * step 2 captures contact + newsletter opt-in; the confirmation reveals the
@@ -86,6 +115,7 @@ export function ConciergeForm({ onBackHome }: ConciergeFormProps) {
           label="Anything else about the job? (optional)"
           multiline
         />
+        <HoneypotField control={stepTwoForm.control} />
         <Button label="Next" variant="primary" onPress={advance} />
       </View>
     );
@@ -173,22 +203,7 @@ export function ConciergeForm({ onBackHome }: ConciergeFormProps) {
         )}
       />
 
-      {/* Honeypot — visually hidden; bots fill it, humans never see it. */}
-      <Controller
-        control={stepTwoForm.control}
-        name="company"
-        render={({ field }) => (
-          <TextInput
-            value={field.value ?? ""}
-            onChangeText={field.onChange}
-            style={styles.honeypot}
-            accessibilityElementsHidden
-            importantForAccessibility="no-hide-descendants"
-            autoComplete="off"
-            autoCorrect={false}
-          />
-        )}
-      />
+      <HoneypotField control={stepTwoForm.control} />
 
       {status === "error" && errorMessage ? (
         <View

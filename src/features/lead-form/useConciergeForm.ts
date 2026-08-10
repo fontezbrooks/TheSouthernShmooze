@@ -57,8 +57,16 @@ export function useConciergeForm() {
 
   // The submit callbacks are BUILT inside the event handlers (not during
   // render) so the react-hooks compiler analysis doesn't flag the ref reads.
-  const advance = () =>
-    stepOneForm.handleSubmit(async (values) => {
+  const advance = () => {
+    // Honeypot fires on step 1 too — the hidden field is mounted in both
+    // steps, so a bot that fills it never persists even a partial row
+    // (review: PR #32). Pretend success, same as the completion path.
+    const honey = stepTwoForm.getValues("company");
+    if (honey && honey.length > 0) {
+      setStep("success");
+      return Promise.resolve();
+    }
+    return stepOneForm.handleSubmit(async (values) => {
       setStep("contact");
       // Best-effort capture (FR-4.2): never blocks the user; a failure just
       // means the completion won't reference a partial row.
@@ -71,11 +79,18 @@ export function useConciergeForm() {
         lastPartialPayload.current = payload;
       }
       const inFlight = submitPartialLead(values, id).then((result) => {
-        if (result.ok) savedPartialId.current = result.data.id;
+        // Record only if this insert is still the CURRENT partial — an
+        // edited re-advance may have superseded it while it was in flight,
+        // and a late stale resolution must not overwrite the fresh id
+        // (review: PR #32).
+        if (result.ok && partialId.current === id) {
+          savedPartialId.current = result.data.id;
+        }
       });
       partialInFlight.current = inFlight;
       await inFlight;
     })();
+  };
 
   const back = () => setStep("job");
 
