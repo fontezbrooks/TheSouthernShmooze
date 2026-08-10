@@ -57,9 +57,12 @@ export const FAQ_CONTENT: Record<FaqAudience, readonly FaqTopic[]> = {
           q: "What does 'Shmooze Certified' mean?",
           a: "It is the trust seal every listed business earns. It signals they are a real, reachable local business the community stands behind, not a random ad.",
         },
+        // Qualified vs the site's answer: live Google reviews on in-app
+        // registry profiles land with the at-launch profile-depth work
+        // (L2/L5) — do not promise them in this release (review: PR #35).
         {
           q: "Are the reviews on the profiles real?",
-          a: "Yes. Profile reviews are pulled live from Google with the reviewer's real name, and every profile links to the business's Google listing so you can verify for yourself.",
+          a: "Yes. On the Southern Shmooze website, profile reviews are pulled live from Google with the reviewer's real name, and each profile links to the business's Google listing so you can verify for yourself. Live Google ratings are coming to profiles in the app soon.",
         },
         {
           q: "What if I have a bad experience with a pro?",
@@ -103,13 +106,16 @@ export const FAQ_CONTENT: Record<FaqAudience, readonly FaqTopic[]> = {
           q: "What is the Concierge Match?",
           a: "Tell us what you need and the concierge sends your request straight to the right certified pro for the job, one pro, not a bidding war, instead of you sifting through listings.",
         },
+        // Qualified vs the site's answers: automatic Market Leader trade
+        // rotation lands at launch (L4) — today the concierge team routes
+        // each request to a trusted pro (review: PR #35).
         {
           q: "How does the concierge choose a business?",
-          a: "It routes your request by trade to a top-tier Market Leader who is ready to take the work, on a fair rotation so no one gets buried.",
+          a: "The concierge routes your request to a trusted Shmooze Certified pro who fits the job. As the new registry rolls out, requests will route by trade to top-tier Market Leaders on a fair rotation so no one gets buried.",
         },
         {
           q: "What happens after I submit a request?",
-          a: "The matched pro is notified right away and reaches out to you directly. If they cannot take it, we route you to the next one automatically.",
+          a: "Your matched pro is notified and reaches out to you directly. If they cannot take the job, the concierge routes you to the next trusted pro.",
         },
         {
           q: "Can I request a specific trade or service?",
