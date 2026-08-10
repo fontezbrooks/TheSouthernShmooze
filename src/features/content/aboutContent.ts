@@ -69,4 +69,12 @@ export const COMMUNITY_LINKS: readonly {
     description: "The Shmooze around town, in pictures.",
     url: "https://www.instagram.com/shmoozeatl",
   },
+  // The site publishes no dedicated meetup URL — gatherings are announced
+  // in the Facebook group, so that is the honest destination (E6 review).
+  {
+    label: "Monthly Meetups",
+    description:
+      "Get to know the real people behind the businesses — announced in the Facebook group.",
+    url: "https://www.facebook.com/groups/TheSouthernShmooze",
+  },
 ];

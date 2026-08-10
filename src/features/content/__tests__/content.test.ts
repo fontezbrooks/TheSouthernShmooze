@@ -63,6 +63,7 @@ describe("About content", () => {
       "The Shmooze Podcast",
       "The Newsletter",
       "Instagram",
+      "Monthly Meetups",
     ]);
   });
 });

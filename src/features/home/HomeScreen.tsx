@@ -4,6 +4,7 @@ import {
   StyleSheet,
   View,
   Text,
+  Pressable,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -100,32 +101,35 @@ export function HomeScreen() {
           onPress={() => openLink(LINKS.newsletter)}
         />
 
-        {/* Content links (E6): FAQ + About, compact footer row. */}
+        {/* Content links (E6): FAQ + About, compact footer row. Pressables
+            with a 44pt minimum target (a11y review: PR #35). */}
         <View style={styles.contentLinks}>
-          <Text
+          <Pressable
             accessibilityRole="link"
             accessibilityLabel="Frequently asked questions"
             onPress={() => router.push("/faq")}
-            style={[
-              t.typography.caption,
-              styles.contentLink,
-              { color: t.brand.colors.clay },
-            ]}
+            style={styles.contentLink}
+            hitSlop={8}
           >
-            FAQ
-          </Text>
-          <Text
+            <Text
+              style={[t.typography.caption, { color: t.brand.colors.clay }]}
+            >
+              FAQ
+            </Text>
+          </Pressable>
+          <Pressable
             accessibilityRole="link"
             accessibilityLabel="About The Southern Shmooze"
             onPress={() => router.push("/about")}
-            style={[
-              t.typography.caption,
-              styles.contentLink,
-              { color: t.brand.colors.clay },
-            ]}
+            style={styles.contentLink}
+            hitSlop={8}
           >
-            About the Shmooze
-          </Text>
+            <Text
+              style={[t.typography.caption, { color: t.brand.colors.clay }]}
+            >
+              About the Shmooze
+            </Text>
+          </Pressable>
         </View>
       </ScrollView>
     </ImageBackground>
@@ -143,7 +147,13 @@ const styles = StyleSheet.create({
   contentLinks: {
     flexDirection: "row",
     justifyContent: "center",
-    gap: 32,
+    gap: 24,
   },
-  contentLink: { paddingVertical: 8 },
+  contentLink: {
+    minHeight: 44,
+    minWidth: 44,
+    paddingHorizontal: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });

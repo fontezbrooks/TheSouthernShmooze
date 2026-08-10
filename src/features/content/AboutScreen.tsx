@@ -124,9 +124,10 @@ export function AboutScreen() {
         >
           Join the community
         </Text>
+        {/* Keyed by label: the meetup entry shares the Facebook group URL. */}
         {COMMUNITY_LINKS.map((link) => (
           <Pressable
-            key={link.url}
+            key={link.label}
             accessibilityRole="link"
             accessibilityLabel={link.label}
             onPress={() => openLink(link.url)}
