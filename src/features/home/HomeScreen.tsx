@@ -76,6 +76,15 @@ export function HomeScreen() {
           onPress={() => openLink(LINKS.facebook)}
         />
 
+        {/* Contractor entry (E5) — Check My Fit wizard. Copy: draft, owner approves at PR. */}
+        <Banner
+          layout="imageTop"
+          title="Are You a Local Pro?"
+          subtitle="See if you're a fit for the Shmooze registry — free, takes about 2 minutes."
+          cta={{ label: "Check My Fit" }}
+          onPress={() => router.push("/contractor-wizard")}
+        />
+
         {/* Newsletter block (H1) — replaces the Newsletter tab. Copy: draft, owner approves at PR. */}
         <Banner
           layout="imageTop"
