@@ -1,4 +1,11 @@
-import { ScrollView, ImageBackground, StyleSheet } from "react-native";
+import {
+  ScrollView,
+  ImageBackground,
+  StyleSheet,
+  View,
+  Text,
+  Pressable,
+} from "react-native";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/theme/ThemeProvider";
 import { daisyBackground, bannerHelp, bannerCommunity } from "@/theme/assets";
@@ -93,6 +100,37 @@ export function HomeScreen() {
           cta={{ label: "Subscribe" }}
           onPress={() => openLink(LINKS.newsletter)}
         />
+
+        {/* Content links (E6): FAQ + About, compact footer row. Pressables
+            with a 44pt minimum target (a11y review: PR #35). */}
+        <View style={styles.contentLinks}>
+          <Pressable
+            accessibilityRole="link"
+            accessibilityLabel="Frequently asked questions"
+            onPress={() => router.push("/faq")}
+            style={styles.contentLink}
+            hitSlop={8}
+          >
+            <Text
+              style={[t.typography.caption, { color: t.brand.colors.clay }]}
+            >
+              FAQ
+            </Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="link"
+            accessibilityLabel="About The Southern Shmooze"
+            onPress={() => router.push("/about")}
+            style={styles.contentLink}
+            hitSlop={8}
+          >
+            <Text
+              style={[t.typography.caption, { color: t.brand.colors.clay }]}
+            >
+              About the Shmooze
+            </Text>
+          </Pressable>
+        </View>
       </ScrollView>
     </ImageBackground>
   );
@@ -105,5 +143,17 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 44,
     gap: 24,
+  },
+  contentLinks: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 24,
+  },
+  contentLink: {
+    minHeight: 44,
+    minWidth: 44,
+    paddingHorizontal: 12,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
