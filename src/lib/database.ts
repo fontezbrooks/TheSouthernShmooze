@@ -25,15 +25,24 @@ export interface LeadRow {
 /** Columns the client supplies on insert. `status` is forced to 'new' by RLS/default. */
 export interface LeadInsert {
   id?: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  address: string;
+  // Contact columns are nullable since 0019 (two-step concierge): the DB's
+  // `leads_complete_contact` check requires them whenever stage='complete';
+  // zod guards each submit path client-side.
+  first_name?: string | null;
+  last_name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  address?: string | null;
   budget?: BudgetValue[];
   project_start_date?: string | null;
-  project_details: string;
+  project_details?: string | null;
   file_path?: string | null;
+  // Two-step concierge columns (0019).
+  trade?: string | null;
+  zip?: string | null;
+  newsletter_opt_in?: boolean;
+  stage?: "partial" | "complete";
+  partial_id?: string | null;
 }
 
 /** A phone entry aggregated into the directory app view. */
