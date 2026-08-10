@@ -88,6 +88,13 @@ export async function verifyFit(values: WizardValues): Promise<FitVerdict> {
   const payload = {
     placeId: values.placeId || "",
     session: values.placeSession || "",
+    // Site parity, deliberately hardcoded (matching the web wizard): the
+    // step-4 field is labelled "Primary Metro Atlanta service area", so the
+    // applicant asserted the claim by answering it. Per the worker contract
+    // the flag only softens a geocode that lands just outside the metro —
+    // it cannot pass an out-of-area business on its own, and with no
+    // listing picked there is no geocode and the outcome is the deliberate
+    // "unverified" pass regardless of this flag.
     claimsAtlanta: true,
     answers: {
       trade: values.trade || "",
