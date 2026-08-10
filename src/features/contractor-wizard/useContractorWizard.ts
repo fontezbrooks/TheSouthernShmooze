@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { randomUUID } from "expo-crypto";
@@ -44,6 +44,16 @@ export function useContractorWizard() {
   const placeSession = useRef<string | null>(null);
   // True while an advance (including the final verify+submit) is running.
   const advancing = useRef(false);
+  // Leaving the screen (header back / route pop) mid-verification means the
+  // user backed out — the pending flow must NOT record the application or
+  // set state after unmount (review: PR #34).
+  const mounted = useRef(true);
+  useEffect(
+    () => () => {
+      mounted.current = false;
+    },
+    [],
+  );
 
   const getPlaceSession = () => {
     if (!placeSession.current) {
@@ -75,6 +85,9 @@ export function useContractorWizard() {
       if (elapsed < ANALYZE_FLOOR_MS) {
         await new Promise((r) => setTimeout(r, ANALYZE_FLOOR_MS - elapsed));
       }
+      // User left the screen while verifying — abandon: no application
+      // recorded, no setState after unmount.
+      if (!mounted.current) return;
       // Fire-and-forget, site parity — the decision is already made.
       void submitApplication(values, res);
       setVerdict(res);

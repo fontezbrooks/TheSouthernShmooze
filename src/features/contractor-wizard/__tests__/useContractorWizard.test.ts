@@ -148,6 +148,35 @@ describe("useContractorWizard", () => {
     expect(result.current.verdict?.offline).toBe(true);
   });
 
+  test("leaving the screen mid-verification abandons the submit", async () => {
+    let resolveVerify!: (v: FitVerdict) => void;
+    verifyFitMock.mockReturnValue(
+      new Promise<FitVerdict>((r) => {
+        resolveVerify = r;
+      }),
+    );
+    const { result, unmount } = await renderHook(() => useContractorWizard());
+    for (let i = 0; i < 6; i++) {
+      await fillStep(result, i);
+      await act(async () => {
+        await result.current.advance();
+      });
+    }
+    await fillStep(result, 6);
+    let advancePromise!: Promise<void>;
+    await act(async () => {
+      // act drains microtasks, parking the advance at the verify await.
+      advancePromise = result.current.advance() as Promise<void>;
+    });
+    // RNTL v14: unmount is async — must be awaited or cleanup hasn't run.
+    await unmount();
+    await act(async () => {
+      resolveVerify(passVerdict);
+      await advancePromise;
+    });
+    expect(submitMock).not.toHaveBeenCalled();
+  });
+
   test("back is ignored while an advance is in flight", async () => {
     const { result } = await renderHook(() => useContractorWizard());
     await fillStep(result, 0);
