@@ -45,11 +45,11 @@ export const directoryRepository: DirectoryRepository = {
         .order("recommended_score", { ascending: false, nullsFirst: false })
         .order("name", { ascending: true });
 
-      if (error) return err("We couldn’t load the directory right now.");
+      if (error) return err("We couldn’t load the registry right now.");
       const rows = (data ?? []) as DirectoryBusinessRow[];
       return ok(pinToTop(rows.map(toBusiness)));
     } catch {
-      return err("Network error loading the directory.");
+      return err("Network error loading the registry.");
     }
   },
 

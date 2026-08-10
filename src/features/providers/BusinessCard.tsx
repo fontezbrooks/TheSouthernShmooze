@@ -31,7 +31,7 @@ export function BusinessCard({
     <PhysicalPressable
       fullWidth={false}
       onPress={() => onCardPress(business.sourceUid)}
-      accessibilityLabel={`${business.name} — open directory listing`}
+      accessibilityLabel={`${business.name} — open registry listing`}
       radius={t.radii.card}
       shadowColor={t.colors.rustDark}
       style={[
