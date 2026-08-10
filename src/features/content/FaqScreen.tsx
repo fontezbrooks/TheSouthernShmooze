@@ -179,6 +179,7 @@ const styles = StyleSheet.create({
   // 320pt viewport, worse at accessibility font sizes (review: PR #35).
   tab: {
     flex: 1,
+    minHeight: 44,
     paddingVertical: 8,
     paddingHorizontal: 8,
     borderWidth: 1,

@@ -225,9 +225,12 @@ export const FAQ_CONTENT: Record<FaqAudience, readonly FaqTopic[]> = {
           q: "Are these shared leads like other sites?",
           a: "No. We do not sell the same lead to five competitors. A concierge lead goes to you, not into a bidding war.",
         },
+        // Qualified vs the site: fair trade rotation lands at launch (L4)
+        // — same forthcoming framing as the neighboring answers
+        // (review: PR #35).
         {
           q: "How are concierge leads assigned?",
-          a: "By trade, to Market Leaders on a fair rotation, so you get real, ready-to-hire homeowners in your category.",
+          a: "Today the concierge routes each request to a trusted certified pro for the job. As rotation rolls out, leads will route by trade to Market Leaders on a fair rotation, so you get real, ready-to-hire homeowners in your category.",
         },
         {
           q: "What makes Shmooze leads different?",
