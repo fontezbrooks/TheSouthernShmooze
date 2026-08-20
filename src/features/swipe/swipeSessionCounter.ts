@@ -1,11 +1,12 @@
 /**
- * Cumulative swipe counter scoped to the SWIPE SESSION, not the screen
- * (review: PR #43): SwipeScreen is a stack route that unmounts when the user
- * backs out, but the session token lives in SwipeSessionProvider for the whole
- * app session. A screen-local ref would restart session_swipe_count at 1 on
- * every reopen, corrupting the power-swiper distribution.
+ * Cumulative swipe counter scoped to the ANALYTICS SESSION, not the screen
+ * (review: PR #43 ×2): SwipeScreen is a stack route that unmounts on back-out
+ * (a local ref would restart at 1 every reopen), and the swipe session token
+ * is restored from storage and never rotates in-process — so the key is the
+ * POSTHOG session id (rotates after backgrounding inactivity), with the swipe
+ * token only as the capture-disabled fallback.
  *
- * Module state keyed by session token; only the current token is retained.
+ * Module state; only the current key is retained.
  */
 let counterToken: string | null = null;
 let counterValue = 0;

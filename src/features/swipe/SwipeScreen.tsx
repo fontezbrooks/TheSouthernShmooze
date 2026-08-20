@@ -48,7 +48,7 @@ export function SwipeScreen() {
 	/** ST3 transient pass flash. */
 	const [passed, setPassed] = useState(false);
 	const [quickViewUid, setQuickViewUid] = useState<string | null>(null);
-	const { track } = useAnalytics();
+	const { sessionKey, track } = useAnalytics();
 
 	// Top card changed → it's being shown to the homeowner (US-4).
 	const { current } = deck;
@@ -99,7 +99,7 @@ export function SwipeScreen() {
 		track("shmoozer_card_swiped", {
 			is_promoted: card.isFeatured,
 			pro_business_id: card.sourceUid,
-			session_swipe_count: nextSwipeCount(session.sessionToken),
+			session_swipe_count: nextSwipeCount(sessionKey() ?? session.sessionToken),
 			swipe_direction: "right",
 		});
 		// Confirm every Match: the routed contact page — nothing sends silently.
@@ -114,7 +114,9 @@ export function SwipeScreen() {
 			track("shmoozer_card_swiped", {
 				is_promoted: current.isFeatured,
 				pro_business_id: current.sourceUid,
-				session_swipe_count: nextSwipeCount(session.sessionToken),
+				session_swipe_count: nextSwipeCount(
+					sessionKey() ?? session.sessionToken
+				),
 				swipe_direction: "left",
 			});
 		}

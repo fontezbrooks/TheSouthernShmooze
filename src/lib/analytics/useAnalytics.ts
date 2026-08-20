@@ -12,6 +12,13 @@ export interface Analytics {
 	 * into our own form; person props only — never event props.
 	 */
 	identify: (email: string, properties: IdentifyProperties) => void;
+	/**
+	 * The CURRENT PostHog session id (rotates after backgrounding
+	 * inactivity), or null when capture is disabled. Session-scoped metrics
+	 * (e.g. session_swipe_count) must key on this — app-lifetime tokens
+	 * outlive an analytics session (review: PR #43).
+	 */
+	sessionKey: () => string | null;
 	/** Typed capture — event/props pairs come from the AnalyticsEvent map. */
 	track: <K extends AnalyticsEventName>(
 		event: K,
@@ -39,7 +46,11 @@ export function useAnalytics(): Analytics {
 		},
 		[client]
 	);
-	return { identify, track };
+	const sessionKey = useCallback<Analytics["sessionKey"]>(
+		() => (client ? client.getSessionId() : null),
+		[client]
+	);
+	return { identify, sessionKey, track };
 }
 
 /**
