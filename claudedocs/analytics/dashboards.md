@@ -24,16 +24,19 @@ Concierge conversion (cohort funnel initiated → submitted, 14d window — not 
 conversion over time, 14d window — abandonment approximated by its complement;
 person-level because the events carry no shared request id yet — emitting a
 request_key on step-1 + submitted and aggregating by it is a backlog item) ·
-Post-submit call CTR (UNIQUE completion-screen callers / UNIQUE submitters —
-repeat taps can't inflate it).
+Post-submit call-through (cohort funnel submitted → completion-screen call
+within 7 days — cohort-based, cannot exceed 100% or straddle range boundaries).
 
 ### 3 · Contractor Growth (3 tiles)
 Funnel portal_started → qualification_submitted · Qualification outcomes
 (stacked bars by instant_qualification_response) · Portal entry points
 (home_banner vs registry_footer).
 
-### 4 · Registry Sync & Ops (3 tiles)
-Sync success rate (sync_status=success / all, 7d scorecard) · Sync duration
+### 4 · Registry Sync & Ops (4 tiles)
+Sync success rate of REPORTED runs (sync_status=success / all, 7d scorecard —
+blind to invocations that crash before reporting) · Runs reported per day
+(count vs the cron cadence: ~144/day directory + ~288/day profiles; shortfall
+= crashed/killed runs, the success tile's blind spot) · Sync duration
 (avg duration_ms by sync_source) · Sync throughput per day (sum
 records_ingested by sync_source — semantics differ: sync-directory counts rows
 actually added/updated (0 = unchanged directory, normal); sync-profiles counts
