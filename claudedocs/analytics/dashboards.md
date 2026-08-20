@@ -20,7 +20,7 @@ Screen paths ($screen) · Weekly retention (Application Opened, first-time,
 
 ### 2 · Find My Pro Funnel (4 tiles)
 Funnel initiated → step_1_completed → submitted (14d window) ·
-Conversion rate scorecard (B/A, %) · Step-2 completion per PERSON (funnel
+Concierge conversion (cohort funnel initiated → submitted, 14d window — not an event-count ratio) · Step-2 completion per PERSON (funnel
 conversion over time, 14d window — abandonment approximated by its complement;
 person-level because the events carry no shared request id yet — emitting a
 request_key on step-1 + submitted and aggregating by it is a backlog item) ·
