@@ -36,9 +36,11 @@ Funnel portal_started → qualification_submitted · Qualification outcomes
 Sync success rate of REPORTED runs (sync_status=success / all, 7d scorecard —
 blind to runs that never report) · Runs reported per day (count vs the cron
 cadence: ~144/day directory + ~288/day profiles; a shortfall means runs went
-UNREPORTED — crashed/killed invocations OR telemetry-delivery failures, since
-capture swallows HTTP/network errors, its 2s timeout, and missing env by
-design; Supabase function logs identify the failure domain) · Sync duration
+UNREPORTED — crashed/killed invocations, pre-capture 401s (both handlers
+reject a missing/mismatched cron secret BEFORE capture runs), or
+telemetry-delivery failures, since capture swallows HTTP/network errors, its
+2s timeout, and missing env by design; Supabase function logs identify the
+failure domain) · Sync duration
 (avg duration_ms by sync_source) · Sync throughput per day (sum
 records_ingested by sync_source — semantics differ: sync-directory counts rows
 actually added/updated (0 = unchanged directory, normal); sync-profiles counts
