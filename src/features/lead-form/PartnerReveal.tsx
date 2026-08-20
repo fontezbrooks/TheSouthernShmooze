@@ -3,6 +3,7 @@ import { ActivityIndicator, Image, StyleSheet, Text, View } from "react-native";
 import { Button } from "@/components/ui/Button";
 import { providerRepository } from "@/features/providers/providerRepository";
 import type { DirectoryBusiness } from "@/features/providers/providerTypes";
+import { useAnalytics } from "@/lib/analytics/useAnalytics";
 import { openLink } from "@/lib/openLink";
 import { useTheme } from "@/theme/ThemeProvider";
 
@@ -24,6 +25,7 @@ export function PartnerReveal({
 	onSubmitAnother,
 }: PartnerRevealProps) {
 	const t = useTheme();
+	const { track } = useAnalytics();
 	const [loading, setLoading] = useState(true);
 	const [partner, setPartner] = useState<DirectoryBusiness | null>(null);
 
@@ -99,7 +101,13 @@ export function PartnerReveal({
 								<Text
 									accessibilityLabel={`Call ${partner.name} at ${partner.phoneDisplay}`}
 									accessibilityRole="link"
-									onPress={() => openLink(`tel:${partner.phone}`)}
+									onPress={() => {
+										track("partner_call_button_clicked", {
+											call_placement_source: "find_my_pro_completion",
+											pro_business_id: partner.sourceUid,
+										});
+										openLink(`tel:${partner.phone}`);
+									}}
 									style={[
 										t.brand.typography.caption,
 										{ color: t.brand.colors.clay },

@@ -1,6 +1,7 @@
+import { usePathname } from "expo-router";
 import type PostHog from "posthog-react-native";
 import { PostHogProvider } from "posthog-react-native";
-import { createContext, type ReactNode, useMemo } from "react";
+import { createContext, type ReactNode, useEffect, useMemo } from "react";
 import { getAnalyticsClient } from "./posthog";
 
 /**
@@ -25,8 +26,12 @@ export function AnalyticsProvider({
 	children,
 	client = getAnalyticsClient(),
 }: AnalyticsProviderProps) {
+	// captureScreens OFF: the SDK's screen autocapture hooks a react-navigation
+	// container ref that expo-router never hands it — a live device pass
+	// produced ZERO $screen events (2026-08-20). ScreenTracker below is the
+	// authoritative source instead.
 	const autocapture = useMemo(
-		() => ({ captureScreens: true, captureTouches: false }),
+		() => ({ captureScreens: false, captureTouches: false }),
 		[]
 	);
 	if (!client) {
@@ -39,8 +44,20 @@ export function AnalyticsProvider({
 	return (
 		<AnalyticsContext.Provider value={client}>
 			<PostHogProvider autocapture={autocapture} client={client}>
+				<ScreenTracker client={client} />
 				{children}
 			</PostHogProvider>
 		</AnalyticsContext.Provider>
 	);
+}
+
+/** Emits a $screen per expo-router pathname change (autocapture fallback). */
+function ScreenTracker({ client }: { client: PostHog }) {
+	const pathname = usePathname();
+	useEffect(() => {
+		if (pathname) {
+			client.screen(pathname);
+		}
+	}, [client, pathname]);
+	return null;
 }

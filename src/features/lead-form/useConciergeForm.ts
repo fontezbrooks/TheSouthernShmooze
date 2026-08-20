@@ -1,6 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { zipPrefix } from "@/lib/analytics/events";
+import { useAnalytics } from "@/lib/analytics/useAnalytics";
 import {
 	type ConciergeStepOneValues,
 	type ConciergeStepTwoValues,
@@ -38,9 +40,18 @@ export function useConciergeForm() {
 		resolver: zodResolver(conciergeStepTwoSchema),
 	});
 
+	const { track } = useAnalytics();
 	const [step, setStep] = useState<ConciergeStep>("job");
 	const [status, setStatus] = useState<SubmitStatus>("idle");
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+	// Funnel step 0 (US-2). Lives HERE, not on the screen: the tab-preserved
+	// Concierge screen never remounts, so "Submit Another Request" (reset)
+	// must emit its own initiation — one per request, not one per mount
+	// (review: PR #43).
+	useEffect(() => {
+		track("find_my_pro_initiated", {});
+	}, [track]);
 
 	// Stable ids across retries (see submitConcierge id contract).
 	const partialId = useRef<string | null>(null);
@@ -87,7 +98,12 @@ export function useConciergeForm() {
 				savedPartialId.current = null;
 				lastPartialPayload.current = payload;
 			}
+			// THIS request's own outcome — the event flag must not read shared
+			// mutable state, which a concurrent re-advance can repoint to a
+			// different request (review: PR #43).
+			let partialRecorded = false;
 			const inFlight = submitPartialLead(values, id).then((result) => {
+				partialRecorded = result.ok;
 				// Record only if this insert is still the CURRENT partial — an
 				// edited re-advance may have superseded it while it was in flight,
 				// and a late stale resolution must not overwrite the fresh id
@@ -98,6 +114,12 @@ export function useConciergeForm() {
 			});
 			partialInFlight.current = inFlight;
 			await inFlight;
+			// After the partial settles so partial_lead_recorded is truthful (US-2).
+			track("find_my_pro_step_1_completed", {
+				partial_lead_recorded: partialRecorded,
+				requested_category: values.trade,
+				zip_prefix: zipPrefix(values.zip),
+			});
 		})();
 	};
 
@@ -156,6 +178,10 @@ export function useConciergeForm() {
 			if (result.ok) {
 				setStatus("idle");
 				setStep("success");
+				// matched_pro_id omitted: the partner reveal picks the pinned
+				// provider independently (see PartnerReveal) — L4 rotation will
+				// give the submit path a real matched id.
+				track("find_my_pro_submitted", {});
 			} else {
 				setStatus("error");
 				setErrorMessage(result.error);
@@ -177,6 +203,8 @@ export function useConciergeForm() {
 		setStatus("idle");
 		setErrorMessage(null);
 		setStep("job");
+		// A fresh request begins without a remount — see the mount effect above.
+		track("find_my_pro_initiated", {});
 	};
 
 	return {

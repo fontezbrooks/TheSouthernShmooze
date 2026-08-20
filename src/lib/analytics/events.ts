@@ -48,17 +48,23 @@ export interface AnalyticsEvent {
 		empty_state_rendered: boolean;
 	};
 	shmoozer_card_rendered: {
+		card_index: number;
+		/** Paid placement (provider_promotions) — NOT the certified tier. */
+		is_promoted: boolean;
 		pro_business_id: string;
 		pro_business_name: string;
-		pro_tier?: string;
 		pro_rating?: number;
-		card_index: number;
+		/** Certified level (e.g. "Market Leader") — absent until L1 lands tier data. */
+		pro_tier?: string;
 	};
 	shmoozer_card_swiped: {
+		/** Paid placement (provider_promotions) — NOT the certified tier. */
+		is_promoted: boolean;
 		pro_business_id: string;
+		/** Certified level — absent until L1 lands tier data. */
 		pro_tier?: string;
-		swipe_direction: "left" | "right";
 		session_swipe_count: number;
+		swipe_direction: "left" | "right";
 	};
 	shmoozer_match_triggered: {
 		pro_business_id: string;

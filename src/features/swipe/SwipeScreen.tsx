@@ -11,11 +11,13 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
+import { useAnalytics } from "@/lib/analytics/useAnalytics";
 import { useTheme } from "@/theme/ThemeProvider";
 import { FiltersModal } from "./FiltersModal";
 import { ProfileQuickView } from "./ProfileQuickView";
 import { SwipeDeck } from "./SwipeDeck";
 import { useSwipeSession } from "./SwipeSessionProvider";
+import { nextSwipeCount } from "./swipeSessionCounter";
 import type { DeckCard, SwipeTask } from "./swipeTypes";
 import { useSwipeDeck } from "./useSwipeDeck";
 
@@ -46,6 +48,21 @@ export function SwipeScreen() {
 	/** ST3 transient pass flash. */
 	const [passed, setPassed] = useState(false);
 	const [quickViewUid, setQuickViewUid] = useState<string | null>(null);
+	const { sessionKey, track } = useAnalytics();
+
+	// Top card changed → it's being shown to the homeowner (US-4).
+	const { current } = deck;
+	useEffect(() => {
+		if (!current) {
+			return;
+		}
+		track("shmoozer_card_rendered", {
+			card_index: deck.cards.indexOf(current),
+			is_promoted: current.isFeatured,
+			pro_business_id: current.sourceUid,
+			pro_business_name: current.name,
+		});
+	}, [current, deck.cards, track]);
 
 	useEffect(() => {
 		if (!passed) {
@@ -79,6 +96,12 @@ export function SwipeScreen() {
 		if (!deck.taskId) {
 			return;
 		}
+		track("shmoozer_card_swiped", {
+			is_promoted: card.isFeatured,
+			pro_business_id: card.sourceUid,
+			session_swipe_count: nextSwipeCount(sessionKey() ?? session.sessionToken),
+			swipe_direction: "right",
+		});
 		// Confirm every Match: the routed contact page — nothing sends silently.
 		setBanner(null);
 		session.setPending({ card, taskId: deck.taskId });
@@ -87,6 +110,16 @@ export function SwipeScreen() {
 
 	// A left swipe already committed in the engine — this is just the ST3 flash.
 	const onPass = () => {
+		if (current) {
+			track("shmoozer_card_swiped", {
+				is_promoted: current.isFeatured,
+				pro_business_id: current.sourceUid,
+				session_swipe_count: nextSwipeCount(
+					sessionKey() ?? session.sessionToken
+				),
+				swipe_direction: "left",
+			});
+		}
 		setBanner(null);
 		setPassed(true);
 	};

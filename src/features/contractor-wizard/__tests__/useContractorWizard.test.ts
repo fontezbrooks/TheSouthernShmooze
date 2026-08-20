@@ -6,7 +6,7 @@ import type { WizardValues } from "../wizardSchema";
 jest.mock("expo-crypto", () => ({ randomUUID: () => "uuid-1" }));
 jest.mock("../wizardApi", () => ({
 	...jest.requireActual("../wizardApi"),
-	submitApplication: jest.fn().mockResolvedValue(undefined),
+	submitApplication: jest.fn().mockResolvedValue(true),
 	verifyFit: jest.fn(),
 }));
 
@@ -39,6 +39,7 @@ let now = 0;
 beforeEach(() => {
 	verifyFitMock.mockReset().mockResolvedValue(passVerdict);
 	submitMock.mockClear();
+	submitMock.mockResolvedValue(true);
 	now = 0;
 	jest.spyOn(Date, "now").mockImplementation(() => (now += 1000));
 });
@@ -242,5 +243,70 @@ describe("useContractorWizard", () => {
 		expect(result.current.phase).toBe("form");
 		expect(result.current.verdict).toBeNull();
 		expect(result.current.form.getValues("contact")).toBe("");
+	});
+});
+
+const mockTrack = jest.fn();
+jest.mock("@/lib/analytics/useAnalytics", () => ({
+	useAnalytics: () => ({ identify: jest.fn(), track: mockTrack }),
+	useFlag: () => undefined,
+}));
+
+describe("qualification analytics (US-5)", () => {
+	beforeEach(() => mockTrack.mockClear());
+
+	async function walkToSubmit(result: {
+		current: ReturnType<typeof useContractorWizard>;
+	}) {
+		for (let i = 0; i < stepValues.length; i += 1) {
+			// biome-ignore lint/performance/noAwaitInLoops: wizard steps must advance sequentially
+			await fillStep(result, i);
+			await act(async () => {
+				await result.current.advance();
+			});
+		}
+	}
+
+	test("verified outcome tracks approved with the applicant trade", async () => {
+		const { result } = await renderHook(() => useContractorWizard());
+		await walkToSubmit(result);
+		expect(mockTrack).toHaveBeenCalledWith(
+			"contractor_qualification_submitted",
+			{
+				applicant_trade: "Plumbing",
+				instant_qualification_response: "approved",
+			}
+		);
+	});
+
+	test("not-yet outcome tracks flagged", async () => {
+		verifyFitMock.mockResolvedValue({ ...passVerdict, outcome: "not-yet" });
+		const { result } = await renderHook(() => useContractorWizard());
+		await walkToSubmit(result);
+		expect(mockTrack).toHaveBeenCalledWith(
+			"contractor_qualification_submitted",
+			{ applicant_trade: "Plumbing", instant_qualification_response: "flagged" }
+		);
+	});
+});
+
+describe("qualification analytics persistence gate (review PR #43)", () => {
+	beforeEach(() => mockTrack.mockClear());
+
+	test("no event when the application submit fails to persist", async () => {
+		submitMock.mockResolvedValue(false);
+		const { result } = await renderHook(() => useContractorWizard());
+		for (let i = 0; i < stepValues.length; i += 1) {
+			// biome-ignore lint/performance/noAwaitInLoops: wizard steps must advance sequentially
+			await fillStep(result, i);
+			await act(async () => {
+				await result.current.advance();
+			});
+		}
+		expect(result.current.phase).toBe("result");
+		expect(mockTrack).not.toHaveBeenCalledWith(
+			"contractor_qualification_submitted",
+			expect.anything()
+		);
 	});
 });

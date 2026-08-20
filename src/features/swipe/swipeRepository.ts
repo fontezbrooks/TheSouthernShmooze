@@ -25,7 +25,11 @@ export interface SwipeContactInput {
 const DECK_LIMIT = 30;
 const MIN_CONFIDENCE = 30;
 
-export type SubmitOutcome = "ok" | "duplicate";
+export interface SubmitOutcome {
+	/** The swipe_leads row id (0021) — null only under pre-0021 deploy skew. */
+	leadId: string | null;
+	status: "ok" | "duplicate";
+}
 
 export interface SwipeRepository {
 	createTask(task: SwipeTask, sessionToken: string): Promise<Result<string>>;
@@ -47,9 +51,13 @@ export interface SwipeRepository {
 	): Promise<Result<SubmitOutcome>>;
 }
 
-/** Read `{ status, reason }` from an RPC jsonb result. */
-function readStatus(data: unknown): { status?: string; reason?: string } {
-	return (data ?? {}) as { status?: string; reason?: string };
+/** Read `{ status, reason, lead_id }` from an RPC jsonb result. */
+function readStatus(data: unknown): {
+	lead_id?: string;
+	reason?: string;
+	status?: string;
+} {
+	return (data ?? {}) as { lead_id?: string; reason?: string; status?: string };
 }
 
 export const swipeRepository: SwipeRepository = {
@@ -131,12 +139,9 @@ export const swipeRepository: SwipeRepository = {
 			if (error) {
 				return err("We couldn’t send that match right now.");
 			}
-			const { status, reason } = readStatus(data);
-			if (status === "ok") {
-				return ok("ok");
-			}
-			if (status === "duplicate") {
-				return ok("duplicate");
+			const { status, reason, lead_id } = readStatus(data);
+			if (status === "ok" || status === "duplicate") {
+				return ok({ leadId: lead_id ?? null, status });
 			}
 			return err(reason ?? "We couldn’t send that match.");
 		} catch {

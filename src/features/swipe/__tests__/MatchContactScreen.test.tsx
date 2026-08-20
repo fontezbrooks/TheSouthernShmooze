@@ -106,7 +106,10 @@ const makeSession = (
 beforeEach(() => {
 	jest.clearAllMocks();
 	mockSaveContact.mockResolvedValue({ data: undefined, ok: true });
-	mockSubmitLead.mockResolvedValue({ data: "ok", ok: true });
+	mockSubmitLead.mockResolvedValue({
+		data: { leadId: "lead-1", status: "ok" },
+		ok: true,
+	});
 });
 
 describe("MatchContactScreen (CP1–CP3)", () => {
@@ -169,5 +172,37 @@ describe("MatchContactScreen (CP1–CP3)", () => {
 		expect(await findByText("send failed")).toBeTruthy();
 		expect(mockSession.setMatchResult).not.toHaveBeenCalled();
 		expect(mockBack).not.toHaveBeenCalled();
+	});
+});
+
+const mockTrack = jest.fn();
+jest.mock("@/lib/analytics/useAnalytics", () => ({
+	useAnalytics: () => ({ identify: jest.fn(), track: mockTrack }),
+	useFlag: () => undefined,
+}));
+
+describe("match analytics (US-4)", () => {
+	it("tracks shmoozer_match_triggered when the lead send succeeds", async () => {
+		mockSession = makeSession();
+		const { getByText } = await render(<MatchContactScreen />);
+		await fireEvent.press(getByText("Send request"));
+		await waitFor(() =>
+			expect(mockTrack).toHaveBeenCalledWith("shmoozer_match_triggered", {
+				concierge_request_id: "lead-1",
+				pro_business_id: "uid-1",
+			})
+		);
+	});
+
+	it("does not track a match when the send fails", async () => {
+		mockSession = makeSession();
+		mockSubmitLead.mockResolvedValue({ error: "down", ok: false });
+		const { getByText } = await render(<MatchContactScreen />);
+		await fireEvent.press(getByText("Send request"));
+		await waitFor(() => expect(mockSubmitLead).toHaveBeenCalled());
+		expect(mockTrack).not.toHaveBeenCalledWith(
+			"shmoozer_match_triggered",
+			expect.anything()
+		);
 	});
 });

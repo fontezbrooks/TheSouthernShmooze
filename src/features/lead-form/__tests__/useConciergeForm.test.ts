@@ -345,3 +345,47 @@ describe("useConciergeForm", () => {
 		expect(newSubmissionId).toHaveBeenCalled();
 	});
 });
+
+const mockTrack = jest.fn();
+jest.mock("@/lib/analytics/useAnalytics", () => ({
+	useAnalytics: () => ({ identify: jest.fn(), track: mockTrack }),
+	useFlag: () => undefined,
+}));
+
+describe("find-my-pro analytics (US-2)", () => {
+	it("tracks step 1 completion with the zip prefix and partial flag", async () => {
+		const { result } = await renderHook(() => useConciergeForm());
+		await fillStepOne(result);
+		expect(mockTrack).toHaveBeenCalledWith("find_my_pro_step_1_completed", {
+			partial_lead_recorded: true,
+			requested_category: "Plumbing",
+			zip_prefix: "303",
+		});
+	});
+
+	it("reports partial_lead_recorded false when the partial insert fails", async () => {
+		mockedPartial.mockResolvedValue({ error: "down", ok: false });
+		const { result } = await renderHook(() => useConciergeForm());
+		await fillStepOne(result);
+		expect(mockTrack).toHaveBeenCalledWith("find_my_pro_step_1_completed", {
+			partial_lead_recorded: false,
+			requested_category: "Plumbing",
+			zip_prefix: "303",
+		});
+	});
+
+	it("tracks find_my_pro_submitted only on completion success", async () => {
+		const { result } = await renderHook(() => useConciergeForm());
+		await fillStepOne(result);
+		await fillStepTwo(result);
+		expect(mockTrack).toHaveBeenCalledWith("find_my_pro_submitted", {});
+	});
+
+	it("does not track submission when the completion insert fails", async () => {
+		mockedComplete.mockResolvedValue({ error: "down", ok: false });
+		const { result } = await renderHook(() => useConciergeForm());
+		await fillStepOne(result);
+		await fillStepTwo(result);
+		expect(mockTrack).not.toHaveBeenCalledWith("find_my_pro_submitted", {});
+	});
+});

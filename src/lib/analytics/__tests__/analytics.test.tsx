@@ -12,6 +12,7 @@ function makeClient(): PostHog {
 		capture: jest.fn(),
 		debug: jest.fn(),
 		getFeatureFlag: jest.fn().mockReturnValue(true),
+		getSessionId: jest.fn().mockReturnValue("ph-session-1"),
 		identify: jest.fn(),
 		onFeatureFlags: jest.fn().mockReturnValue(() => {
 			/* unsubscribe */
@@ -104,11 +105,13 @@ describe("useAnalytics", () => {
 			wrapper: withClient(client),
 		});
 		result.current.track("shmoozer_card_swiped", {
+			is_promoted: false,
 			pro_business_id: "biz_1",
 			session_swipe_count: 3,
 			swipe_direction: "right",
 		});
 		expect(client.capture).toHaveBeenCalledWith("shmoozer_card_swiped", {
+			is_promoted: false,
 			pro_business_id: "biz_1",
 			session_swipe_count: 3,
 			swipe_direction: "right",
@@ -151,5 +154,24 @@ describe("useFlag", () => {
 		});
 		expect(result.current).toBe(true);
 		expect(client.onFeatureFlags).toHaveBeenCalled();
+	});
+});
+
+describe("sessionKey", () => {
+	test("null without a client; PostHog session id with one", async () => {
+		const noClient = await renderHook(() => useAnalytics(), {
+			wrapper: ({ children }: { children: ReactNode }) => (
+				<AnalyticsProvider client={null}>{children}</AnalyticsProvider>
+			),
+		});
+		expect(noClient.result.current.sessionKey()).toBeNull();
+
+		const client = makeClient();
+		const withClient = await renderHook(() => useAnalytics(), {
+			wrapper: ({ children }: { children: ReactNode }) => (
+				<AnalyticsProvider client={client}>{children}</AnalyticsProvider>
+			),
+		});
+		expect(withClient.result.current.sessionKey()).toBe("ph-session-1");
 	});
 });

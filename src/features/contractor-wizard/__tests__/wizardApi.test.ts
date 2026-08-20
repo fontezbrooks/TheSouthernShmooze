@@ -180,9 +180,9 @@ describe("buildApplicationPayload", () => {
 });
 
 describe("submitApplication", () => {
-	test("fire-and-forget: swallows failures", async () => {
+	test("fire-and-forget: swallows failures and reports them as unpersisted", async () => {
 		mockInvoke.mockRejectedValue(new Error("down"));
-		await expect(submitApplication(values, verdict)).resolves.toBeUndefined();
+		await expect(submitApplication(values, verdict)).resolves.toBe(false);
 	});
 });
 

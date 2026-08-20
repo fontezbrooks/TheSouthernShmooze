@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { CertifiedBadge } from "@/components/ui/CertifiedBadge";
 import { businessDetailRepository } from "@/features/business-detail/businessDetailRepository";
 import type { BusinessDetail } from "@/features/business-detail/businessDetailTypes";
+import { useAnalytics } from "@/lib/analytics/useAnalytics";
 import { openLink } from "@/lib/openLink";
 import { useTheme } from "@/theme/ThemeProvider";
 import { CenteredSheet } from "./CenteredSheet";
@@ -25,6 +26,7 @@ export function ProfileQuickView({
 	sourceUid,
 	onClose,
 }: ProfileQuickViewProps) {
+	const { track } = useAnalytics();
 	const t = useTheme();
 	const router = useRouter();
 	const [detail, setDetail] = useState<BusinessDetail | null>(null);
@@ -105,7 +107,15 @@ export function ProfileQuickView({
 							{detail.phones[0] ? (
 								<Button
 									label={`Call ${detail.phones[0].display}`}
-									onPress={() => openLink(`tel:${detail.phones[0].raw}`)}
+									onPress={() => {
+										if (sourceUid) {
+											track("partner_call_button_clicked", {
+												call_placement_source: "swiper_match_popup",
+												pro_business_id: sourceUid,
+											});
+										}
+										openLink(`tel:${detail.phones[0].raw}`);
+									}}
 									variant="outline"
 								/>
 							) : null}

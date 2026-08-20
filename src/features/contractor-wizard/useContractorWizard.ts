@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { randomUUID } from "expo-crypto";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useAnalytics } from "@/lib/analytics/useAnalytics";
 import {
 	type FitVerdict,
 	type PlacePrediction,
@@ -29,6 +30,17 @@ const ANALYZE_FLOOR_MS = 700;
  * runs the live Google verification (which can never reject on failure —
  * see wizardApi.fallbackVerdict) and fires the application submit.
  */
+/**
+ * Worker outcome → taxonomy status (US-5): verified passes cleanly (approved),
+ * unverified passes but gets a concierge look (review), not-yet is the only
+ * rejection (flagged).
+ */
+const OUTCOME_TO_STATUS = {
+	"not-yet": "flagged",
+	unverified: "review",
+	verified: "approved",
+} as const;
+
 export function useContractorWizard() {
 	const form = useForm<WizardValues>({
 		defaultValues: emptyWizard,
@@ -36,6 +48,7 @@ export function useContractorWizard() {
 		resolver: zodResolver(wizardSchema),
 	});
 
+	const { track } = useAnalytics();
 	const [step, setStep] = useState(1);
 	const [phase, setPhase] = useState<WizardPhase>("form");
 	const [verdict, setVerdict] = useState<FitVerdict | null>(null);
@@ -90,8 +103,18 @@ export function useContractorWizard() {
 			if (!mounted.current) {
 				return;
 			}
-			// Fire-and-forget, site parity — the decision is already made.
-			void submitApplication(values, res);
+			// Fire-and-forget, site parity — the decision is already made. The
+			// event chains on the ACTUAL persistence result (review: PR #43) so
+			// a swallowed network failure never reports a submission; the UI
+			// still advances immediately.
+			void submitApplication(values, res).then((persisted) => {
+				if (persisted) {
+					track("contractor_qualification_submitted", {
+						applicant_trade: values.trade,
+						instant_qualification_response: OUTCOME_TO_STATUS[res.outcome],
+					});
+				}
+			});
 			setVerdict(res);
 			setPhase("result");
 		})();
