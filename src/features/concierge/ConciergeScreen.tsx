@@ -1,5 +1,4 @@
 import { useRouter } from "expo-router";
-import { useEffect } from "react";
 import {
 	ImageBackground,
 	KeyboardAvoidingView,
@@ -12,7 +11,6 @@ import { AppHeader } from "@/components/ui/AppHeader";
 import { StrokedHeading } from "@/components/ui/StrokedHeading";
 import { StrokedText } from "@/components/ui/StrokedText";
 import { ConciergeForm } from "@/features/lead-form/ConciergeForm";
-import { useAnalytics } from "@/lib/analytics/useAnalytics";
 import { daisyBackground } from "@/theme/assets";
 import { useTheme } from "@/theme/ThemeProvider";
 
@@ -20,12 +18,6 @@ import { useTheme } from "@/theme/ThemeProvider";
 export function ConciergeScreen() {
 	const t = useTheme();
 	const router = useRouter();
-	const { track } = useAnalytics();
-
-	// Funnel step 0 — entering the Find My Pro flow (US-2).
-	useEffect(() => {
-		track("find_my_pro_initiated", {});
-	}, [track]);
 
 	return (
 		<ImageBackground

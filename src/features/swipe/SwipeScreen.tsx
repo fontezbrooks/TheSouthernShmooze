@@ -17,6 +17,7 @@ import { FiltersModal } from "./FiltersModal";
 import { ProfileQuickView } from "./ProfileQuickView";
 import { SwipeDeck } from "./SwipeDeck";
 import { useSwipeSession } from "./SwipeSessionProvider";
+import { nextSwipeCount } from "./swipeSessionCounter";
 import type { DeckCard, SwipeTask } from "./swipeTypes";
 import { useSwipeDeck } from "./useSwipeDeck";
 
@@ -48,8 +49,6 @@ export function SwipeScreen() {
 	const [passed, setPassed] = useState(false);
 	const [quickViewUid, setQuickViewUid] = useState<string | null>(null);
 	const { track } = useAnalytics();
-	/** Cumulative swipes this session (identifies power-swipers, US-4). */
-	const swipeCount = useRef(0);
 
 	// Top card changed → it's being shown to the homeowner (US-4).
 	const { current } = deck;
@@ -97,11 +96,10 @@ export function SwipeScreen() {
 		if (!deck.taskId) {
 			return;
 		}
-		swipeCount.current += 1;
 		track("shmoozer_card_swiped", {
 			is_promoted: card.isFeatured,
 			pro_business_id: card.sourceUid,
-			session_swipe_count: swipeCount.current,
+			session_swipe_count: nextSwipeCount(session.sessionToken),
 			swipe_direction: "right",
 		});
 		// Confirm every Match: the routed contact page — nothing sends silently.
@@ -112,12 +110,11 @@ export function SwipeScreen() {
 
 	// A left swipe already committed in the engine — this is just the ST3 flash.
 	const onPass = () => {
-		swipeCount.current += 1;
 		if (current) {
 			track("shmoozer_card_swiped", {
 				is_promoted: current.isFeatured,
 				pro_business_id: current.sourceUid,
-				session_swipe_count: swipeCount.current,
+				session_swipe_count: nextSwipeCount(session.sessionToken),
 				swipe_direction: "left",
 			});
 		}

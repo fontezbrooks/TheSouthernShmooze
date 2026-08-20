@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zipPrefix } from "@/lib/analytics/events";
 import { useAnalytics } from "@/lib/analytics/useAnalytics";
@@ -44,6 +44,14 @@ export function useConciergeForm() {
 	const [step, setStep] = useState<ConciergeStep>("job");
 	const [status, setStatus] = useState<SubmitStatus>("idle");
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+	// Funnel step 0 (US-2). Lives HERE, not on the screen: the tab-preserved
+	// Concierge screen never remounts, so "Submit Another Request" (reset)
+	// must emit its own initiation — one per request, not one per mount
+	// (review: PR #43).
+	useEffect(() => {
+		track("find_my_pro_initiated", {});
+	}, [track]);
 
 	// Stable ids across retries (see submitConcierge id contract).
 	const partialId = useRef<string | null>(null);
@@ -195,6 +203,8 @@ export function useConciergeForm() {
 		setStatus("idle");
 		setErrorMessage(null);
 		setStep("job");
+		// A fresh request begins without a remount — see the mount effect above.
+		track("find_my_pro_initiated", {});
 	};
 
 	return {
