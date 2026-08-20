@@ -3,7 +3,8 @@
 const { getDefaultConfig } = require("expo/metro-config");
 
 /** @type {import('expo/metro-config').MetroConfig} */
-const config = getDefaultConfig(import.meta.dirname);
+// biome-ignore lint/correctness/noGlobalDirnameFilename: Metro loads this file as CommonJS via require(); import.meta is invalid there — the autofix silently drops the whole exported config (no .transformer), killing SVG imports.
+const config = getDefaultConfig(__dirname);
 
 config.transformer.babelTransformerPath = require.resolve(
 	"react-native-svg-transformer/expo"
