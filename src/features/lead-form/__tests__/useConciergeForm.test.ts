@@ -346,6 +346,19 @@ describe("useConciergeForm", () => {
 	});
 });
 
+// Captures the focus callback so tests can simulate the tab regaining
+// focus without a navigation container (holder lives in the factory —
+// module-scope variables would hit the TDZ when jest hoists the mock).
+jest.mock("expo-router", () => {
+	const holder: { cb?: () => void } = {};
+	return {
+		__focusHolder: holder,
+		useFocusEffect: (cb: () => void) => {
+			holder.cb = cb;
+		},
+	};
+});
+
 const mockTrack = jest.fn();
 const mockIdentify = jest.fn();
 const mockResetIdentity = jest.fn();
@@ -414,6 +427,23 @@ describe("find-my-pro analytics (US-2)", () => {
 		const [resetOrder] = mockResetForAudience.mock.invocationCallOrder;
 		const [trackOrder] = mockTrack.mock.invocationCallOrder;
 		expect(resetOrder).toBeLessThan(trackOrder);
+	});
+
+	it("re-checks the audience boundary on tab re-focus, without re-initiating (PR #44)", async () => {
+		const { __focusHolder } = jest.requireMock("expo-router") as {
+			__focusHolder: { cb?: () => void };
+		};
+		await renderHook(() => useConciergeForm());
+		mockResetForAudience.mockClear();
+		mockTrack.mockClear();
+		// The preserved tab regains focus after e.g. a contractor identified
+		// elsewhere on this device.
+		await act(async () => {
+			__focusHolder.cb?.();
+			await Promise.resolve();
+		});
+		expect(mockResetForAudience).toHaveBeenCalledWith("homeowner");
+		expect(mockTrack).not.toHaveBeenCalled();
 	});
 
 	it("completion settling after UNMOUNT identifies nothing (PR #44)", async () => {

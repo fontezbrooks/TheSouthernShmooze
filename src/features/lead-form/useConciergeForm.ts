@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useRef, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zipPrefix } from "@/lib/analytics/events";
 import { useAnalytics } from "@/lib/analytics/useAnalytics";
@@ -67,6 +68,17 @@ export function useConciergeForm() {
 		resetIdentityForAudience("homeowner");
 		track("find_my_pro_initiated", {});
 	}, [resetIdentityForAudience, track]);
+
+	// The tab PRESERVES this hook, so the mount effect above runs once ever —
+	// re-check the audience boundary every time the tab regains focus: a
+	// contractor identified elsewhere and returning here must not have the
+	// resumed homeowner form attributed to them (review: PR #44). Initiation
+	// is NOT re-tracked — one per request, per the mount effect's rule.
+	useFocusEffect(
+		useCallback(() => {
+			resetIdentityForAudience("homeowner");
+		}, [resetIdentityForAudience])
+	);
 
 	// Stable ids across retries (see submitConcierge id contract).
 	const partialId = useRef<string | null>(null);

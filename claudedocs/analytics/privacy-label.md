@@ -20,7 +20,8 @@ whenever a new event or person property lands.
 | Category | Data type | Collected where | Purposes |
 |---|---|---|---|
 | Contact Info | Email Address | Contractor wizard submit; Find-My-Pro step 2 | App Functionality, Analytics |
-| Identifiers | User ID (PostHog distinct id = email; anonymous device id pre-identify) | SDK | Analytics |
+| Identifiers | User ID (PostHog distinct id = email after identify) | SDK | Analytics |
+| Identifiers | Device ID (SDK-generated installation id: the anonymous distinct id pre-identify + the persistent device id used for flag bucketing — not IDFA) | SDK | Analytics |
 | Usage Data | Product Interaction (screens, swipes, form funnels, calls) | Whole app | Analytics |
 | Location | Coarse Location (user-typed 5-digit ZIP, persisted with leads — incl. partial leads saved after step 1 alone) | Find-My-Pro step 1; swipe intake | App Functionality |
 
@@ -58,6 +59,6 @@ Notes:
 
 1. "Do you or your third-party partners collect data from this app?" — **Yes**.
 2. Data types: Email Address, Name, Phone Number, Coarse Location (app
-   functionality); User ID, Product Interaction (analytics).
+   functionality); User ID, Device ID, Product Interaction (analytics).
 3. "Is this data linked to the user's identity?" — **Yes** for all of the above.
 4. "Do you or your partners use data for tracking?" — **No**.
