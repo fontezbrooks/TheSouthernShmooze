@@ -1,32 +1,32 @@
 import {
-  View,
-  Text,
-  StyleSheet,
-  type TextStyle,
-  type ViewStyle,
-  type StyleProp,
-  type TextProps,
+	type StyleProp,
+	StyleSheet,
+	Text,
+	type TextProps,
+	type TextStyle,
+	View,
+	type ViewStyle,
 } from "react-native";
 import { heading } from "@/theme/tokens";
 
 interface StrokedTextProps extends Omit<TextProps, "style" | "children"> {
-  children: string;
-  /** Full text style (typography + color) — applied to fill and stroke copies. */
-  style?: StyleProp<TextStyle>;
-  strokeColor?: string;
-  strokeWidth?: number;
-  /** Layout styles (flex, margins) belong on the wrapper, not the text. */
-  containerStyle?: StyleProp<ViewStyle>;
+	children: string;
+	/** Layout styles (flex, margins) belong on the wrapper, not the text. */
+	containerStyle?: StyleProp<ViewStyle>;
+	strokeColor?: string;
+	strokeWidth?: number;
+	/** Full text style (typography + color) — applied to fill and stroke copies. */
+	style?: StyleProp<TextStyle>;
 }
 
 // Sample N points around a circle of radius = strokeWidth. Thin strokes
 // (<=2px) stay gap-free with 8 directions; thicker ones need a denser ring
 // (8 fixed dirs leave diagonal gaps past ~2px — see StrokedHeading).
 const ring = (samples: number) =>
-  Array.from({ length: samples }, (_, i) => {
-    const a = (i / samples) * 2 * Math.PI;
-    return [Math.cos(a), Math.sin(a)] as const;
-  });
+	Array.from({ length: samples }, (_, i) => {
+		const a = (i / samples) * 2 * Math.PI;
+		return [Math.cos(a), Math.sin(a)] as const;
+	});
 const RING_THIN = ring(8);
 const RING_DENSE = ring(16);
 
@@ -38,46 +38,46 @@ const RING_DENSE = ring(16);
  * TextProps (a11y labels, live regions).
  */
 export function StrokedText({
-  children,
-  style,
-  strokeColor = heading.strokeColor,
-  strokeWidth = 1.5,
-  containerStyle,
-  ...textProps
+	children,
+	style,
+	strokeColor = heading.strokeColor,
+	strokeWidth = 1.5,
+	containerStyle,
+	...textProps
 }: StrokedTextProps) {
-  const samples = strokeWidth <= 2 ? RING_THIN : RING_DENSE;
-  const stroke: StyleProp<TextStyle> = [style, { color: strokeColor }];
+	const samples = strokeWidth <= 2 ? RING_THIN : RING_DENSE;
+	const stroke: StyleProp<TextStyle> = [style, { color: strokeColor }];
 
-  return (
-    <View style={[styles.wrap, containerStyle]}>
-      {samples.map(([dx, dy], i) => (
-        <Text
-          key={i}
-          accessible={false}
-          accessibilityElementsHidden
-          importantForAccessibility="no-hide-descendants"
-          style={[
-            StyleSheet.absoluteFill,
-            stroke,
-            {
-              transform: [
-                { translateX: dx * strokeWidth },
-                { translateY: dy * strokeWidth },
-              ],
-            },
-          ]}
-        >
-          {children}
-        </Text>
-      ))}
-      <Text style={style} {...textProps}>
-        {children}
-      </Text>
-    </View>
-  );
+	return (
+		<View style={[styles.wrap, containerStyle]}>
+			{samples.map(([dx, dy], i) => (
+				<Text
+					accessibilityElementsHidden
+					accessible={false}
+					importantForAccessibility="no-hide-descendants"
+					key={i}
+					style={[
+						StyleSheet.absoluteFill,
+						stroke,
+						{
+							transform: [
+								{ translateX: dx * strokeWidth },
+								{ translateY: dy * strokeWidth },
+							],
+						},
+					]}
+				>
+					{children}
+				</Text>
+			))}
+			<Text style={style} {...textProps}>
+				{children}
+			</Text>
+		</View>
+	);
 }
 
 const styles = StyleSheet.create({
-  // Sizes to the fill text; absolute stroke copies mirror that box and wrap identically.
-  wrap: { position: "relative" },
+	// Sizes to the fill text; absolute stroke copies mirror that box and wrap identically.
+	wrap: { position: "relative" },
 });

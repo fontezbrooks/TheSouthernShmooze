@@ -1,4 +1,4 @@
-import { View, StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useTheme } from "@/theme/ThemeProvider";
 import { Icon, type IconName } from "./Icon";
 
@@ -8,19 +8,19 @@ import { Icon, type IconName } from "./Icon";
  * (Figma "Business Card/Atoms/Reviews Tag" + "Discount Tag"). Presentational.
  */
 export function CardBadge({ icon }: { icon: IconName }) {
-  const t = useTheme();
-  return (
-    <View style={styles.badge}>
-      <Icon name={icon} size={16} color={t.colors.rust} />
-    </View>
-  );
+	const t = useTheme();
+	return (
+		<View style={styles.badge}>
+			<Icon color={t.colors.rust} name={icon} size={16} />
+		</View>
+	);
 }
 
 const styles = StyleSheet.create({
-  badge: {
-    width: 20,
-    height: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+	badge: {
+		alignItems: "center",
+		height: 20,
+		justifyContent: "center",
+		width: 20,
+	},
 });

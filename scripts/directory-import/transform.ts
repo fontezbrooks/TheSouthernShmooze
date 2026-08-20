@@ -5,4 +5,4 @@
  *
  * Canonical source: supabase/functions/_shared/directory-transform.ts
  */
-export * from '../../supabase/functions/_shared/directory-transform';
+export * from "../../supabase/functions/_shared/directory-transform";

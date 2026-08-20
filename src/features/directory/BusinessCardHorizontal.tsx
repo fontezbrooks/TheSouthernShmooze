@@ -1,13 +1,13 @@
-import { View, Text, Image, Pressable, StyleSheet } from "react-native";
-import { useTheme } from "@/theme/ThemeProvider";
-import { Icon } from "@/components/ui/Icon";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { CardBadge } from "@/components/ui/CardBadge";
 import { CertifiedBadge } from "@/components/ui/CertifiedBadge";
+import { Icon } from "@/components/ui/Icon";
 import type { DirectoryBusiness } from "@/features/providers/providerTypes";
+import { useTheme } from "@/theme/ThemeProvider";
 
 interface BusinessCardHorizontalProps {
-  business: DirectoryBusiness;
-  onPress: (sourceUid: string) => void;
+	business: DirectoryBusiness;
+	onPress: (sourceUid: string) => void;
 }
 
 const LOGO_SIZE = 104;
@@ -20,97 +20,100 @@ const LOGO_SIZE = 104;
  * screen. No-logo businesses show a briefcase placeholder.
  */
 export function BusinessCardHorizontal({
-  business,
-  onPress,
+	business,
+	onPress,
 }: BusinessCardHorizontalProps) {
-  const t = useTheme();
-  const hasBadges = business.recommended || business.hasCoupon;
+	const t = useTheme();
+	const hasBadges = business.recommended || business.hasCoupon;
 
-  return (
-    <Pressable
-      onPress={() => onPress(business.sourceUid)}
-      accessibilityRole="button"
-      accessibilityLabel={`${business.name} — view details`}
-      style={({ pressed }) => [styles.card, { opacity: pressed ? 0.7 : 1 }]}
-    >
-      {business.logoUrl ? (
-        <Image
-          source={{ uri: business.logoUrl }}
-          style={[styles.logo, { borderColor: t.brand.colors.line }]}
-          resizeMode="cover"
-        />
-      ) : (
-        <View
-          style={[
-            styles.logo,
-            styles.placeholder,
-            {
-              borderColor: t.brand.colors.line,
-              backgroundColor: t.brand.colors.porchCream,
-            },
-          ]}
-        >
-          <Icon name="briefcaseFilled" size={40} color={t.brand.colors.pine} />
-        </View>
-      )}
+	return (
+		<Pressable
+			accessibilityLabel={`${business.name} — view details`}
+			accessibilityRole="button"
+			onPress={() => onPress(business.sourceUid)}
+			style={({ pressed }) => [styles.card, { opacity: pressed ? 0.7 : 1 }]}
+		>
+			{business.logoUrl ? (
+				<Image
+					resizeMode="cover"
+					source={{ uri: business.logoUrl }}
+					style={[styles.logo, { borderColor: t.brand.colors.line }]}
+				/>
+			) : (
+				<View
+					style={[
+						styles.logo,
+						styles.placeholder,
+						{
+							backgroundColor: t.brand.colors.porchCream,
+							borderColor: t.brand.colors.line,
+						},
+					]}
+				>
+					<Icon color={t.brand.colors.pine} name="briefcaseFilled" size={40} />
+				</View>
+			)}
 
-      <View style={styles.body}>
-        {hasBadges ? (
-          <View style={styles.badgeRow}>
-            {business.recommended ? <CardBadge icon="thumbsUp" /> : null}
-            {business.hasCoupon ? <CardBadge icon="discount" /> : null}
-          </View>
-        ) : null}
+			<View style={styles.body}>
+				{hasBadges ? (
+					<View style={styles.badgeRow}>
+						{business.recommended ? <CardBadge icon="thumbsUp" /> : null}
+						{business.hasCoupon ? <CardBadge icon="discount" /> : null}
+					</View>
+				) : null}
 
-        <View style={styles.copy}>
-          <Text
-            style={[
-              t.typography.cardTitle,
-              { fontFamily: t.brand.fonts.bodyBold, color: t.brand.colors.text },
-            ]}
-            numberOfLines={2}
-          >
-            {business.name}
-          </Text>
-          <Text
-            style={[
-              t.brand.typography.caption,
-              { color: t.brand.colors.textSoft },
-            ]}
-            numberOfLines={2}
-            ellipsizeMode="tail"
-          >
-            {business.tagline}
-          </Text>
-        </View>
+				<View style={styles.copy}>
+					<Text
+						numberOfLines={2}
+						style={[
+							t.typography.cardTitle,
+							{
+								color: t.brand.colors.text,
+								fontFamily: t.brand.fonts.bodyBold,
+							},
+						]}
+					>
+						{business.name}
+					</Text>
+					<Text
+						ellipsizeMode="tail"
+						numberOfLines={2}
+						style={[
+							t.brand.typography.caption,
+							{ color: t.brand.colors.textSoft },
+						]}
+					>
+						{business.tagline}
+					</Text>
+				</View>
 
-        {business.isCertified ? <CertifiedBadge /> : null}
-      </View>
-    </Pressable>
-  );
+				{business.isCertified ? <CertifiedBadge /> : null}
+			</View>
+		</Pressable>
+	);
 }
 
 const styles = StyleSheet.create({
-  card: {
-    width: "100%",
-    height: LOGO_SIZE,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  logo: {
-    width: LOGO_SIZE,
-    height: LOGO_SIZE,
-    borderRadius: 8,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-  placeholder: { alignItems: "center", justifyContent: "center" },
-  body: {
-    flex: 1,
-    justifyContent: "center",
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  badgeRow: { flexDirection: "row", gap: 4 },
-  copy: { gap: 2 },
+	badgeRow: { flexDirection: "row", gap: 4 },
+	body: {
+		flex: 1,
+		gap: 6,
+		justifyContent: "center",
+		paddingHorizontal: 12,
+		paddingVertical: 8,
+	},
+	card: {
+		alignItems: "center",
+		flexDirection: "row",
+		height: LOGO_SIZE,
+		width: "100%",
+	},
+	copy: { gap: 2 },
+	logo: {
+		borderRadius: 8,
+		borderWidth: StyleSheet.hairlineWidth,
+		height: LOGO_SIZE,
+		width: LOGO_SIZE,
+	},
+	placeholder: { alignItems: "center", justifyContent: "center" },
 });

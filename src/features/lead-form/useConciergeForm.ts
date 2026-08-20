@@ -1,18 +1,18 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  conciergeStepOneSchema,
-  conciergeStepTwoSchema,
-  emptyStepOne,
-  emptyStepTwo,
-  type ConciergeStepOneValues,
-  type ConciergeStepTwoValues,
+	type ConciergeStepOneValues,
+	type ConciergeStepTwoValues,
+	conciergeStepOneSchema,
+	conciergeStepTwoSchema,
+	emptyStepOne,
+	emptyStepTwo,
 } from "./conciergeSchema";
 import {
-  newSubmissionId,
-  submitConciergeLead,
-  submitPartialLead,
+	newSubmissionId,
+	submitConciergeLead,
+	submitPartialLead,
 } from "./submitConcierge";
 
 export type ConciergeStep = "job" | "contact" | "success";
@@ -27,163 +27,167 @@ export type SubmitStatus = "idle" | "submitting" | "error";
  * partial only when the partial insert actually succeeded (its id is a FK).
  */
 export function useConciergeForm() {
-  const stepOneForm = useForm<ConciergeStepOneValues>({
-    resolver: zodResolver(conciergeStepOneSchema),
-    defaultValues: emptyStepOne,
-    mode: "onTouched",
-  });
-  const stepTwoForm = useForm<ConciergeStepTwoValues>({
-    resolver: zodResolver(conciergeStepTwoSchema),
-    defaultValues: emptyStepTwo,
-    mode: "onTouched",
-  });
+	const stepOneForm = useForm<ConciergeStepOneValues>({
+		defaultValues: emptyStepOne,
+		mode: "onTouched",
+		resolver: zodResolver(conciergeStepOneSchema),
+	});
+	const stepTwoForm = useForm<ConciergeStepTwoValues>({
+		defaultValues: emptyStepTwo,
+		mode: "onTouched",
+		resolver: zodResolver(conciergeStepTwoSchema),
+	});
 
-  const [step, setStep] = useState<ConciergeStep>("job");
-  const [status, setStatus] = useState<SubmitStatus>("idle");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+	const [step, setStep] = useState<ConciergeStep>("job");
+	const [status, setStatus] = useState<SubmitStatus>("idle");
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Stable ids across retries (see submitConcierge id contract).
-  const partialId = useRef<string | null>(null);
-  const completionId = useRef<string | null>(null);
-  // Set only when the partial insert succeeded — safe to reference as a FK.
-  const savedPartialId = useRef<string | null>(null);
-  // In-flight partial insert — awaited before completing so a fast submit on
-  // a slow connection still links the partial (review: PR #32).
-  const partialInFlight = useRef<Promise<void> | null>(null);
-  // Snapshot of the last-submitted step-1 payload: materially edited values
-  // get a FRESH partial id (a reused id would duplicate-key against the old
-  // row and silently keep stale job data — review: PR #32).
-  const lastPartialPayload = useRef<string | null>(null);
-  // Same principle for the completion: a retry after edits must not reuse
-  // the committed id, or the duplicate-key "success" would confirm the NEW
-  // values while the stored lead keeps the OLD ones (review: PR #32).
-  const lastCompletionPayload = useRef<string | null>(null);
-  // The RESOLVER-TRANSFORMED step-1 values from the last advance. The raw
-  // form state (getValues) skips zod's trim — a pasted " 30303 " would pass
-  // step 1 yet violate the DB zip check at completion (review: PR #32).
-  const validatedJob = useRef<ConciergeStepOneValues | null>(null);
+	// Stable ids across retries (see submitConcierge id contract).
+	const partialId = useRef<string | null>(null);
+	const completionId = useRef<string | null>(null);
+	// Set only when the partial insert succeeded — safe to reference as a FK.
+	const savedPartialId = useRef<string | null>(null);
+	// In-flight partial insert — awaited before completing so a fast submit on
+	// a slow connection still links the partial (review: PR #32).
+	const partialInFlight = useRef<Promise<void> | null>(null);
+	// Snapshot of the last-submitted step-1 payload: materially edited values
+	// get a FRESH partial id (a reused id would duplicate-key against the old
+	// row and silently keep stale job data — review: PR #32).
+	const lastPartialPayload = useRef<string | null>(null);
+	// Same principle for the completion: a retry after edits must not reuse
+	// the committed id, or the duplicate-key "success" would confirm the NEW
+	// values while the stored lead keeps the OLD ones (review: PR #32).
+	const lastCompletionPayload = useRef<string | null>(null);
+	// The RESOLVER-TRANSFORMED step-1 values from the last advance. The raw
+	// form state (getValues) skips zod's trim — a pasted " 30303 " would pass
+	// step 1 yet violate the DB zip check at completion (review: PR #32).
+	const validatedJob = useRef<ConciergeStepOneValues | null>(null);
 
-  // The submit callbacks are BUILT inside the event handlers (not during
-  // render) so the react-hooks compiler analysis doesn't flag the ref reads.
-  const advance = () => {
-    // Honeypot fires on step 1 too — the hidden field is mounted in both
-    // steps, so a bot that fills it never persists even a partial row
-    // (review: PR #32). Pretend success, same as the completion path.
-    const honey = stepTwoForm.getValues("company");
-    if (honey && honey.length > 0) {
-      setStep("success");
-      return Promise.resolve();
-    }
-    return stepOneForm.handleSubmit(async (values) => {
-      validatedJob.current = values;
-      setStep("contact");
-      // Best-effort capture (FR-4.2): never blocks the user; a failure just
-      // means the completion won't reference a partial row.
-      const payload = JSON.stringify(values);
-      let id = partialId.current;
-      if (id === null || payload !== lastPartialPayload.current) {
-        id = newSubmissionId();
-        partialId.current = id;
-        savedPartialId.current = null;
-        lastPartialPayload.current = payload;
-      }
-      const inFlight = submitPartialLead(values, id).then((result) => {
-        // Record only if this insert is still the CURRENT partial — an
-        // edited re-advance may have superseded it while it was in flight,
-        // and a late stale resolution must not overwrite the fresh id
-        // (review: PR #32).
-        if (result.ok && partialId.current === id) {
-          savedPartialId.current = result.data.id;
-        }
-      });
-      partialInFlight.current = inFlight;
-      await inFlight;
-    })();
-  };
+	// The submit callbacks are BUILT inside the event handlers (not during
+	// render) so the react-hooks compiler analysis doesn't flag the ref reads.
+	const advance = () => {
+		// Honeypot fires on step 1 too — the hidden field is mounted in both
+		// steps, so a bot that fills it never persists even a partial row
+		// (review: PR #32). Pretend success, same as the completion path.
+		const honey = stepTwoForm.getValues("company");
+		if (honey && honey.length > 0) {
+			setStep("success");
+			return Promise.resolve();
+		}
+		return stepOneForm.handleSubmit(async (values) => {
+			validatedJob.current = values;
+			setStep("contact");
+			// Best-effort capture (FR-4.2): never blocks the user; a failure just
+			// means the completion won't reference a partial row.
+			const payload = JSON.stringify(values);
+			let id = partialId.current;
+			if (id === null || payload !== lastPartialPayload.current) {
+				id = newSubmissionId();
+				partialId.current = id;
+				savedPartialId.current = null;
+				lastPartialPayload.current = payload;
+			}
+			const inFlight = submitPartialLead(values, id).then((result) => {
+				// Record only if this insert is still the CURRENT partial — an
+				// edited re-advance may have superseded it while it was in flight,
+				// and a late stale resolution must not overwrite the fresh id
+				// (review: PR #32).
+				if (result.ok && partialId.current === id) {
+					savedPartialId.current = result.data.id;
+				}
+			});
+			partialInFlight.current = inFlight;
+			await inFlight;
+		})();
+	};
 
-  // No-op while a submission is in flight: editing the job mid-submit would
-  // let the pending completion resume with NEW job values but the OLD
-  // contact snapshot, and possibly race the replacement partial
-  // (review: PR #32). The UI also disables the button.
-  const back = () => {
-    if (status === "submitting") return;
-    setStep("job");
-  };
+	// No-op while a submission is in flight: editing the job mid-submit would
+	// let the pending completion resume with NEW job values but the OLD
+	// contact snapshot, and possibly race the replacement partial
+	// (review: PR #32). The UI also disables the button.
+	const back = () => {
+		if (status === "submitting") {
+			return;
+		}
+		setStep("job");
+	};
 
-  const submit = () => {
-    // Honeypot BEFORE validation: the schema rejects any non-empty `company`,
-    // so an in-callback check would never run for a bot. A filled field means
-    // a bot — pretend success without submitting (legacy rule).
-    const honey = stepTwoForm.getValues("company");
-    if (honey && honey.length > 0) {
-      setStep("success");
-      return Promise.resolve();
-    }
-    return stepTwoForm.handleSubmit(async (values) => {
-      setStatus("submitting");
-      setErrorMessage(null);
+	const submit = () => {
+		// Honeypot BEFORE validation: the schema rejects any non-empty `company`,
+		// so an in-callback check would never run for a bot. A filled field means
+		// a bot — pretend success without submitting (legacy rule).
+		const honey = stepTwoForm.getValues("company");
+		if (honey && honey.length > 0) {
+			setStep("success");
+			return Promise.resolve();
+		}
+		return stepTwoForm.handleSubmit(async (values) => {
+			setStatus("submitting");
+			setErrorMessage(null);
 
-      // Let an in-flight partial land first so its id can be referenced.
-      if (partialInFlight.current) await partialInFlight.current;
+			// Let an in-flight partial land first so its id can be referenced.
+			if (partialInFlight.current) {
+				await partialInFlight.current;
+			}
 
-      const jobValues = validatedJob.current;
-      if (!jobValues) {
-        // Unreachable via the UI (contact step requires a successful
-        // advance) — fail visibly rather than submit unvalidated job data.
-        setStatus("error");
-        setErrorMessage(
-          "Something went wrong submitting your request. Please try again.",
-        );
-        return;
-      }
-      const payload = JSON.stringify([jobValues, values]);
-      let cid = completionId.current;
-      if (cid === null || payload !== lastCompletionPayload.current) {
-        cid = newSubmissionId();
-        completionId.current = cid;
-        lastCompletionPayload.current = payload;
-      }
-      const result = await submitConciergeLead(
-        jobValues,
-        values,
-        savedPartialId.current,
-        cid,
-      );
-      if (result.ok) {
-        setStatus("idle");
-        setStep("success");
-      } else {
-        setStatus("error");
-        setErrorMessage(result.error);
-      }
-    })();
-  };
+			const jobValues = validatedJob.current;
+			if (!jobValues) {
+				// Unreachable via the UI (contact step requires a successful
+				// advance) — fail visibly rather than submit unvalidated job data.
+				setStatus("error");
+				setErrorMessage(
+					"Something went wrong submitting your request. Please try again."
+				);
+				return;
+			}
+			const payload = JSON.stringify([jobValues, values]);
+			let cid = completionId.current;
+			if (cid === null || payload !== lastCompletionPayload.current) {
+				cid = newSubmissionId();
+				completionId.current = cid;
+				lastCompletionPayload.current = payload;
+			}
+			const result = await submitConciergeLead(
+				jobValues,
+				values,
+				savedPartialId.current,
+				cid
+			);
+			if (result.ok) {
+				setStatus("idle");
+				setStep("success");
+			} else {
+				setStatus("error");
+				setErrorMessage(result.error);
+			}
+		})();
+	};
 
-  /** Start a fresh request (post-success "Submit Another", tab re-entry). */
-  const reset = () => {
-    stepOneForm.reset(emptyStepOne);
-    stepTwoForm.reset(emptyStepTwo);
-    partialId.current = null;
-    completionId.current = null;
-    savedPartialId.current = null;
-    partialInFlight.current = null;
-    lastPartialPayload.current = null;
-    lastCompletionPayload.current = null;
-    validatedJob.current = null;
-    setStatus("idle");
-    setErrorMessage(null);
-    setStep("job");
-  };
+	/** Start a fresh request (post-success "Submit Another", tab re-entry). */
+	const reset = () => {
+		stepOneForm.reset(emptyStepOne);
+		stepTwoForm.reset(emptyStepTwo);
+		partialId.current = null;
+		completionId.current = null;
+		savedPartialId.current = null;
+		partialInFlight.current = null;
+		lastPartialPayload.current = null;
+		lastCompletionPayload.current = null;
+		validatedJob.current = null;
+		setStatus("idle");
+		setErrorMessage(null);
+		setStep("job");
+	};
 
-  return {
-    step,
-    status,
-    errorMessage,
-    stepOneForm,
-    stepTwoForm,
-    advance,
-    back,
-    submit,
-    reset,
-  };
+	return {
+		advance,
+		back,
+		errorMessage,
+		reset,
+		status,
+		step,
+		stepOneForm,
+		stepTwoForm,
+		submit,
+	};
 }

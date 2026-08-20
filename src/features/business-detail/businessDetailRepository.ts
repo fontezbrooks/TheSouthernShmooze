@@ -1,7 +1,7 @@
-import { getSupabase } from "@/lib/supabase";
-import { ok, err, type Result } from "@/lib/result";
 import type { DirectoryBusinessDetailRow } from "@/lib/database";
-import { toDetail, type BusinessDetail } from "./businessDetailTypes";
+import { err, ok, type Result } from "@/lib/result";
+import { getSupabase } from "@/lib/supabase";
+import { type BusinessDetail, toDetail } from "./businessDetailTypes";
 
 const VIEW = "directory_business_detail_view";
 
@@ -11,23 +11,27 @@ const VIEW = "directory_business_detail_view";
  * source_uid. `ok(null)` means the uid wasn't found. Result-based (no throws).
  */
 export interface BusinessDetailRepository {
-  fetchByUid(sourceUid: string): Promise<Result<BusinessDetail | null>>;
+	fetchByUid(sourceUid: string): Promise<Result<BusinessDetail | null>>;
 }
 
 export const businessDetailRepository: BusinessDetailRepository = {
-  async fetchByUid(sourceUid) {
-    try {
-      const { data, error } = await getSupabase()
-        .from(VIEW)
-        .select("*")
-        .eq("source_uid", sourceUid)
-        .maybeSingle();
+	async fetchByUid(sourceUid) {
+		try {
+			const { data, error } = await getSupabase()
+				.from(VIEW)
+				.select("*")
+				.eq("source_uid", sourceUid)
+				.maybeSingle();
 
-      if (error) return err("We couldn’t load this business right now.");
-      if (!data) return ok(null);
-      return ok(toDetail(data as DirectoryBusinessDetailRow));
-    } catch {
-      return err("Network error loading this business.");
-    }
-  },
+			if (error) {
+				return err("We couldn’t load this business right now.");
+			}
+			if (!data) {
+				return ok(null);
+			}
+			return ok(toDetail(data as DirectoryBusinessDetailRow));
+		} catch {
+			return err("Network error loading this business.");
+		}
+	},
 };

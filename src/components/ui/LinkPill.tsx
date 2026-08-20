@@ -1,17 +1,17 @@
 import {
-  Text,
-  Pressable,
-  StyleSheet,
-  type StyleProp,
-  type ViewStyle,
+	Pressable,
+	type StyleProp,
+	StyleSheet,
+	Text,
+	type ViewStyle,
 } from "react-native";
 import { useTheme } from "@/theme/ThemeProvider";
 
 interface LinkPillProps {
-  label: string;
-  onPress: () => void;
-  accessibilityLabel?: string;
-  style?: StyleProp<ViewStyle>;
+	accessibilityLabel?: string;
+	label: string;
+	onPress: () => void;
+	style?: StyleProp<ViewStyle>;
 }
 
 /**
@@ -21,41 +21,41 @@ interface LinkPillProps {
  * bare text link disappears (owner polish round).
  */
 export function LinkPill({
-  label,
-  onPress,
-  accessibilityLabel,
-  style,
+	label,
+	onPress,
+	accessibilityLabel,
+	style,
 }: LinkPillProps) {
-  const t = useTheme();
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel ?? label}
-      onPress={onPress}
-      style={[
-        styles.pill,
-        {
-          backgroundColor: t.brand.colors.surface,
-          borderColor: t.brand.colors.line,
-          borderRadius: t.brand.radii.pill,
-        },
-        t.brand.shadow.card,
-        style,
-      ]}
-    >
-      <Text style={[t.brand.typography.chip, { color: t.brand.colors.text }]}>
-        {label}
-      </Text>
-    </Pressable>
-  );
+	const t = useTheme();
+	return (
+		<Pressable
+			accessibilityLabel={accessibilityLabel ?? label}
+			accessibilityRole="button"
+			onPress={onPress}
+			style={[
+				styles.pill,
+				{
+					backgroundColor: t.brand.colors.surface,
+					borderColor: t.brand.colors.line,
+					borderRadius: t.brand.radii.pill,
+				},
+				t.brand.shadow.card,
+				style,
+			]}
+		>
+			<Text style={[t.brand.typography.chip, { color: t.brand.colors.text }]}>
+				{label}
+			</Text>
+		</Pressable>
+	);
 }
 
 const styles = StyleSheet.create({
-  pill: {
-    minHeight: 44,
-    paddingHorizontal: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: StyleSheet.hairlineWidth,
-  },
+	pill: {
+		alignItems: "center",
+		borderWidth: StyleSheet.hairlineWidth,
+		justifyContent: "center",
+		minHeight: 44,
+		paddingHorizontal: 16,
+	},
 });

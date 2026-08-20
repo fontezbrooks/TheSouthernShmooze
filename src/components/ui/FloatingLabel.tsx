@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { StyleSheet } from "react-native";
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  interpolate,
+	interpolate,
+	useAnimatedStyle,
+	useSharedValue,
+	withTiming,
 } from "react-native-reanimated";
 import { useTheme } from "@/theme/ThemeProvider";
 
@@ -15,11 +15,11 @@ const ICON_OFFSET = 24;
 const PLACEHOLDER_Y = 11;
 
 interface FloatingLabelProps {
-  label: string;
-  /** focused || hasValue (always true for multiline). Drives the float. */
-  floated: boolean;
-  hasIcon: boolean;
-  color?: string;
+	color?: string;
+	/** focused || hasValue (always true for multiline). Drives the float. */
+	floated: boolean;
+	hasIcon: boolean;
+	label: string;
 }
 
 /**
@@ -29,55 +29,55 @@ interface FloatingLabelProps {
  * the UI thread; `transformOrigin: left` keeps it left-anchored while scaling.
  */
 export function FloatingLabel({
-  label,
-  floated,
-  hasIcon,
-  color,
+	label,
+	floated,
+	hasIcon,
+	color,
 }: FloatingLabelProps) {
-  const t = useTheme();
-  const progress = useSharedValue(floated ? 1 : 0);
+	const t = useTheme();
+	const progress = useSharedValue(floated ? 1 : 0);
 
-  useEffect(() => {
-    progress.value = withTiming(floated ? 1 : 0, { duration: 150 });
-  }, [floated, progress]);
+	useEffect(() => {
+		progress.value = withTiming(floated ? 1 : 0, { duration: 150 });
+	}, [floated, progress]);
 
-  // Placeholder sits after the leading icon (in the value row); when it floats
-  // up it slides to the box's left edge, above the icon.
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      {
-        translateX: interpolate(
-          progress.value,
-          [0, 1],
-          [hasIcon ? ICON_OFFSET : 0, 0],
-        ),
-      },
-      { translateY: interpolate(progress.value, [0, 1], [PLACEHOLDER_Y, 0]) },
-      { scale: interpolate(progress.value, [0, 1], [1, 0.75]) },
-    ],
-  }));
+	// Placeholder sits after the leading icon (in the value row); when it floats
+	// up it slides to the box's left edge, above the icon.
+	const animatedStyle = useAnimatedStyle(() => ({
+		transform: [
+			{
+				translateX: interpolate(
+					progress.value,
+					[0, 1],
+					[hasIcon ? ICON_OFFSET : 0, 0]
+				),
+			},
+			{ translateY: interpolate(progress.value, [0, 1], [PLACEHOLDER_Y, 0]) },
+			{ scale: interpolate(progress.value, [0, 1], [1, 0.75]) },
+		],
+	}));
 
-  return (
-    <Animated.Text
-      pointerEvents="none"
-      numberOfLines={1}
-      style={[
-        styles.label,
-        t.typography.body,
-        { color: color ?? t.colors.muted },
-        animatedStyle,
-      ]}
-    >
-      {label}
-    </Animated.Text>
-  );
+	return (
+		<Animated.Text
+			numberOfLines={1}
+			pointerEvents="none"
+			style={[
+				styles.label,
+				t.typography.body,
+				{ color: color ?? t.colors.muted },
+				animatedStyle,
+			]}
+		>
+			{label}
+		</Animated.Text>
+	);
 }
 
 const styles = StyleSheet.create({
-  label: {
-    position: "absolute",
-    left: 0,
-    top: 0,
-    transformOrigin: "left center",
-  },
+	label: {
+		left: 0,
+		position: "absolute",
+		top: 0,
+		transformOrigin: "left center",
+	},
 });

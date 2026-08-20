@@ -1,9 +1,9 @@
 import {
-  Pressable,
-  Text,
-  StyleSheet,
-  type StyleProp,
-  type ViewStyle,
+	Pressable,
+	type StyleProp,
+	StyleSheet,
+	Text,
+	type ViewStyle,
 } from "react-native";
 import { useTheme } from "@/theme/ThemeProvider";
 import { Icon, type IconName } from "./Icon";
@@ -23,144 +23,150 @@ export type ButtonVariant = "primary" | "solid" | "pill" | "wide" | "outline";
 export type ButtonTone = "rust" | "black" | "none";
 
 interface ButtonProps {
-  label: string;
-  onPress?: () => void;
-  variant?: ButtonVariant;
-  tone?: ButtonTone;
-  icon?: IconName;
-  iconPosition?: "leading" | "trailing";
-  disabled?: boolean;
-  style?: StyleProp<ViewStyle>;
+	disabled?: boolean;
+	icon?: IconName;
+	iconPosition?: "leading" | "trailing";
+	label: string;
+	onPress?: () => void;
+	style?: StyleProp<ViewStyle>;
+	tone?: ButtonTone;
+	variant?: ButtonVariant;
 }
 
 export function Button({
-  label,
-  onPress,
-  variant = "primary",
-  tone = "rust",
-  icon,
-  iconPosition = "trailing",
-  disabled = false,
-  style,
+	label,
+	onPress,
+	variant = "primary",
+	tone = "rust",
+	icon,
+	iconPosition = "trailing",
+	disabled = false,
+	style,
 }: ButtonProps) {
-  const t = useTheme();
+	const t = useTheme();
 
-  const isPrimary = variant === "primary";
-  const isSolid = variant === "solid";
-  const isPill = variant === "pill";
-  const isOutline = variant === "outline";
-  const isRustFill = isPrimary || isSolid;
+	const isPrimary = variant === "primary";
+	const isSolid = variant === "solid";
+	const isPill = variant === "pill";
+	const isOutline = variant === "outline";
+	const isRustFill = isPrimary || isSolid;
 
-  // Resolve surface, border, shadow, and label color.
-  const toneColor =
-    tone === "rust"
-      ? t.colors.rust
-      : tone === "black"
-        ? t.colors.black
-        : t.colors.text;
+	// Resolve surface, border, shadow, and label color.
+	const toneColor =
+		tone === "rust"
+			? t.colors.rust
+			: tone === "black"
+				? t.colors.black
+				: t.colors.text;
 
-  // Primary has an explicit disabled look (grey fill/border/shadow); other
-  // variants fall back to a simple opacity dim.
-  const disabledPrimary = disabled && isPrimary;
+	// Primary has an explicit disabled look (grey fill/border/shadow); other
+	// variants fall back to a simple opacity dim.
+	const disabledPrimary = disabled && isPrimary;
 
-  const bg = disabledPrimary
-    ? t.colors.inputBorder
-    : isRustFill
-      ? t.colors.rust
-      : t.colors.bg;
-  const labelColor = isRustFill
-    ? t.colors.white
-    : isOutline
-      ? t.colors.rustDark
-      : toneColor;
-  const labelStyle = isPill
-    ? t.typography.captionSemi
-    : t.typography.bodySemibold;
+	const bg = disabledPrimary
+		? t.colors.inputBorder
+		: isRustFill
+			? t.colors.rust
+			: t.colors.bg;
+	const labelColor = isRustFill
+		? t.colors.white
+		: isOutline
+			? t.colors.rustDark
+			: toneColor;
+	const labelStyle = isPill
+		? t.typography.captionSemi
+		: t.typography.bodySemibold;
 
-  const bordered = isRustFill || isOutline || (isPill && tone !== "none");
-  const borderColor = disabledPrimary
-    ? t.colors.neutral500
-    : isRustFill || isOutline
-      ? t.colors.rustDark
-      : tone === "black"
-        ? t.colors.black
-        : t.colors.rustDark;
-  // primary 3px (2px when disabled), solid/pill/outline 2px.
-  const borderWidth = !bordered ? 0 : isPrimary ? (disabledPrimary ? 2 : 3) : 2;
-  const shadowed = isRustFill || isOutline || (isPill && tone !== "none");
-  const shadowStyle = disabledPrimary
-    ? t.shadow.hardNeutral
-    : tone === "black"
-      ? t.shadow.hardBlack
-      : t.shadow.hard;
+	const bordered = isRustFill || isOutline || (isPill && tone !== "none");
+	const borderColor = disabledPrimary
+		? t.colors.neutral500
+		: isRustFill || isOutline
+			? t.colors.rustDark
+			: tone === "black"
+				? t.colors.black
+				: t.colors.rustDark;
+	// primary 3px (2px when disabled), solid/pill/outline 2px.
+	const borderWidth = bordered
+		? isPrimary
+			? disabledPrimary
+				? 2
+				: 3
+			: 2
+		: 0;
+	const shadowed = isRustFill || isOutline || (isPill && tone !== "none");
+	const shadowStyle = disabledPrimary
+		? t.shadow.hardNeutral
+		: tone === "black"
+			? t.shadow.hardBlack
+			: t.shadow.hard;
 
-  const iconNode = icon ? (
-    <Icon name={icon} size={isPill ? 12 : 18} color={labelColor} />
-  ) : null;
+	const iconNode = icon ? (
+		<Icon color={labelColor} name={icon} size={isPill ? 12 : 18} />
+	) : null;
 
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ disabled }}
-      disabled={disabled}
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.base,
-        isPrimary && styles.primary,
-        isSolid && styles.solid,
-        isPill && styles.pill,
-        isOutline && styles.outline,
-        variant === "wide" && styles.wide,
-        {
-          backgroundColor: bg,
-          borderRadius: t.radii.button,
-          borderWidth,
-          borderColor: bordered ? borderColor : "transparent",
-          opacity: disabledPrimary ? 1 : disabled ? 0.5 : pressed ? 0.85 : 1,
-        },
-        shadowed && shadowStyle,
-        style,
-      ]}
-    >
-      {icon && iconPosition === "leading" ? iconNode : null}
-      <Text style={[labelStyle, { color: labelColor }]}>{label}</Text>
-      {icon && iconPosition === "trailing" ? iconNode : null}
-    </Pressable>
-  );
+	return (
+		<Pressable
+			accessibilityRole="button"
+			accessibilityState={{ disabled }}
+			disabled={disabled}
+			onPress={onPress}
+			style={({ pressed }) => [
+				styles.base,
+				isPrimary && styles.primary,
+				isSolid && styles.solid,
+				isPill && styles.pill,
+				isOutline && styles.outline,
+				variant === "wide" && styles.wide,
+				{
+					backgroundColor: bg,
+					borderColor: bordered ? borderColor : "transparent",
+					borderRadius: t.radii.button,
+					borderWidth,
+					opacity: disabledPrimary ? 1 : disabled ? 0.5 : pressed ? 0.85 : 1,
+				},
+				shadowed && shadowStyle,
+				style,
+			]}
+		>
+			{icon && iconPosition === "leading" ? iconNode : null}
+			<Text style={[labelStyle, { color: labelColor }]}>{label}</Text>
+			{icon && iconPosition === "trailing" ? iconNode : null}
+		</Pressable>
+	);
 }
 
 const styles = StyleSheet.create({
-  base: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-  },
-  primary: {
-    height: 56,
-    width: "100%",
-    paddingHorizontal: 16,
-  },
-  solid: {
-    height: 48,
-    alignSelf: "center",
-    paddingHorizontal: 16,
-  },
-  pill: {
-    height: 32,
-    paddingHorizontal: 12,
-    alignSelf: "flex-start",
-  },
-  outline: {
-    height: 48,
-    alignSelf: "center",
-    paddingHorizontal: 16,
-  },
-  wide: {
-    height: 56,
-    width: "100%",
-    paddingHorizontal: 16,
-  },
+	base: {
+		alignItems: "center",
+		flexDirection: "row",
+		gap: 6,
+		justifyContent: "center",
+	},
+	outline: {
+		alignSelf: "center",
+		height: 48,
+		paddingHorizontal: 16,
+	},
+	pill: {
+		alignSelf: "flex-start",
+		height: 32,
+		paddingHorizontal: 12,
+	},
+	primary: {
+		height: 56,
+		paddingHorizontal: 16,
+		width: "100%",
+	},
+	solid: {
+		alignSelf: "center",
+		height: 48,
+		paddingHorizontal: 16,
+	},
+	wide: {
+		height: 56,
+		paddingHorizontal: 16,
+		width: "100%",
+	},
 });
 
 /** Re-exported for callers that only need the View type. */

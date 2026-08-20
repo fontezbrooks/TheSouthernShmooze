@@ -1,0 +1,46 @@
+Event/Category,Type,Name,Description,Data Type,Example Value,Aligned User Story
+User Profile Traits (Identify),User Property ($set),email,The homeowner or contractor's verified email address once they identify.,String,homeowner_atl@gmail.com,"US-2, US-5"
+User Profile Traits (Identify),User Property ($set),user_type,Specifies whether the user is a homeowner looking for service or a contractor/business owner.,String,homeowner,"US-1, US-5"
+User Profile Traits (Identify),User Property ($set),atlanta_neighborhood,The homeowner's neighborhood in Atlanta for geo-specific local matching.,String,Inman Park,"US-1, US-2"
+User Profile Traits (Identify),User Property ($set_once),$initial_utm_source,The acquisition source captured on the user's very first anonymous app launch.,String,facebook-ads,SOAR Framework (Source)
+User Profile Traits (Identify),User Property ($set_once),$initial_utm_medium,The acquisition medium captured on the first anonymous app launch.,String,cpc,SOAR Framework (Source)
+User Profile Traits (Identify),User Property ($set_once),$initial_utm_campaign,The marketing campaign name captured on the first anonymous app launch.,String,atlanta-plumbing-pros,SOAR Framework (Source)
+User Profile Traits (Identify),User Property ($set_once),$initial_referrer,The referrer URL from which the user downloaded or opened the app.,String,https://m.facebook.com/,SOAR Framework (Source)
+Registry Search & Discovery,Custom Event,registry_search_performed,Fires when a homeowner submits or refines a search in the contractor registry.,Event Trigger,N/A,US-1
+Registry Search & Discovery,Event Property,filter_category,The taxonomy category applied to the search.,String,Plumbing,US-1
+Registry Search & Discovery,Event Property,filter_tier,The contractor registry tier being filtered.,String,Market Leader,US-1
+Registry Search & Discovery,Event Property,filter_badges,"Array of specific badges selected to refine matches (e.g. Certified, Fast Responder).",Array of Strings,"['Certified', 'Top Rated']",US-1
+Registry Search & Discovery,Event Property,results_count,The number of certified pros returned by the filter parameters.,Integer,4,US-1
+Registry Search & Discovery,Event Property,empty_state_rendered,"Whether the search resulted in 0 matches, triggering a concierge backup offer.",Boolean,true,US-1
+Shmoozer Swiper Engine,Custom Event,shmoozer_card_rendered,Fires when a contractor's card is shown to a homeowner in the swiper interface.,Event Trigger,N/A,US-4
+Shmoozer Swiper Engine,Event Property,pro_business_id,Unique database identifier for the contractor displayed on the swiper card.,String,biz_atl_plumbing_921,US-4
+Shmoozer Swiper Engine,Event Property,pro_business_name,The public brand name of the service business displayed.,String,Peach State Plumbers,US-4
+Shmoozer Swiper Engine,Event Property,pro_tier,The certified tier level of the contractor card.,String,Market Leader,US-4
+Shmoozer Swiper Engine,Event Property,pro_rating,The average rating score displayed to the swiping homeowner.,Float,4.85,US-4
+Shmoozer Swiper Engine,Event Property,card_index,The card's position in the current swiping session deck.,Integer,3,US-4
+Shmoozer Swiper Engine,Custom Event,shmoozer_card_swiped,Fires when a homeowner swipes a contractor card left (pass) or right (match interest).,Event Trigger,N/A,US-4
+Shmoozer Swiper Engine,Event Property,swipe_direction,The direction of the user swipe. Crucial for measuring concierge matchmaking intent.,String (left | right),right,US-4
+Shmoozer Swiper Engine,Event Property,session_swipe_count,Cumulative swipes done by this user in the current session (identifies power-swipers).,Integer,12,US-4
+Shmoozer Swiper Engine,Custom Event,shmoozer_match_triggered,Fires when a 'right' swipe satisfies matching parameters and auto-creates a concierge lead.,Event Trigger,N/A,US-4
+Shmoozer Swiper Engine,Event Property,concierge_request_id,The backend ID of the concierge ticket generated instantly from the swipe match.,String,cc_ticket_83721,US-4
+Lead Funnel: Find My Pro,Custom Event,find_my_pro_initiated,Fires when a homeowner launches the 2-step 'Find My Pro' request flow.,Event Trigger,N/A,US-2
+Lead Funnel: Find My Pro,Custom Event,find_my_pro_step_1_completed,Fires immediately after Step 1 of the lead flow is submitted (capturing key category/contact details). Allows partial lead follow-up.,Event Trigger,N/A,US-2
+Lead Funnel: Find My Pro,Event Property,requested_category,The service category required by the homeowner.,String,Plumbing,US-2
+Lead Funnel: Find My Pro,Event Property,partial_lead_recorded,Boolean flag indicating this was stored as a high-intent fallback lead in case of abandonment.,Boolean,true,US-2
+Lead Funnel: Find My Pro,Custom Event,find_my_pro_submitted,"Fires upon successful completion of Step 2 (full matching lead recorded, pro partner displayed).",Event Trigger,N/A,US-2
+Lead Funnel: Find My Pro,Event Property,matched_pro_id,The ID of the preferred contractor partner shown to the homeowner upon submission.,String,biz_atl_plumbing_921,US-2
+Lead Funnel: Find My Pro,Custom Event,partner_call_button_clicked,Fires when a homeowner clicks the 'Call' button on a matched partner or profile screen.,Event Trigger,N/A,"US-2, US-3"
+Lead Funnel: Find My Pro,Event Property,call_placement_source,"Identifies where the call trigger occurred (e.g., 'find_my_pro_completion', 'profile_view', 'swiper_match_popup').",String,find_my_pro_completion,"US-2, US-3"
+Profile Engagement,Custom Event,profile_rendered_gracefully,"Fires to verify page loads cleanly even when metadata assets like rating, photos, or deal are absent.",Event Trigger,N/A,US-3
+Profile Engagement,Event Property,has_photos,Tracks if photos are present on the profile.,Boolean,false,US-3
+Profile Engagement,Event Property,has_editorial_story,Tracks if editorial profile text is present.,Boolean,true,US-3
+Profile Engagement,Event Property,has_active_deal,Tracks if an active deal/coupon is visible.,Boolean,true,US-3
+Profile Engagement,Custom Event,external_google_reviews_opened,Fires when a homeowner clicks to read Google reviews from the profile page.,Event Trigger,N/A,US-3
+Contractor Qualification,Custom Event,contractor_portal_started,Fires when a business owner clicks 'I run a business' to enter the onboarding funnel.,Event Trigger,N/A,US-5
+Contractor Qualification,Custom Event,contractor_qualification_submitted,Fires when a contractor submits their qualification form for certified registry access.,Event Trigger,N/A,US-5
+Contractor Qualification,Event Property,applicant_trade,The trade category selected by the applicant.,String,Electrical,US-5
+Contractor Qualification,Event Property,instant_qualification_response,Status output from the instant matching system mirroring website logic.,String (approved | flagged | review),approved,US-5
+Registry Health & Operations,Custom Event,registry_sync_completed,"Fires on background sync execution, verifying dynamic updates render without app-store release.",Event Trigger,N/A,US-6
+Registry Health & Operations,Event Property,sync_status,Whether the local cache updated successfully.,String (success | failed),success,US-6
+Registry Health & Operations,Event Property,records_ingested,The total number of contractor records updated during the sync.,Integer,184,US-6
+Registry Health & Operations,Event Property,ratings_refresh_independent,Boolean flag tracking if contractor ratings synced independently of the full registry schema.,Boolean,true,US-6

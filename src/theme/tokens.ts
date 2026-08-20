@@ -5,46 +5,46 @@
  */
 
 export const colors = {
-  /** Page base — warm Vanilla, sits under the daisy pattern. */
-  bg: "#FFF8EA",
-  /** Card / input surface. */
-  surface: "#FFFFFF",
+	/** Page base — warm Vanilla, sits under the daisy pattern. */
+	bg: "#FFF8EA",
 
-  /** Brand rust — primary banner + primary button fill. */
-  rust: "#994706",
-  /** Orange600 — borders + the signature hard drop shadow. */
-  rustDark: "#602A00",
-  /** Mustard — community banner + "See More" card. */
-  mustard: "#C18D22",
-  /** Pumpkin accent. */
-  pumpkin: "#DF7C3D",
-  /** Yellow400 — Certified chip star (Figma Yellow/Yellow400). */
-  yellow: "#EEB030",
-  /** Yellow200 — "Shmooze Certified" pill background (Figma Yellow/Yellow200). */
-  yellow200: "#FFEABE",
+	black: "#000000",
+	/** AppHeader bottom divider (Figma drop-shadow 0.5px Neutral400). */
+	divider: "#CCCAC9",
+	/** Error border + warning-triangle fill (Reds/Red400). */
+	error: "#EE4145",
+	/** Provider-card image/placeholder bottom hairline (Figma #EBEBEB). */
+	imageHairline: "#EBEBEB",
 
-  /** Primary text (Grey120). */
-  text: "#1B1B1C",
-  /** Near-black (Neutral800) — navbar inactive icon/label + tab text. */
-  neutral800: "#25201B",
-  /** Softer text (Neutral700). */
-  textSoft: "#302B27",
-  /** Muted — input placeholder / inside-label (Neutral600). */
-  muted: "#757371",
+	/** Input hairline border (Neutral400). */
+	inputBorder: "#CCCAC9",
+	/** Mustard — community banner + "See More" card. */
+	mustard: "#C18D22",
+	/** Muted — input placeholder / inside-label (Neutral600). */
+	muted: "#757371",
+	/** Disabled button border (Neutrals/Neutral500). */
+	neutral500: "#A09F9F",
+	/** Near-black (Neutral800) — navbar inactive icon/label + tab text. */
+	neutral800: "#25201B",
+	/** Pumpkin accent. */
+	pumpkin: "#DF7C3D",
 
-  /** Input hairline border (Neutral400). */
-  inputBorder: "#CCCAC9",
-  /** AppHeader bottom divider (Figma drop-shadow 0.5px Neutral400). */
-  divider: "#CCCAC9",
-  /** Provider-card image/placeholder bottom hairline (Figma #EBEBEB). */
-  imageHairline: "#EBEBEB",
-  /** Error border + warning-triangle fill (Reds/Red400). */
-  error: "#EE4145",
-  /** Disabled button border (Neutrals/Neutral500). */
-  neutral500: "#A09F9F",
+	/** Brand rust — primary banner + primary button fill. */
+	rust: "#994706",
+	/** Orange600 — borders + the signature hard drop shadow. */
+	rustDark: "#602A00",
+	/** Card / input surface. */
+	surface: "#FFFFFF",
 
-  black: "#000000",
-  white: "#FFFFFF",
+	/** Primary text (Grey120). */
+	text: "#1B1B1C",
+	/** Softer text (Neutral700). */
+	textSoft: "#302B27",
+	white: "#FFFFFF",
+	/** Yellow400 — Certified chip star (Figma Yellow/Yellow400). */
+	yellow: "#EEB030",
+	/** Yellow200 — "Shmooze Certified" pill background (Figma Yellow/Yellow200). */
+	yellow200: "#FFEABE",
 } as const;
 
 /**
@@ -53,25 +53,25 @@ export const colors = {
  * NOTE: values pending exact confirmation from the Figma node `strokes`.
  */
 export const heading = {
-  strokeColor: "#FEF8E8",
-  strokeWidth: 4,
+	strokeColor: "#FEF8E8",
+	strokeWidth: 4,
 } as const;
 
 export const radii = {
-  input: 4,
-  button: 8,
-  card: 24,
-  pill: 100,
+	button: 8,
+	card: 24,
+	input: 4,
+	pill: 100,
 } as const;
 
 /** 8px-based spacing scale. */
 export const spacing = {
-  xs: 4,
-  sm: 8,
-  md: 16,
-  lg: 24,
-  xl: 32,
-  xxl: 48,
+	lg: 24,
+	md: 16,
+	sm: 8,
+	xl: 32,
+	xs: 4,
+	xxl: 48,
 } as const;
 
 /**
@@ -79,47 +79,47 @@ export const spacing = {
  * color rustDark, offset (4,4), radius 0, spread 0.
  */
 export const shadow = {
-  hard: {
-    shadowColor: colors.rustDark,
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 1,
-    shadowRadius: 0,
-    elevation: 4,
-  },
-  /** Same offset shadow in black (community banner button). */
-  hardBlack: {
-    shadowColor: colors.black,
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 1,
-    shadowRadius: 0,
-    elevation: 4,
-  },
-  /** Same offset shadow in neutral grey (disabled Button Full). */
-  hardNeutral: {
-    shadowColor: colors.neutral500,
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 1,
-    shadowRadius: 0,
-    elevation: 4,
-  },
-  /** Smaller 2px hard offset in mustard — the "Shmooze Certified" pill. */
-  certified: {
-    shadowColor: colors.mustard,
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 0,
-    elevation: 2,
-  },
+	/** Smaller 2px hard offset in mustard — the "Shmooze Certified" pill. */
+	certified: {
+		elevation: 2,
+		shadowColor: colors.mustard,
+		shadowOffset: { height: 2, width: 2 },
+		shadowOpacity: 1,
+		shadowRadius: 0,
+	},
+	hard: {
+		elevation: 4,
+		shadowColor: colors.rustDark,
+		shadowOffset: { height: 4, width: 4 },
+		shadowOpacity: 1,
+		shadowRadius: 0,
+	},
+	/** Same offset shadow in black (community banner button). */
+	hardBlack: {
+		elevation: 4,
+		shadowColor: colors.black,
+		shadowOffset: { height: 4, width: 4 },
+		shadowOpacity: 1,
+		shadowRadius: 0,
+	},
+	/** Same offset shadow in neutral grey (disabled Button Full). */
+	hardNeutral: {
+		elevation: 4,
+		shadowColor: colors.neutral500,
+		shadowOffset: { height: 4, width: 4 },
+		shadowOpacity: 1,
+		shadowRadius: 0,
+	},
 } as const;
 
 /** Motion durations (ms). */
 export const durations = {
-  instant: 75,
-  xs: 100,
-  sm: 170,
-  md: 300,
-  lg: 500,
-  xl: 1000,
+	instant: 75,
+	lg: 500,
+	md: 300,
+	sm: 170,
+	xl: 1000,
+	xs: 100,
 } as const;
 
 /**
@@ -127,14 +127,14 @@ export const durations = {
  * equals the imported export name). Wired in `app/_layout.tsx`.
  */
 export const fonts = {
-  /** Shrikhand — display/headings. */
-  display: "Shrikhand_400Regular",
-  /** Bitter — body. */
-  body: "Bitter_400Regular",
-  bodySemi: "Bitter_600SemiBold",
-  bodyBold: "Bitter_800ExtraBold",
-  /** Tab bar label — Bitter SemiBold per RC1 NavBar (was Open Sans). */
-  tab: "Bitter_600SemiBold",
+	/** Bitter — body. */
+	body: "Bitter_400Regular",
+	bodyBold: "Bitter_800ExtraBold",
+	bodySemi: "Bitter_600SemiBold",
+	/** Shrikhand — display/headings. */
+	display: "Shrikhand_400Regular",
+	/** Tab bar label — Bitter SemiBold per RC1 NavBar (was Open Sans). */
+	tab: "Bitter_600SemiBold",
 } as const;
 
 export type Colors = typeof colors;
@@ -148,45 +148,45 @@ export type Fonts = typeof fonts;
  * ------------------------------------------------------------------------- */
 
 export const brandColors = {
-  /** Page base — Magnolia. */
-  bg: "#FFFDF8",
-  /** Warm section background — Porch Cream. */
-  porchCream: "#FBF1E1",
-  /** Card / input surface. */
-  surface: "#FFFFFF",
+	/** Page base — Magnolia. */
+	bg: "#FFFDF8",
+	black: "#000000",
 
-  /** Primary accent — Clay (buttons, links, active states). */
-  clay: "#A8472B",
-  /** Clay pressed/border. */
-  clayDark: "#8A3820",
-  /** Secondary — deep Pine green. */
-  pine: "#26402F",
-  pineDark: "#1B2E21",
-  /** Gold — badges, stars, pins. */
-  gold: "#C98F2B",
-  goldLight: "#E7B85A",
-  /** Warm peach tints. */
-  peach: "#EFA85F",
-  peachSoft: "#F9E0BE",
+	/** Primary accent — Clay (buttons, links, active states). */
+	clay: "#A8472B",
+	/** Clay pressed/border. */
+	clayDark: "#8A3820",
 
-  /** Primary text — Ink. */
-  text: "#2A2420",
-  /** Secondary text. */
-  textSoft: "#5B5148",
-  /** Hairline borders/dividers. */
-  line: "#E4D6BE",
+	error: "#EE4145",
+	/** Gold — badges, stars, pins. */
+	gold: "#C98F2B",
+	goldLight: "#E7B85A",
+	/** Hairline borders/dividers. */
+	line: "#E4D6BE",
+	/** Warm peach tints. */
+	peach: "#EFA85F",
+	peachSoft: "#F9E0BE",
+	/** Secondary — deep Pine green. */
+	pine: "#26402F",
+	pineDark: "#1B2E21",
+	/** Warm section background — Porch Cream. */
+	porchCream: "#FBF1E1",
+	/** Card / input surface. */
+	surface: "#FFFFFF",
 
-  error: "#EE4145",
-  black: "#000000",
-  white: "#FFFFFF",
+	/** Primary text — Ink. */
+	text: "#2A2420",
+	/** Secondary text. */
+	textSoft: "#5B5148",
+	white: "#FFFFFF",
 } as const;
 
 /** Site radii scale (10/16/28 + pill). */
 export const brandRadii = {
-  sm: 10,
-  md: 16,
-  lg: 28,
-  pill: 999,
+	lg: 28,
+	md: 16,
+	pill: 999,
+	sm: 10,
 } as const;
 
 /**
@@ -195,20 +195,20 @@ export const brandRadii = {
  * RN has no shadow spread — approximated via radius/opacity + elevation.
  */
 export const brandShadow = {
-  card: {
-    shadowColor: brandColors.text,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.18,
-    shadowRadius: 10,
-    elevation: 4,
-  },
-  pin: {
-    shadowColor: brandColors.text,
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
-    elevation: 8,
-  },
+	card: {
+		elevation: 4,
+		shadowColor: brandColors.text,
+		shadowOffset: { height: 8, width: 0 },
+		shadowOpacity: 0.18,
+		shadowRadius: 10,
+	},
+	pin: {
+		elevation: 8,
+		shadowColor: brandColors.text,
+		shadowOffset: { height: 12, width: 0 },
+		shadowOpacity: 0.35,
+		shadowRadius: 12,
+	},
 } as const;
 
 /**
@@ -216,19 +216,19 @@ export const brandShadow = {
  * Fraunces = display serif, Public Sans = body, Caveat = handwritten accent.
  */
 export const brandFonts = {
-  display: "Fraunces_700Bold",
-  displayBlack: "Fraunces_900Black",
-  displaySemi: "Fraunces_600SemiBold",
-  body: "PublicSans_400Regular",
-  bodySemi: "PublicSans_600SemiBold",
-  bodyBold: "PublicSans_700Bold",
-  /**
-   * Caveat 500, deliberately: the site's CSS computes weight 400, but its
-   * Google Fonts URL loads only Caveat 500/600/700, so browsers map 400 to
-   * the 500 face — 500 is what actually renders.
-   */
-  accent: "Caveat_500Medium",
-  accentSemi: "Caveat_600SemiBold",
+	/**
+	 * Caveat 500, deliberately: the site's CSS computes weight 400, but its
+	 * Google Fonts URL loads only Caveat 500/600/700, so browsers map 400 to
+	 * the 500 face — 500 is what actually renders.
+	 */
+	accent: "Caveat_500Medium",
+	accentSemi: "Caveat_600SemiBold",
+	body: "PublicSans_400Regular",
+	bodyBold: "PublicSans_700Bold",
+	bodySemi: "PublicSans_600SemiBold",
+	display: "Fraunces_700Bold",
+	displayBlack: "Fraunces_900Black",
+	displaySemi: "Fraunces_600SemiBold",
 } as const;
 
 export type BrandColors = typeof brandColors;
