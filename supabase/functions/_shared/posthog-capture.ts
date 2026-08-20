@@ -42,9 +42,16 @@ export async function captureServerEvent(
 		const res = await fetch(`${host.replace(TRAILING_SLASH, "")}/i/v0/e/`, {
 			body: JSON.stringify({
 				api_key: apiKey,
+				// distinct_id in BOTH positions: current docs show it top-level,
+				// the legacy capture schema reads properties.distinct_id — the
+				// duplicate is harmless and covers both (review: PR #45).
 				distinct_id: distinctId,
 				event,
-				properties: { ...properties, $process_person_profile: false },
+				properties: {
+					...properties,
+					$process_person_profile: false,
+					distinct_id: distinctId,
+				},
 			}),
 			headers: { "Content-Type": "application/json" },
 			method: "POST",

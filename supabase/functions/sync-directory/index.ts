@@ -142,7 +142,14 @@ Deno.serve(async (req: Request) => {
 		return json(200, { reason: error.message, status: "failed" });
 	}
 
-	await captureSync("ok", fetched.records.length);
+	// The RPC's safety guard skips the apply WITHOUT an error (status
+	// "skipped_guard", zero records applied) — exactly the condition this
+	// telemetry must expose as a failure, not a success (review: PR #45).
+	if (data?.status === "skipped_guard") {
+		await captureSync("failed", 0);
+	} else {
+		await captureSync("success", fetched.records.length);
+	}
 	return json(200, {
 		...data,
 		duration_ms: Date.now() - startedAt,

@@ -158,7 +158,7 @@ Deno.serve(async (req: Request) => {
 			p_status: "ok",
 			p_updated: 0,
 		});
-		await captureSync("ok", 0);
+		await captureSync("success", 0);
 		return json(200, { failed: 0, processed: 0, status: "ok", updated: 0 });
 	}
 
@@ -204,7 +204,10 @@ Deno.serve(async (req: Request) => {
 		p_updated: updated,
 	});
 
-	await captureSync(failed > 0 ? "partial" : "ok", updated);
+	// Taxonomy declares sync_status as success | failed (CSV row 44) — a run
+	// with any item failures maps to failed; records_ingested still reports
+	// what DID land (review: PR #45).
+	await captureSync(failed > 0 ? "failed" : "success", updated);
 	return json(200, {
 		duration_ms: Date.now() - startedAt,
 		failed,

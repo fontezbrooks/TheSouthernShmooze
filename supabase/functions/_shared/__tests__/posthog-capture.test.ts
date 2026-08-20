@@ -33,6 +33,7 @@ describe("captureServerEvent (P4 server-side capture)", () => {
 			event: "registry_sync_completed",
 			properties: {
 				$process_person_profile: false,
+				distinct_id: "server:sync",
 				records_ingested: 42,
 				sync_status: "ok",
 			},
@@ -47,6 +48,8 @@ describe("captureServerEvent (P4 server-side capture)", () => {
 		const [url, init] = fetchMock.mock.calls[0];
 		expect(url).toBe("https://us.i.posthog.com/i/v0/e/");
 		expect(JSON.parse(init.body).distinct_id).toBe("server:custom");
+		// Legacy capture schema position (review: PR #45).
+		expect(JSON.parse(init.body).properties.distinct_id).toBe("server:custom");
 	});
 
 	test("missing key or host is a silent no-op", async () => {
