@@ -20,8 +20,11 @@ Screen paths ($screen) · Weekly retention (Application Opened, first-time,
 
 ### 2 · Find My Pro Funnel (4 tiles)
 Funnel initiated → step_1_completed → submitted (14d window) ·
-Conversion rate scorecard (B/A, %) · Partial-lead abandonment ((A-B)/A weekly) ·
-Post-submit call CTR (completion-screen partner calls / submissions).
+Conversion rate scorecard (B/A, %) · Step-2 completion per request (funnel
+conversion over time, 14d window — abandonment is its complement; per-request,
+so cross-week completions and repeat step-1 events can't skew it) ·
+Post-submit call CTR (UNIQUE completion-screen callers / UNIQUE submitters —
+repeat taps can't inflate it).
 
 ### 3 · Contractor Growth (3 tiles)
 Funnel portal_started → qualification_submitted · Qualification outcomes
@@ -30,8 +33,10 @@ Funnel portal_started → qualification_submitted · Qualification outcomes
 
 ### 4 · Registry Sync & Ops (3 tiles)
 Sync success rate (sync_status=success / all, 7d scorecard) · Sync duration
-(avg duration_ms by sync_source) · Records changed per day (sum
-records_ingested by sync_source; 0 = unchanged directory, normal).
+(avg duration_ms by sync_source) · Sync throughput per day (sum
+records_ingested by sync_source — semantics differ: sync-directory counts rows
+actually added/updated (0 = unchanged directory, normal); sync-profiles counts
+profiles REFRESHED on the staleness schedule, including unchanged content).
 
 ## Feature flags
 
