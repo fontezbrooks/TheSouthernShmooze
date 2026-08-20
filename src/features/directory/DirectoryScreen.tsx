@@ -15,6 +15,7 @@ import { Icon } from "@/components/ui/Icon";
 import { LinkPill } from "@/components/ui/LinkPill";
 import { PhysicalPressable } from "@/components/ui/PhysicalPressable";
 import { CategoryChips } from "@/features/providers/CategoryChips";
+import { useAnalytics } from "@/lib/analytics/useAnalytics";
 import { LINKS } from "@/lib/links";
 import { openLink } from "@/lib/openLink";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -33,6 +34,7 @@ import { useDirectorySearch } from "./useDirectorySearch";
 export function DirectoryScreen() {
 	const t = useTheme();
 	const router = useRouter();
+	const { track } = useAnalytics();
 	const insets = useSafeAreaInsets();
 	const s = useDirectorySearch();
 	const { setQuery } = s;
@@ -178,7 +180,12 @@ export function DirectoryScreen() {
                   LinkPill so it reads as a button (owner polish round). */}
 							<LinkPill
 								label="I run a business — Check My Fit"
-								onPress={() => router.push("/contractor-wizard")}
+								onPress={() => {
+									track("contractor_portal_started", {
+										entry_point: "registry_footer",
+									});
+									router.push("/contractor-wizard");
+								}}
 								style={styles.proFooter}
 							/>
 						</View>

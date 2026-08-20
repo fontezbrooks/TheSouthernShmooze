@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { DirectoryBusiness } from "@/features/providers/providerTypes";
+import { useAnalytics } from "@/lib/analytics/useAnalytics";
 import { useDebounce } from "@/lib/useDebounce";
 import {
 	type DirectoryRepository,
@@ -49,6 +50,7 @@ export function useDirectorySearch(
 
 	const debounced = useDebounce(query.trim(), delayMs);
 	const active = debounced.length >= MIN_QUERY;
+	const { track } = useAnalytics();
 
 	// Initial browse-all load.
 	useEffect(() => {
@@ -90,6 +92,11 @@ export function useDirectorySearch(
 			if (res.ok) {
 				setResults(res.data);
 				setError(null);
+				// Once per SETTLED (debounced, still-current) query — US-1.
+				track("registry_search_performed", {
+					empty_state_rendered: res.data.length === 0,
+					results_count: res.data.length,
+				});
 			} else {
 				// Keep results null (NOT []) so a failure renders the error rather than
 				// misreporting an outage as an empty "no results" search.
@@ -101,7 +108,7 @@ export function useDirectorySearch(
 		return () => {
 			alive = false;
 		};
-	}, [debounced, active, repo]);
+	}, [debounced, active, repo, track]);
 
 	const clear = useCallback(() => setQuery(""), []);
 

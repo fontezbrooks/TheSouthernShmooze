@@ -11,6 +11,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
+import { useAnalytics } from "@/lib/analytics/useAnalytics";
 import { useTheme } from "@/theme/ThemeProvider";
 import { FiltersModal } from "./FiltersModal";
 import { ProfileQuickView } from "./ProfileQuickView";
@@ -46,6 +47,23 @@ export function SwipeScreen() {
 	/** ST3 transient pass flash. */
 	const [passed, setPassed] = useState(false);
 	const [quickViewUid, setQuickViewUid] = useState<string | null>(null);
+	const { track } = useAnalytics();
+	/** Cumulative swipes this session (identifies power-swipers, US-4). */
+	const swipeCount = useRef(0);
+
+	// Top card changed → it's being shown to the homeowner (US-4).
+	const { current } = deck;
+	useEffect(() => {
+		if (!current) {
+			return;
+		}
+		track("shmoozer_card_rendered", {
+			card_index: deck.cards.indexOf(current),
+			pro_business_id: current.sourceUid,
+			pro_business_name: current.name,
+			pro_tier: current.isFeatured ? "featured" : undefined,
+		});
+	}, [current, deck.cards, track]);
 
 	useEffect(() => {
 		if (!passed) {
@@ -79,6 +97,13 @@ export function SwipeScreen() {
 		if (!deck.taskId) {
 			return;
 		}
+		swipeCount.current += 1;
+		track("shmoozer_card_swiped", {
+			pro_business_id: card.sourceUid,
+			pro_tier: card.isFeatured ? "featured" : undefined,
+			session_swipe_count: swipeCount.current,
+			swipe_direction: "right",
+		});
 		// Confirm every Match: the routed contact page — nothing sends silently.
 		setBanner(null);
 		session.setPending({ card, taskId: deck.taskId });
@@ -87,6 +112,15 @@ export function SwipeScreen() {
 
 	// A left swipe already committed in the engine — this is just the ST3 flash.
 	const onPass = () => {
+		swipeCount.current += 1;
+		if (current) {
+			track("shmoozer_card_swiped", {
+				pro_business_id: current.sourceUid,
+				pro_tier: current.isFeatured ? "featured" : undefined,
+				session_swipe_count: swipeCount.current,
+				swipe_direction: "left",
+			});
+		}
 		setBanner(null);
 		setPassed(true);
 	};

@@ -107,3 +107,51 @@ describe("useDirectorySearch", () => {
 		expect(result.current.items.map((b) => b.id)).toEqual(["a", "b"]);
 	});
 });
+
+const mockTrack = jest.fn();
+jest.mock("@/lib/analytics/useAnalytics", () => ({
+	useAnalytics: () => ({ identify: jest.fn(), track: mockTrack }),
+	useFlag: () => undefined,
+}));
+
+describe("registry search analytics (US-1)", () => {
+	beforeEach(() => mockTrack.mockClear());
+
+	it("fires registry_search_performed once per settled query", async () => {
+		const repo = makeRepo();
+		const { result } = await render(repo);
+		await flush();
+		await act(async () => result.current.setQuery("lawn"));
+		await flush();
+		expect(mockTrack).toHaveBeenCalledTimes(1);
+		expect(mockTrack).toHaveBeenCalledWith("registry_search_performed", {
+			empty_state_rendered: false,
+			results_count: 1,
+		});
+	});
+
+	it("flags the empty state when a search returns nothing", async () => {
+		const repo = makeRepo({
+			search: jest.fn().mockResolvedValue({ data: [], ok: true }),
+		});
+		const { result } = await render(repo);
+		await flush();
+		await act(async () => result.current.setQuery("nothing"));
+		await flush();
+		expect(mockTrack).toHaveBeenCalledWith("registry_search_performed", {
+			empty_state_rendered: true,
+			results_count: 0,
+		});
+	});
+
+	it("does not fire on a failed search", async () => {
+		const repo = makeRepo({
+			search: jest.fn().mockResolvedValue({ error: "down", ok: false }),
+		});
+		const { result } = await render(repo);
+		await flush();
+		await act(async () => result.current.setQuery("lawn"));
+		await flush();
+		expect(mockTrack).not.toHaveBeenCalled();
+	});
+});

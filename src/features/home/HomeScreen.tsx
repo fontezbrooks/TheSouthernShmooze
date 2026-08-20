@@ -5,6 +5,7 @@ import { Banner } from "@/components/ui/Banner";
 import { LinkPill } from "@/components/ui/LinkPill";
 import { SearchBarButton } from "@/features/directory/SearchBar";
 import { CertifiedProviders } from "@/features/providers/CertifiedProviders";
+import { useAnalytics } from "@/lib/analytics/useAnalytics";
 import { LINKS } from "@/lib/links";
 import { openLink } from "@/lib/openLink";
 import { bannerCommunity, bannerHelp, daisyBackground } from "@/theme/assets";
@@ -18,6 +19,7 @@ import SmilyPeachLogo from "./smily-peach.svg";
 export function HomeScreen() {
 	const t = useTheme();
 	const router = useRouter();
+	const { track } = useAnalytics();
 
 	const callBusiness = (phone: string) => openLink(`tel:${phone}`);
 
@@ -72,7 +74,10 @@ export function HomeScreen() {
 					ctaSize="lg"
 					imageNode={<SmilyPeachLogo height={94} width={96} />}
 					layout="titleRow"
-					onPress={() => router.push("/contractor-wizard")}
+					onPress={() => {
+						track("contractor_portal_started", { entry_point: "home_banner" });
+						router.push("/contractor-wizard");
+					}}
 					subtitle="See if you're a fit for the Shmooze registry — free, takes about 2 minutes."
 					title="Are You a Local Pro?"
 				/>

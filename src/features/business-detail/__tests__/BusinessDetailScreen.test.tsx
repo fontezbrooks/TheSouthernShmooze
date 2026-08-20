@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react-native";
+import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import { BusinessDetailScreen } from "../BusinessDetailScreen";
 import type { BusinessDetail } from "../businessDetailTypes";
 
@@ -105,5 +105,58 @@ describe("BusinessDetailScreen (E6)", () => {
 		const { findByText } = await renderScreen();
 
 		expect(await findByText("Not found.")).toBeTruthy();
+	});
+});
+
+const mockTrack = jest.fn();
+jest.mock("@/lib/analytics/useAnalytics", () => ({
+	useAnalytics: () => ({ identify: jest.fn(), track: mockTrack }),
+	useFlag: () => undefined,
+}));
+
+describe("profile analytics (US-3)", () => {
+	it("tracks profile_rendered_gracefully with the profile's actual assets", async () => {
+		mockFetchByUid.mockResolvedValue({ data: makeDetail(), ok: true });
+		await renderScreen();
+		await waitFor(() =>
+			expect(mockTrack).toHaveBeenCalledWith("profile_rendered_gracefully", {
+				has_active_deal: false,
+				has_editorial_story: true,
+				has_photos: false,
+				pro_business_id: "uid-1",
+			})
+		);
+	});
+
+	it("tracks external_google_reviews_opened only for the goo link", async () => {
+		mockFetchByUid.mockResolvedValue({
+			data: makeDetail({
+				socials: [
+					{ key: "goo", label: "Google", url: "https://g.example.com" },
+					{ key: "ylp", label: "Yelp", url: "https://yelp.example.com" },
+				],
+			}),
+			ok: true,
+		});
+		const { findByText } = await renderScreen();
+		await fireEvent.press(await findByText("Yelp"));
+		expect(mockTrack).not.toHaveBeenCalledWith(
+			"external_google_reviews_opened",
+			expect.anything()
+		);
+		await fireEvent.press(await findByText("Google"));
+		expect(mockTrack).toHaveBeenCalledWith("external_google_reviews_opened", {
+			pro_business_id: "uid-1",
+		});
+	});
+
+	it("tracks the profile call placement on the sticky call bar", async () => {
+		mockFetchByUid.mockResolvedValue({ data: makeDetail(), ok: true });
+		const { findByText } = await renderScreen();
+		await fireEvent.press(await findByText("Call 678-790-4781"));
+		expect(mockTrack).toHaveBeenCalledWith("partner_call_button_clicked", {
+			call_placement_source: "profile_view",
+			pro_business_id: "uid-1",
+		});
 	});
 });

@@ -244,3 +244,47 @@ describe("useContractorWizard", () => {
 		expect(result.current.form.getValues("contact")).toBe("");
 	});
 });
+
+const mockTrack = jest.fn();
+jest.mock("@/lib/analytics/useAnalytics", () => ({
+	useAnalytics: () => ({ identify: jest.fn(), track: mockTrack }),
+	useFlag: () => undefined,
+}));
+
+describe("qualification analytics (US-5)", () => {
+	beforeEach(() => mockTrack.mockClear());
+
+	async function walkToSubmit(result: {
+		current: ReturnType<typeof useContractorWizard>;
+	}) {
+		for (let i = 0; i < stepValues.length; i += 1) {
+			// biome-ignore lint/performance/noAwaitInLoops: wizard steps must advance sequentially
+			await fillStep(result, i);
+			await act(async () => {
+				await result.current.advance();
+			});
+		}
+	}
+
+	test("verified outcome tracks approved with the applicant trade", async () => {
+		const { result } = await renderHook(() => useContractorWizard());
+		await walkToSubmit(result);
+		expect(mockTrack).toHaveBeenCalledWith(
+			"contractor_qualification_submitted",
+			{
+				applicant_trade: "Plumbing",
+				instant_qualification_response: "approved",
+			}
+		);
+	});
+
+	test("not-yet outcome tracks flagged", async () => {
+		verifyFitMock.mockResolvedValue({ ...passVerdict, outcome: "not-yet" });
+		const { result } = await renderHook(() => useContractorWizard());
+		await walkToSubmit(result);
+		expect(mockTrack).toHaveBeenCalledWith(
+			"contractor_qualification_submitted",
+			{ applicant_trade: "Plumbing", instant_qualification_response: "flagged" }
+		);
+	});
+});

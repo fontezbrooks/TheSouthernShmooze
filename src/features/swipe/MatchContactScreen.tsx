@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { CategoryChip } from "@/features/providers/CategoryChips";
+import { useAnalytics } from "@/lib/analytics/useAnalytics";
 import { useTheme } from "@/theme/ThemeProvider";
 import { LeadCaptureForm } from "./LeadCaptureForm";
 import { useSwipeSession } from "./SwipeSessionProvider";
@@ -38,6 +39,7 @@ export function MatchContactScreen() {
 	const t = useTheme();
 	const router = useRouter();
 	const session = useSwipeSession();
+	const { track } = useAnalytics();
 	const pending = session.pending;
 	const [sendError, setSendError] = useState<string | null>(null);
 
@@ -66,6 +68,12 @@ export function MatchContactScreen() {
 			pending.card.confidence
 		);
 		if (res.ok) {
+			// The RPC returns only { status } — no lead id crosses the client
+			// boundary, so the task id stands in as the request identifier.
+			track("shmoozer_match_triggered", {
+				concierge_request_id: pending.taskId,
+				pro_business_id: pending.card.sourceUid,
+			});
 			session.setMatchResult({
 				first: !session.hasMatched,
 				name: pending.card.name,

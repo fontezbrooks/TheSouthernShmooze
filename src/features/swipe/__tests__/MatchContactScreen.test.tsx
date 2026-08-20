@@ -171,3 +171,35 @@ describe("MatchContactScreen (CP1–CP3)", () => {
 		expect(mockBack).not.toHaveBeenCalled();
 	});
 });
+
+const mockTrack = jest.fn();
+jest.mock("@/lib/analytics/useAnalytics", () => ({
+	useAnalytics: () => ({ identify: jest.fn(), track: mockTrack }),
+	useFlag: () => undefined,
+}));
+
+describe("match analytics (US-4)", () => {
+	it("tracks shmoozer_match_triggered when the lead send succeeds", async () => {
+		mockSession = makeSession();
+		const { getByText } = await render(<MatchContactScreen />);
+		await fireEvent.press(getByText("Send request"));
+		await waitFor(() =>
+			expect(mockTrack).toHaveBeenCalledWith("shmoozer_match_triggered", {
+				concierge_request_id: "task-1",
+				pro_business_id: "uid-1",
+			})
+		);
+	});
+
+	it("does not track a match when the send fails", async () => {
+		mockSession = makeSession();
+		mockSubmitLead.mockResolvedValue({ error: "down", ok: false });
+		const { getByText } = await render(<MatchContactScreen />);
+		await fireEvent.press(getByText("Send request"));
+		await waitFor(() => expect(mockSubmitLead).toHaveBeenCalled());
+		expect(mockTrack).not.toHaveBeenCalledWith(
+			"shmoozer_match_triggered",
+			expect.anything()
+		);
+	});
+});

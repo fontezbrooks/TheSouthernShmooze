@@ -15,6 +15,7 @@ import { AppHeader } from "@/components/ui/AppHeader";
 import { Button } from "@/components/ui/Button";
 import { CertifiedBadge } from "@/components/ui/CertifiedBadge";
 import { Icon, type IconName } from "@/components/ui/Icon";
+import { useAnalytics } from "@/lib/analytics/useAnalytics";
 import { openLink } from "@/lib/openLink";
 import { useTheme } from "@/theme/ThemeProvider";
 import { businessDetailRepository } from "./businessDetailRepository";
@@ -50,6 +51,7 @@ export function BusinessDetailScreen({ uid }: { uid: string }) {
 	const t = useTheme();
 	const router = useRouter();
 	const insets = useSafeAreaInsets();
+	const { track } = useAnalytics();
 	const [state, setState] = useState<DetailState>({
 		detail: null,
 		error: null,
@@ -68,11 +70,21 @@ export function BusinessDetailScreen({ uid }: { uid: string }) {
 					? { detail: res.data, error: null, loading: false }
 					: { detail: null, error: res.error, loading: false }
 			);
+			if (res.ok && res.data) {
+				// Lighter profiles must still render/convert — track what this
+				// one has (US-3). No deal field until L5 profile depth lands.
+				track("profile_rendered_gracefully", {
+					has_active_deal: false,
+					has_editorial_story: Boolean(res.data.aboutText),
+					has_photos: res.data.gallery.length > 0,
+					pro_business_id: uid,
+				});
+			}
 		})();
 		return () => {
 			alive = false;
 		};
-	}, [uid]);
+	}, [uid, track]);
 
 	const back = () =>
 		router.canGoBack() ? router.back() : router.replace("/directory");
@@ -95,6 +107,10 @@ export function BusinessDetailScreen({ uid }: { uid: string }) {
 		if (!(detail && primaryPhone)) {
 			return;
 		}
+		track("partner_call_button_clicked", {
+			call_placement_source: "profile_view",
+			pro_business_id: uid,
+		});
 		if (detail.phones.length === 1) {
 			openLink(`tel:${primaryPhone.raw}`);
 			return;
@@ -173,7 +189,16 @@ export function BusinessDetailScreen({ uid }: { uid: string }) {
 											icon={SOCIAL_ICONS[l.key] ?? "globe"}
 											key={`${l.key}:${l.url}`}
 											label={l.label}
-											onPress={() => openLink(l.url)}
+											onPress={() => {
+												// "goo" = the Google Business link — the external
+												// trust-validation click US-3 measures.
+												if (l.key === "goo") {
+													track("external_google_reviews_opened", {
+														pro_business_id: uid,
+													});
+												}
+												openLink(l.url);
+											}}
 										/>
 									))}
 								</View>

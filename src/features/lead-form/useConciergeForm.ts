@@ -1,6 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { zipPrefix } from "@/lib/analytics/events";
+import { useAnalytics } from "@/lib/analytics/useAnalytics";
 import {
 	type ConciergeStepOneValues,
 	type ConciergeStepTwoValues,
@@ -38,6 +40,7 @@ export function useConciergeForm() {
 		resolver: zodResolver(conciergeStepTwoSchema),
 	});
 
+	const { track } = useAnalytics();
 	const [step, setStep] = useState<ConciergeStep>("job");
 	const [status, setStatus] = useState<SubmitStatus>("idle");
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -98,6 +101,12 @@ export function useConciergeForm() {
 			});
 			partialInFlight.current = inFlight;
 			await inFlight;
+			// After the partial settles so partial_lead_recorded is truthful (US-2).
+			track("find_my_pro_step_1_completed", {
+				partial_lead_recorded: savedPartialId.current !== null,
+				requested_category: values.trade,
+				zip_prefix: zipPrefix(values.zip),
+			});
 		})();
 	};
 
@@ -156,6 +165,10 @@ export function useConciergeForm() {
 			if (result.ok) {
 				setStatus("idle");
 				setStep("success");
+				// matched_pro_id omitted: the partner reveal picks the pinned
+				// provider independently (see PartnerReveal) — L4 rotation will
+				// give the submit path a real matched id.
+				track("find_my_pro_submitted", {});
 			} else {
 				setStatus("error");
 				setErrorMessage(result.error);
