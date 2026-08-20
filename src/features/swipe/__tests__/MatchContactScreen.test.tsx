@@ -106,7 +106,10 @@ const makeSession = (
 beforeEach(() => {
 	jest.clearAllMocks();
 	mockSaveContact.mockResolvedValue({ data: undefined, ok: true });
-	mockSubmitLead.mockResolvedValue({ data: "ok", ok: true });
+	mockSubmitLead.mockResolvedValue({
+		data: { leadId: "lead-1", status: "ok" },
+		ok: true,
+	});
 });
 
 describe("MatchContactScreen (CP1–CP3)", () => {
@@ -185,7 +188,7 @@ describe("match analytics (US-4)", () => {
 		await fireEvent.press(getByText("Send request"));
 		await waitFor(() =>
 			expect(mockTrack).toHaveBeenCalledWith("shmoozer_match_triggered", {
-				concierge_request_id: "task-1",
+				concierge_request_id: "lead-1",
 				pro_business_id: "uid-1",
 			})
 		);

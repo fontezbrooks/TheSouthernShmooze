@@ -128,18 +128,27 @@ describe("saveContact", () => {
 });
 
 describe("submitLead", () => {
-	it("maps 'ok' and 'duplicate' statuses to success outcomes", async () => {
-		mockRpc.mockResolvedValueOnce({ data: { status: "ok" }, error: null });
-		expect(await swipeRepository.submitLead("s", "t", "u", 90)).toEqual({
-			data: "ok",
-			ok: true,
-		});
+	it("maps ok/duplicate statuses to success outcomes carrying the lead id (0021)", async () => {
 		mockRpc.mockResolvedValueOnce({
-			data: { status: "duplicate" },
+			data: { lead_id: "lead-9", status: "ok" },
 			error: null,
 		});
 		expect(await swipeRepository.submitLead("s", "t", "u", 90)).toEqual({
-			data: "duplicate",
+			data: { leadId: "lead-9", status: "ok" },
+			ok: true,
+		});
+		mockRpc.mockResolvedValueOnce({
+			data: { lead_id: "lead-9", status: "duplicate" },
+			error: null,
+		});
+		expect(await swipeRepository.submitLead("s", "t", "u", 90)).toEqual({
+			data: { leadId: "lead-9", status: "duplicate" },
+			ok: true,
+		});
+		// Pre-0021 deploy skew: no lead_id in the payload → null, still ok.
+		mockRpc.mockResolvedValueOnce({ data: { status: "ok" }, error: null });
+		expect(await swipeRepository.submitLead("s", "t", "u", 90)).toEqual({
+			data: { leadId: null, status: "ok" },
 			ok: true,
 		});
 	});

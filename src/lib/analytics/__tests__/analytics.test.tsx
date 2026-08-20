@@ -104,11 +104,13 @@ describe("useAnalytics", () => {
 			wrapper: withClient(client),
 		});
 		result.current.track("shmoozer_card_swiped", {
+			is_promoted: false,
 			pro_business_id: "biz_1",
 			session_swipe_count: 3,
 			swipe_direction: "right",
 		});
 		expect(client.capture).toHaveBeenCalledWith("shmoozer_card_swiped", {
+			is_promoted: false,
 			pro_business_id: "biz_1",
 			session_swipe_count: 3,
 			swipe_direction: "right",

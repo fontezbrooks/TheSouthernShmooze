@@ -68,10 +68,10 @@ export function MatchContactScreen() {
 			pending.card.confidence
 		);
 		if (res.ok) {
-			// The RPC returns only { status } — no lead id crosses the client
-			// boundary, so the task id stands in as the request identifier.
+			// Real lead row id from 0021 (dedupes/correlates against swipe_leads);
+			// task id only as a fallback under pre-0021 deploy skew.
 			track("shmoozer_match_triggered", {
-				concierge_request_id: pending.taskId,
+				concierge_request_id: res.data.leadId ?? pending.taskId,
 				pro_business_id: pending.card.sourceUid,
 			});
 			session.setMatchResult({

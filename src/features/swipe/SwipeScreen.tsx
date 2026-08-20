@@ -59,9 +59,9 @@ export function SwipeScreen() {
 		}
 		track("shmoozer_card_rendered", {
 			card_index: deck.cards.indexOf(current),
+			is_promoted: current.isFeatured,
 			pro_business_id: current.sourceUid,
 			pro_business_name: current.name,
-			pro_tier: current.isFeatured ? "featured" : undefined,
 		});
 	}, [current, deck.cards, track]);
 
@@ -99,8 +99,8 @@ export function SwipeScreen() {
 		}
 		swipeCount.current += 1;
 		track("shmoozer_card_swiped", {
+			is_promoted: card.isFeatured,
 			pro_business_id: card.sourceUid,
-			pro_tier: card.isFeatured ? "featured" : undefined,
 			session_swipe_count: swipeCount.current,
 			swipe_direction: "right",
 		});
@@ -115,8 +115,8 @@ export function SwipeScreen() {
 		swipeCount.current += 1;
 		if (current) {
 			track("shmoozer_card_swiped", {
+				is_promoted: current.isFeatured,
 				pro_business_id: current.sourceUid,
-				pro_tier: current.isFeatured ? "featured" : undefined,
 				session_swipe_count: swipeCount.current,
 				swipe_direction: "left",
 			});
