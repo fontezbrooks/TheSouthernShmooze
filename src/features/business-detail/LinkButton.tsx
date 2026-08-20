@@ -1,11 +1,11 @@
-import { Pressable, Text, StyleSheet } from "react-native";
-import { useTheme } from "@/theme/ThemeProvider";
+import { Pressable, StyleSheet, Text } from "react-native";
 import { Icon, type IconName } from "@/components/ui/Icon";
+import { useTheme } from "@/theme/ThemeProvider";
 
 interface LinkButtonProps {
-  icon: IconName;
-  label: string;
-  onPress: () => void;
+	icon: IconName;
+	label: string;
+	onPress: () => void;
 }
 
 /**
@@ -13,39 +13,37 @@ interface LinkButtonProps {
  * with the hard shadow — one visual for website, socials, and brand links.
  */
 export function LinkButton({ icon, label, onPress }: LinkButtonProps) {
-  const t = useTheme();
-  return (
-    <Pressable
-      accessibilityRole="link"
-      accessibilityLabel={label}
-      onPress={onPress}
-      style={[
-        styles.pill,
-        {
-          backgroundColor: t.brand.colors.surface,
-          borderColor: t.brand.colors.line,
-          borderRadius: t.brand.radii.pill,
-        },
-        t.brand.shadow.card,
-      ]}
-    >
-      <Icon name={icon} size={18} color={t.brand.colors.clay} />
-      <Text
-        style={[t.brand.typography.chip, { color: t.brand.colors.text }]}
-      >
-        {label}
-      </Text>
-    </Pressable>
-  );
+	const t = useTheme();
+	return (
+		<Pressable
+			accessibilityLabel={label}
+			accessibilityRole="link"
+			onPress={onPress}
+			style={[
+				styles.pill,
+				{
+					backgroundColor: t.brand.colors.surface,
+					borderColor: t.brand.colors.line,
+					borderRadius: t.brand.radii.pill,
+				},
+				t.brand.shadow.card,
+			]}
+		>
+			<Icon color={t.brand.colors.clay} name={icon} size={18} />
+			<Text style={[t.brand.typography.chip, { color: t.brand.colors.text }]}>
+				{label}
+			</Text>
+		</Pressable>
+	);
 }
 
 const styles = StyleSheet.create({
-  pill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    height: 40,
-    paddingHorizontal: 14,
-    borderWidth: StyleSheet.hairlineWidth,
-  },
+	pill: {
+		alignItems: "center",
+		borderWidth: StyleSheet.hairlineWidth,
+		flexDirection: "row",
+		gap: 6,
+		height: 40,
+		paddingHorizontal: 14,
+	},
 });

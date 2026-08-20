@@ -1,10 +1,10 @@
 import { randomUUID } from "expo-crypto";
-import { getSupabase } from "@/lib/supabase";
-import { ok, err, type Result } from "@/lib/result";
 import type { LeadInsert } from "@/lib/database";
+import { err, ok, type Result } from "@/lib/result";
+import { getSupabase } from "@/lib/supabase";
 import type {
-  ConciergeStepOneValues,
-  ConciergeStepTwoValues,
+	ConciergeStepOneValues,
+	ConciergeStepTwoValues,
 } from "./conciergeSchema";
 
 /** Postgres unique-violation (duplicate primary key). */
@@ -28,26 +28,26 @@ export const newSubmissionId = (): string => randomUUID();
  * attempt already committed and is treated as success.
  */
 export async function submitPartialLead(
-  values: ConciergeStepOneValues,
-  id: string,
+	values: ConciergeStepOneValues,
+	id: string
 ): Promise<Result<{ id: string }>> {
-  try {
-    const supabase = getSupabase();
-    const row: LeadInsert = {
-      id,
-      stage: "partial",
-      trade: values.trade,
-      zip: values.zip,
-      project_details: values.notes?.length ? values.notes : null,
-    };
-    const { error } = await supabase.from("leads").insert(row);
-    if (error && error.code !== PG_UNIQUE_VIOLATION) {
-      return err("Could not save your request. Please try again.");
-    }
-    return ok({ id });
-  } catch {
-    return err("Network error. Please check your connection and try again.");
-  }
+	try {
+		const supabase = getSupabase();
+		const row: LeadInsert = {
+			id,
+			project_details: values.notes?.length ? values.notes : null,
+			stage: "partial",
+			trade: values.trade,
+			zip: values.zip,
+		};
+		const { error } = await supabase.from("leads").insert(row);
+		if (error && error.code !== PG_UNIQUE_VIOLATION) {
+			return err("Could not save your request. Please try again.");
+		}
+		return ok({ id });
+	} catch {
+		return err("Network error. Please check your connection and try again.");
+	}
 }
 
 /**
@@ -60,42 +60,42 @@ export async function submitPartialLead(
  * row, no second owner email.
  */
 export async function submitConciergeLead(
-  stepOne: ConciergeStepOneValues,
-  stepTwo: ConciergeStepTwoValues,
-  partialId: string | null,
-  id: string,
+	stepOne: ConciergeStepOneValues,
+	stepTwo: ConciergeStepTwoValues,
+	partialId: string | null,
+	id: string
 ): Promise<Result<{ id: string }>> {
-  // Guard the id contract: reusing the partial row's id here would collide
-  // with its primary key and misread the 23505 as a committed completion
-  // (no complete row, no owner email, false success). Fail fast instead.
-  if (partialId !== null && id === partialId) {
-    return err(
-      "Something went wrong submitting your request. Please try again.",
-    );
-  }
-  try {
-    const supabase = getSupabase();
-    const row: LeadInsert = {
-      id,
-      stage: "complete",
-      trade: stepOne.trade,
-      zip: stepOne.zip,
-      project_details: stepOne.notes?.length ? stepOne.notes : null,
-      first_name: stepTwo.firstName,
-      last_name: stepTwo.lastName,
-      email: stepTwo.email,
-      phone: stepTwo.phone,
-      newsletter_opt_in: stepTwo.newsletterOptIn,
-      partial_id: partialId,
-    };
-    const { error } = await supabase.from("leads").insert(row);
-    if (error && error.code !== PG_UNIQUE_VIOLATION) {
-      return err(
-        "Something went wrong submitting your request. Please try again.",
-      );
-    }
-    return ok({ id });
-  } catch {
-    return err("Network error. Please check your connection and try again.");
-  }
+	// Guard the id contract: reusing the partial row's id here would collide
+	// with its primary key and misread the 23505 as a committed completion
+	// (no complete row, no owner email, false success). Fail fast instead.
+	if (partialId !== null && id === partialId) {
+		return err(
+			"Something went wrong submitting your request. Please try again."
+		);
+	}
+	try {
+		const supabase = getSupabase();
+		const row: LeadInsert = {
+			email: stepTwo.email,
+			first_name: stepTwo.firstName,
+			id,
+			last_name: stepTwo.lastName,
+			newsletter_opt_in: stepTwo.newsletterOptIn,
+			partial_id: partialId,
+			phone: stepTwo.phone,
+			project_details: stepOne.notes?.length ? stepOne.notes : null,
+			stage: "complete",
+			trade: stepOne.trade,
+			zip: stepOne.zip,
+		};
+		const { error } = await supabase.from("leads").insert(row);
+		if (error && error.code !== PG_UNIQUE_VIOLATION) {
+			return err(
+				"Something went wrong submitting your request. Please try again."
+			);
+		}
+		return ok({ id });
+	} catch {
+		return err("Network error. Please check your connection and try again.");
+	}
 }

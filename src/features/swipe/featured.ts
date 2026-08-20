@@ -17,33 +17,35 @@ export const FEATURED_EVERY_N = 5;
  * so the deck order IS the concierge routing order).
  */
 export function orderDeck(cards: DeckCard[]): DeckCard[] {
-  return interleaveFeatured(cards);
+	return interleaveFeatured(cards);
 }
 
 export function interleaveFeatured(
-  cards: DeckCard[],
-  everyN: number = FEATURED_EVERY_N,
+	cards: DeckCard[],
+	everyN: number = FEATURED_EVERY_N
 ): DeckCard[] {
-  const step = Math.max(1, Math.floor(everyN));
-  const featured = cards.filter((c) => c.isFeatured);
-  if (featured.length === 0) return [...cards];
-  const organic = cards.filter((c) => !c.isFeatured);
+	const step = Math.max(1, Math.floor(everyN));
+	const featured = cards.filter((c) => c.isFeatured);
+	if (featured.length === 0) {
+		return [...cards];
+	}
+	const organic = cards.filter((c) => !c.isFeatured);
 
-  const result: DeckCard[] = [];
-  let fi = 0;
-  let oi = 0;
-  let pos = 0;
-  while (fi < featured.length || oi < organic.length) {
-    const isSlot = pos % step === 0;
-    if (isSlot && fi < featured.length) {
-      result.push(featured[fi++]);
-    } else if (oi < organic.length) {
-      result.push(organic[oi++]);
-    } else {
-      // organic exhausted → append any remaining featured
-      result.push(featured[fi++]);
-    }
-    pos++;
-  }
-  return result;
+	const result: DeckCard[] = [];
+	let fi = 0;
+	let oi = 0;
+	let pos = 0;
+	while (fi < featured.length || oi < organic.length) {
+		const isSlot = pos % step === 0;
+		if (isSlot && fi < featured.length) {
+			result.push(featured[fi++]);
+		} else if (oi < organic.length) {
+			result.push(organic[oi++]);
+		} else {
+			// organic exhausted → append any remaining featured
+			result.push(featured[fi++]);
+		}
+		pos++;
+	}
+	return result;
 }

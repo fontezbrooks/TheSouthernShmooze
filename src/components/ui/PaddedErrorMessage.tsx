@@ -1,9 +1,9 @@
-import { View, Text, StyleSheet } from 'react-native';
-import { useTheme } from '@/theme/ThemeProvider';
-import { Icon } from './Icon';
+import { StyleSheet, Text, View } from "react-native";
+import { useTheme } from "@/theme/ThemeProvider";
+import { Icon } from "./Icon";
 
 interface PaddedErrorMessageProps {
-  message: string;
+	message: string;
 }
 
 /**
@@ -12,24 +12,29 @@ interface PaddedErrorMessageProps {
  * triangle icon + black caption text on a Vanilla background.
  */
 export function PaddedErrorMessage({ message }: PaddedErrorMessageProps) {
-  const t = useTheme();
-  return (
-    <View
-      accessibilityLiveRegion="polite"
-      style={[styles.box, { backgroundColor: t.colors.bg, borderRadius: t.radii.input }]}
-    >
-      <Icon name="triangleWarning" size={12} color={t.colors.error} />
-      <Text style={[t.typography.caption, { color: t.colors.black }]}>{message}</Text>
-    </View>
-  );
+	const t = useTheme();
+	return (
+		<View
+			accessibilityLiveRegion="polite"
+			style={[
+				styles.box,
+				{ backgroundColor: t.colors.bg, borderRadius: t.radii.input },
+			]}
+		>
+			<Icon color={t.colors.error} name="triangleWarning" size={12} />
+			<Text style={[t.typography.caption, { color: t.colors.black }]}>
+				{message}
+			</Text>
+		</View>
+	);
 }
 
 const styles = StyleSheet.create({
-  box: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-  },
+	box: {
+		alignItems: "center",
+		flexDirection: "row",
+		gap: 6,
+		paddingHorizontal: 12,
+		paddingVertical: 4,
+	},
 });

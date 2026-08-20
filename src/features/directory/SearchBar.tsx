@@ -1,13 +1,13 @@
 import {
-  View,
-  Text,
-  TextInput,
-  Pressable,
-  StyleSheet,
-  type ViewStyle,
+	Pressable,
+	StyleSheet,
+	Text,
+	TextInput,
+	View,
+	type ViewStyle,
 } from "react-native";
-import { useTheme } from "@/theme/ThemeProvider";
 import { Icon } from "@/components/ui/Icon";
+import { useTheme } from "@/theme/ThemeProvider";
 
 const PLACEHOLDER = "Search by service type...";
 
@@ -16,60 +16,63 @@ const PLACEHOLDER = "Search by service type...";
  * soft brand card shadow — replaces the legacy 4px hard-offset shell.
  */
 function Shell({
-  children,
-  pressableProps,
+	children,
+	pressableProps,
 }: {
-  children: React.ReactNode;
-  pressableProps?: { onPress: () => void; accessibilityLabel: string };
+	children: React.ReactNode;
+	pressableProps?: { onPress: () => void; accessibilityLabel: string };
 }) {
-  const t = useTheme();
-  const pill: ViewStyle[] = [
-    styles.pill,
-    t.brand.shadow.card,
-    { backgroundColor: t.brand.colors.surface, borderColor: t.brand.colors.line },
-  ];
-  return (
-    <View style={styles.outer}>
-      {pressableProps ? (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={pressableProps.accessibilityLabel}
-          onPress={pressableProps.onPress}
-          style={pill}
-        >
-          {children}
-        </Pressable>
-      ) : (
-        <View style={pill}>{children}</View>
-      )}
-    </View>
-  );
+	const t = useTheme();
+	const pill: ViewStyle[] = [
+		styles.pill,
+		t.brand.shadow.card,
+		{
+			backgroundColor: t.brand.colors.surface,
+			borderColor: t.brand.colors.line,
+		},
+	];
+	return (
+		<View style={styles.outer}>
+			{pressableProps ? (
+				<Pressable
+					accessibilityLabel={pressableProps.accessibilityLabel}
+					accessibilityRole="button"
+					onPress={pressableProps.onPress}
+					style={pill}
+				>
+					{children}
+				</Pressable>
+			) : (
+				<View style={pill}>{children}</View>
+			)}
+		</View>
+	);
 }
 
 /** Filled circle-with-X clear control (Figma `circleWithXFilled`). */
 function ClearButton({ onPress }: { onPress: () => void }) {
-  const t = useTheme();
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel="Clear search"
-      hitSlop={8}
-      onPress={onPress}
-      style={[styles.clear, { backgroundColor: t.colors.neutral500 }]}
-    >
-      <Icon name="x" size={12} color={t.colors.white} />
-    </Pressable>
-  );
+	const t = useTheme();
+	return (
+		<Pressable
+			accessibilityLabel="Clear search"
+			accessibilityRole="button"
+			hitSlop={8}
+			onPress={onPress}
+			style={[styles.clear, { backgroundColor: t.colors.neutral500 }]}
+		>
+			<Icon color={t.colors.white} name="x" size={12} />
+		</Pressable>
+	);
 }
 
 interface SearchBarProps {
-  value: string;
-  onChangeText: (text: string) => void;
-  onFocus?: () => void;
-  onBlur?: () => void;
-  onClear?: () => void;
-  /** Ref to the underlying input so callers can focus it (e.g. arriving from Home). */
-  inputRef?: React.RefObject<TextInput | null>;
+	/** Ref to the underlying input so callers can focus it (e.g. arriving from Home). */
+	inputRef?: React.RefObject<TextInput | null>;
+	onBlur?: () => void;
+	onChangeText: (text: string) => void;
+	onClear?: () => void;
+	onFocus?: () => void;
+	value: string;
 }
 
 /**
@@ -78,45 +81,45 @@ interface SearchBarProps {
  * filled circle-X clear once populated. Controlled by the parent.
  */
 export function SearchBar({
-  value,
-  onChangeText,
-  onFocus,
-  onBlur,
-  onClear,
-  inputRef,
+	value,
+	onChangeText,
+	onFocus,
+	onBlur,
+	onClear,
+	inputRef,
 }: SearchBarProps) {
-  const t = useTheme();
-  return (
-    <Shell>
-      <Icon name="search" size={18} color={t.brand.colors.clay} />
-      <TextInput
-        ref={inputRef}
-        style={[
-          t.brand.typography.body,
-          styles.input,
-          { color: t.brand.colors.text },
-        ]}
-        value={value}
-        onChangeText={onChangeText}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        placeholder={PLACEHOLDER}
-        placeholderTextColor={t.brand.colors.textSoft}
-        returnKeyType="search"
-        autoCorrect={false}
-        autoCapitalize="none"
-        accessibilityLabel="Search the registry"
-      />
-      {value.length > 0 ? (
-        <ClearButton
-          onPress={() => {
-            onChangeText("");
-            onClear?.();
-          }}
-        />
-      ) : null}
-    </Shell>
-  );
+	const t = useTheme();
+	return (
+		<Shell>
+			<Icon color={t.brand.colors.clay} name="search" size={18} />
+			<TextInput
+				accessibilityLabel="Search the registry"
+				autoCapitalize="none"
+				autoCorrect={false}
+				onBlur={onBlur}
+				onChangeText={onChangeText}
+				onFocus={onFocus}
+				placeholder={PLACEHOLDER}
+				placeholderTextColor={t.brand.colors.textSoft}
+				ref={inputRef}
+				returnKeyType="search"
+				style={[
+					t.brand.typography.body,
+					styles.input,
+					{ color: t.brand.colors.text },
+				]}
+				value={value}
+			/>
+			{value.length > 0 ? (
+				<ClearButton
+					onPress={() => {
+						onChangeText("");
+						onClear?.();
+					}}
+				/>
+			) : null}
+		</Shell>
+	);
 }
 
 /**
@@ -124,52 +127,52 @@ export function SearchBar({
  * entry point — "another option for the same route", no in-place search).
  */
 export function SearchBarButton({ onPress }: { onPress: () => void }) {
-  const t = useTheme();
-  return (
-    <Shell
-      pressableProps={{ onPress, accessibilityLabel: "Search the registry" }}
-    >
-      <Icon name="search" size={18} color={t.brand.colors.clay} />
-      <Text
-        style={[
-          t.brand.typography.body,
-          styles.input,
-          { color: t.brand.colors.textSoft },
-        ]}
-      >
-        {PLACEHOLDER}
-      </Text>
-    </Shell>
-  );
+	const t = useTheme();
+	return (
+		<Shell
+			pressableProps={{ accessibilityLabel: "Search the registry", onPress }}
+		>
+			<Icon color={t.brand.colors.clay} name="search" size={18} />
+			<Text
+				style={[
+					t.brand.typography.body,
+					styles.input,
+					{ color: t.brand.colors.textSoft },
+				]}
+			>
+				{PLACEHOLDER}
+			</Text>
+		</Shell>
+	);
 }
 
 const styles = StyleSheet.create({
-  outer: { position: "relative", width: "100%" },
-  pill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    height: 48,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderRadius: 999,
-  },
-  // Center the text in the 48px pill: no default vertical padding, lineHeight
-  // tightened below the 24px body token (which sat the text low) but ABOVE the
-  // font size — a 16px line box clipped the font's ascenders at the top
-  // (device report). Listed AFTER t.typography.body so the override wins.
-  input: {
-    flex: 1,
-    paddingVertical: 0,
-    lineHeight: 20,
-    textAlignVertical: "center",
-    includeFontPadding: false,
-  },
-  clear: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+	clear: {
+		alignItems: "center",
+		borderRadius: 9,
+		height: 18,
+		justifyContent: "center",
+		width: 18,
+	},
+	// Center the text in the 48px pill: no default vertical padding, lineHeight
+	// tightened below the 24px body token (which sat the text low) but ABOVE the
+	// font size — a 16px line box clipped the font's ascenders at the top
+	// (device report). Listed AFTER t.typography.body so the override wins.
+	input: {
+		flex: 1,
+		includeFontPadding: false,
+		lineHeight: 20,
+		paddingVertical: 0,
+		textAlignVertical: "center",
+	},
+	outer: { position: "relative", width: "100%" },
+	pill: {
+		alignItems: "center",
+		borderRadius: 999,
+		borderWidth: 1,
+		flexDirection: "row",
+		gap: 6,
+		height: 48,
+		paddingHorizontal: 12,
+	},
 });

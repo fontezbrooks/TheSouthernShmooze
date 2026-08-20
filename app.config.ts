@@ -1,4 +1,4 @@
-import type { ExpoConfig, ConfigContext } from "expo/config";
+import type { ConfigContext, ExpoConfig } from "expo/config";
 
 /**
  * Expo app configuration.
@@ -9,58 +9,58 @@ import type { ExpoConfig, ConfigContext } from "expo/config";
  * runtime in `src/lib/supabase.ts`.
  */
 export default ({ config }: ConfigContext): ExpoConfig => ({
-  ...config,
-  name: "The Southern Shmooze",
-  owner: "carlhiggins",
-  slug: "thesouthernshmooze",
-  icon: "./assets/icon.png",
-  scheme: "shmooze",
-  version: "1.0.0",
-  orientation: "portrait",
-  userInterfaceStyle: "light",
-  ios: {
-    supportsTablet: true,
-    bundleIdentifier: "com.thesouthernshmooze.app",
-    infoPlist: {
-      ITSAppUsesNonExemptEncryption: false,
-    },
-  },
-  android: {
-    package: "com.thesouthernshmooze.app",
-  },
-  web: {
-    bundler: "metro",
-    output: "static",
-  },
-  plugins: [
-    "expo-router",
-    "expo-font",
-    [
-      "expo-splash-screen",
-      {
-        // Native launch screen — matches the in-app AnimatedSplash's first frame
-        // (mascot on Vanilla cream) so the OS splash → JS splash handoff is seamless.
-        image: "./assets/splash.png",
-        backgroundColor: "#FFF8EA",
-        imageWidth: 220,
-      },
-    ],
-    "@react-native-community/datetimepicker",
-    "expo-web-browser",
-  ],
-  experiments: {
-    typedRoutes: true,
-  },
-  extra: {
-    supabaseUrl:
-      process.env.EXPO_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL ?? "",
-    supabaseAnonKey:
-      process.env.EXPO_PUBLIC_SUPABASE_KEY ??
-      process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ??
-      process.env.SUPABASE_ANON_KEY ??
-      "",
-    eas: {
-      projectId: "d0d1c671-c2a2-4691-8e6f-943b06100833",
-    },
-  },
+	...config,
+	android: {
+		package: "com.thesouthernshmooze.app",
+	},
+	experiments: {
+		typedRoutes: true,
+	},
+	extra: {
+		eas: {
+			projectId: "d0d1c671-c2a2-4691-8e6f-943b06100833",
+		},
+		supabaseAnonKey:
+			process.env.EXPO_PUBLIC_SUPABASE_KEY ??
+			process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ??
+			process.env.SUPABASE_ANON_KEY ??
+			"",
+		supabaseUrl:
+			process.env.EXPO_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL ?? "",
+	},
+	icon: "./assets/icon.png",
+	ios: {
+		bundleIdentifier: "com.thesouthernshmooze.app",
+		infoPlist: {
+			ITSAppUsesNonExemptEncryption: false,
+		},
+		supportsTablet: true,
+	},
+	name: "The Southern Shmooze",
+	orientation: "portrait",
+	owner: "carlhiggins",
+	plugins: [
+		"expo-router",
+		"expo-font",
+		[
+			"expo-splash-screen",
+			{
+				backgroundColor: "#FFF8EA",
+				// Native launch screen — matches the in-app AnimatedSplash's first frame
+				// (mascot on Vanilla cream) so the OS splash → JS splash handoff is seamless.
+				image: "./assets/splash.png",
+				imageWidth: 220,
+			},
+		],
+		"@react-native-community/datetimepicker",
+		"expo-web-browser",
+	],
+	scheme: "shmooze",
+	slug: "thesouthernshmooze",
+	userInterfaceStyle: "light",
+	version: "1.0.0",
+	web: {
+		bundler: "metro",
+		output: "static",
+	},
 });

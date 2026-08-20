@@ -1,4 +1,4 @@
-import { type TextStyle, type StyleProp } from "react-native";
+import type { StyleProp, TextStyle } from "react-native";
 import { useTheme } from "@/theme/ThemeProvider";
 import { heading } from "@/theme/tokens";
 import { StrokedText } from "./StrokedText";
@@ -6,13 +6,13 @@ import { StrokedText } from "./StrokedText";
 type DisplayVariant = "displayL" | "displayS" | "displayXS";
 
 interface StrokedHeadingProps {
-  variant: DisplayVariant;
-  children: string;
-  /** Fill color (defaults to the variant's color). */
-  color?: string;
-  strokeColor?: string;
-  strokeWidth?: number;
-  style?: StyleProp<TextStyle>;
+	children: string;
+	/** Fill color (defaults to the variant's color). */
+	color?: string;
+	strokeColor?: string;
+	strokeWidth?: number;
+	style?: StyleProp<TextStyle>;
+	variant: DisplayVariant;
 }
 
 /**
@@ -22,21 +22,21 @@ interface StrokedHeadingProps {
  * NOTE: stroke color/width come from `heading` tokens — pending exact Figma spec.
  */
 export function StrokedHeading({
-  variant,
-  children,
-  color,
-  strokeColor = heading.strokeColor,
-  strokeWidth = heading.strokeWidth,
-  style,
+	variant,
+	children,
+	color,
+	strokeColor = heading.strokeColor,
+	strokeWidth = heading.strokeWidth,
+	style,
 }: StrokedHeadingProps) {
-  const t = useTheme();
-  return (
-    <StrokedText
-      style={[t.typography[variant], color ? { color } : null, style]}
-      strokeColor={strokeColor}
-      strokeWidth={strokeWidth}
-    >
-      {children}
-    </StrokedText>
-  );
+	const t = useTheme();
+	return (
+		<StrokedText
+			strokeColor={strokeColor}
+			strokeWidth={strokeWidth}
+			style={[t.typography[variant], color ? { color } : null, style]}
+		>
+			{children}
+		</StrokedText>
+	);
 }

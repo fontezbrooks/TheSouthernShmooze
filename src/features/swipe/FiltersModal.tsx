@@ -1,13 +1,13 @@
 import { CenteredSheet } from "./CenteredSheet";
-import { TaskIntake } from "./TaskIntake";
 import type { SwipeTask } from "./swipeTypes";
+import { TaskIntake } from "./TaskIntake";
 
 interface FiltersModalProps {
-  visible: boolean;
-  /** The current search to prefill (keyword + radius + budget + timing). */
-  current: SwipeTask | null;
-  onClose: () => void;
-  onApply: (task: SwipeTask) => void;
+	/** The current search to prefill (keyword + radius + budget + timing). */
+	current: SwipeTask | null;
+	onApply: (task: SwipeTask) => void;
+	onClose: () => void;
+	visible: boolean;
 }
 
 /**
@@ -15,21 +15,21 @@ interface FiltersModalProps {
  * current choices. Applying replaces the task, which re-runs the deck with new matches.
  */
 export function FiltersModal({
-  visible,
-  current,
-  onClose,
-  onApply,
+	visible,
+	current,
+	onClose,
+	onApply,
 }: FiltersModalProps) {
-  return (
-    <CenteredSheet visible={visible} onClose={onClose}>
-      {/* Keyed by open state so it re-inits from `current` each time it opens. */}
-      <TaskIntake
-        key={visible ? "filters-open" : "filters-closed"}
-        initial={current}
-        heading="What are you looking for?"
-        submitLabel="Find my match"
-        onSubmit={onApply}
-      />
-    </CenteredSheet>
-  );
+	return (
+		<CenteredSheet onClose={onClose} visible={visible}>
+			{/* Keyed by open state so it re-inits from `current` each time it opens. */}
+			<TaskIntake
+				heading="What are you looking for?"
+				initial={current}
+				key={visible ? "filters-open" : "filters-closed"}
+				onSubmit={onApply}
+				submitLabel="Find my match"
+			/>
+		</CenteredSheet>
+	);
 }

@@ -6,97 +6,96 @@ import { brandColors, brandFonts, colors, fonts } from "./tokens";
  * Display = Shrikhand (italic), body/labels = Bitter, tab label = Open Sans.
  */
 export const typography = {
-  // Shrikhand is a heavy italic display face with tall ascenders. lineHeight ≈ fontSize
-  // clips the tops of glyphs (the "h"/"l"/"d") on iOS, so display line heights carry
-  // ~1.25-1.3x headroom. StrokedHeading draws all copies from the same metrics, so its
-  // stroke/fill stay aligned. (Figma line heights were near-1.0 — visually too tight here.)
-  /** Header L — Concierge title. */
-  displayL: {
-    fontFamily: fonts.display,
-    fontStyle: "italic",
-    fontSize: 56,
-    lineHeight: 72,
-    letterSpacing: -0.56,
-    color: colors.text,
-  },
-  /** Header S — banner titles. */
-  displayS: {
-    fontFamily: fonts.display,
-    fontStyle: "italic",
-    fontSize: 32,
-    lineHeight: 42,
-    letterSpacing: -0.32,
-    color: colors.text,
-  },
-  /** Header XS — section headers ("Certified Providers"). */
-  displayXS: {
-    fontFamily: fonts.display,
-    fontStyle: "italic",
-    fontSize: 24,
-    lineHeight: 31,
-    letterSpacing: -0.24,
-    color: colors.text,
-  },
+	/** Body Regular. */
+	body: {
+		color: colors.text,
+		fontFamily: fonts.body,
+		fontSize: 16,
+		lineHeight: 24,
+	},
+	/** Body Semibold — Button Full label. */
+	bodySemibold: {
+		color: colors.text,
+		fontFamily: fonts.bodySemi,
+		fontSize: 16,
+		lineHeight: 24,
+	},
+	/** Caption Regular. */
+	caption: {
+		color: colors.text,
+		fontFamily: fonts.body,
+		fontSize: 12,
+		lineHeight: 18,
+	},
+	/** Caption Semibold — Button S label, inside-input label. */
+	captionSemi: {
+		color: colors.text,
+		fontFamily: fonts.bodySemi,
+		fontSize: 12,
+		lineHeight: 18,
+	},
+	/** Caption XS Semibold — chip labels ("Certified"). */
+	captionSemiXS: {
+		color: colors.text,
+		fontFamily: fonts.bodySemi,
+		fontSize: 10,
+		lineHeight: 15,
+	},
 
-  /** Body Regular. */
-  body: {
-    fontFamily: fonts.body,
-    fontSize: 16,
-    lineHeight: 24,
-    color: colors.text,
-  },
-  /** Body Semibold — Button Full label. */
-  bodySemibold: {
-    fontFamily: fonts.bodySemi,
-    fontSize: 16,
-    lineHeight: 24,
-    color: colors.text,
-  },
+	/** Caption Bold — business card name. */
+	cardTitle: {
+		color: colors.text,
+		fontFamily: fonts.bodyBold,
+		fontSize: 12,
+		lineHeight: 18,
+	},
+	// Shrikhand is a heavy italic display face with tall ascenders. lineHeight ≈ fontSize
+	// clips the tops of glyphs (the "h"/"l"/"d") on iOS, so display line heights carry
+	// ~1.25-1.3x headroom. StrokedHeading draws all copies from the same metrics, so its
+	// stroke/fill stay aligned. (Figma line heights were near-1.0 — visually too tight here.)
+	/** Header L — Concierge title. */
+	displayL: {
+		color: colors.text,
+		fontFamily: fonts.display,
+		fontSize: 56,
+		fontStyle: "italic",
+		letterSpacing: -0.56,
+		lineHeight: 72,
+	},
+	/** Header S — banner titles. */
+	displayS: {
+		color: colors.text,
+		fontFamily: fonts.display,
+		fontSize: 32,
+		fontStyle: "italic",
+		letterSpacing: -0.32,
+		lineHeight: 42,
+	},
+	/** Header XS — section headers ("Certified Providers"). */
+	displayXS: {
+		color: colors.text,
+		fontFamily: fonts.display,
+		fontSize: 24,
+		fontStyle: "italic",
+		letterSpacing: -0.24,
+		lineHeight: 31,
+	},
 
-  /** Caption Bold — business card name. */
-  cardTitle: {
-    fontFamily: fonts.bodyBold,
-    fontSize: 12,
-    lineHeight: 18,
-    color: colors.text,
-  },
-  /** Caption Regular. */
-  caption: {
-    fontFamily: fonts.body,
-    fontSize: 12,
-    lineHeight: 18,
-    color: colors.text,
-  },
-  /** Caption Semibold — Button S label, inside-input label. */
-  captionSemi: {
-    fontFamily: fonts.bodySemi,
-    fontSize: 12,
-    lineHeight: 18,
-    color: colors.text,
-  },
-  /** Caption XS Semibold — chip labels ("Certified"). */
-  captionSemiXS: {
-    fontFamily: fonts.bodySemi,
-    fontSize: 10,
-    lineHeight: 15,
-    color: colors.text,
-  },
+	/** Body XS Semibold — "See More". */
+	seeMore: {
+		color: colors.text,
+		fontFamily: fonts.bodySemi,
+		fontSize: 14,
+		lineHeight: 21,
+	},
 
-  /** Body XS Semibold — "See More". */
-  seeMore: {
-    fontFamily: fonts.bodySemi,
-    fontSize: 14,
-    lineHeight: 21,
-    color: colors.text,
-  },
-
-  /** Tab bar label — Bitter SemiBold 10/1.5 (RC1 NavBar). */
-  tab: {
-    fontFamily: fonts.tab,
-    fontSize: 10,
-    lineHeight: 15,
-    color: colors.rust,
-  },
+	/** Tab bar label — Bitter SemiBold 10/1.5 (RC1 NavBar). */
+	tab: {
+		color: colors.rust,
+		fontFamily: fonts.tab,
+		fontSize: 10,
+		lineHeight: 15,
+	},
 } satisfies Record<string, TextStyle>;
 
 export type TypographyVariant = keyof typeof typography;
@@ -110,82 +109,81 @@ export type TypographyVariant = keyof typeof typography;
  * ------------------------------------------------------------------------- */
 
 export const brandTypography = {
-  /** Hero — screen-level headline (site H1). */
-  displayXL: {
-    fontFamily: brandFonts.display,
-    fontSize: 40,
-    lineHeight: 46,
-    letterSpacing: -0.4,
-    color: brandColors.text,
-  },
-  /** Section headline (site H2). */
-  displayL: {
-    fontFamily: brandFonts.display,
-    fontSize: 30,
-    lineHeight: 35,
-    letterSpacing: -0.3,
-    color: brandColors.text,
-  },
-  /** Sub-section headline. */
-  displayM: {
-    fontFamily: brandFonts.display,
-    fontSize: 24,
-    lineHeight: 29,
-    color: brandColors.text,
-  },
-  /** Card/feature title (site H3). */
-  displayS: {
-    fontFamily: brandFonts.display,
-    fontSize: 18,
-    lineHeight: 23,
-    color: brandColors.text,
-  },
+	/** Handwritten accent — porch-note flourishes. */
+	accent: {
+		color: brandColors.text,
+		fontFamily: brandFonts.accent,
+		fontSize: 22,
+		lineHeight: 28,
+	},
 
-  /** Body Regular. */
-  body: {
-    fontFamily: brandFonts.body,
-    fontSize: 16,
-    lineHeight: 24,
-    color: brandColors.textSoft,
-  },
-  /** Body emphasized. */
-  bodySemi: {
-    fontFamily: brandFonts.bodySemi,
-    fontSize: 16,
-    lineHeight: 24,
-    color: brandColors.text,
-  },
+	/** Body Regular. */
+	body: {
+		color: brandColors.textSoft,
+		fontFamily: brandFonts.body,
+		fontSize: 16,
+		lineHeight: 24,
+	},
+	/** Body emphasized. */
+	bodySemi: {
+		color: brandColors.text,
+		fontFamily: brandFonts.bodySemi,
+		fontSize: 16,
+		lineHeight: 24,
+	},
 
-  /** Button label — Public Sans bold, pairs with pill radius. */
-  button: {
-    fontFamily: brandFonts.bodyBold,
-    fontSize: 15,
-    lineHeight: 20,
-    color: brandColors.bg,
-  },
+	/** Button label — Public Sans bold, pairs with pill radius. */
+	button: {
+		color: brandColors.bg,
+		fontFamily: brandFonts.bodyBold,
+		fontSize: 15,
+		lineHeight: 20,
+	},
 
-  /** Caption / meta. */
-  caption: {
-    fontFamily: brandFonts.body,
-    fontSize: 12,
-    lineHeight: 18,
-    color: brandColors.textSoft,
-  },
-  /** Chip/badge label. */
-  chip: {
-    fontFamily: brandFonts.bodyBold,
-    fontSize: 11,
-    lineHeight: 14,
-    color: brandColors.text,
-  },
-
-  /** Handwritten accent — porch-note flourishes. */
-  accent: {
-    fontFamily: brandFonts.accent,
-    fontSize: 22,
-    lineHeight: 28,
-    color: brandColors.text,
-  },
+	/** Caption / meta. */
+	caption: {
+		color: brandColors.textSoft,
+		fontFamily: brandFonts.body,
+		fontSize: 12,
+		lineHeight: 18,
+	},
+	/** Chip/badge label. */
+	chip: {
+		color: brandColors.text,
+		fontFamily: brandFonts.bodyBold,
+		fontSize: 11,
+		lineHeight: 14,
+	},
+	/** Section headline (site H2). */
+	displayL: {
+		color: brandColors.text,
+		fontFamily: brandFonts.display,
+		fontSize: 30,
+		letterSpacing: -0.3,
+		lineHeight: 35,
+	},
+	/** Sub-section headline. */
+	displayM: {
+		color: brandColors.text,
+		fontFamily: brandFonts.display,
+		fontSize: 24,
+		lineHeight: 29,
+	},
+	/** Card/feature title (site H3). */
+	displayS: {
+		color: brandColors.text,
+		fontFamily: brandFonts.display,
+		fontSize: 18,
+		lineHeight: 23,
+	},
+	/** Hero — screen-level headline (site H1). */
+	displayXL: {
+		color: brandColors.text,
+		fontFamily: brandFonts.display,
+		fontSize: 40,
+		letterSpacing: -0.4,
+		lineHeight: 46,
+	},
 } satisfies Record<string, TextStyle>;
 
 export type BrandTypographyVariant = keyof typeof brandTypography;

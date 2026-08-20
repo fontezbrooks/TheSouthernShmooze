@@ -10,33 +10,39 @@ import type { SeekerContact } from "./swipeTypes";
 const FILE_NAME = "shmoozer-session.json";
 
 export interface StoredSession {
-  sessionToken: string;
-  contact: SeekerContact | null;
+	contact: SeekerContact | null;
+	sessionToken: string;
 }
 
 function sessionFile(): File {
-  return new File(Paths.document, FILE_NAME);
+	return new File(Paths.document, FILE_NAME);
 }
 
 export async function loadSession(): Promise<StoredSession | null> {
-  try {
-    const file = sessionFile();
-    if (!file.exists) return null;
-    const text = await file.text();
-    const parsed = JSON.parse(text) as StoredSession;
-    if (!parsed?.sessionToken) return null;
-    return parsed;
-  } catch {
-    return null;
-  }
+	try {
+		const file = sessionFile();
+		if (!file.exists) {
+			return null;
+		}
+		const text = await file.text();
+		const parsed = JSON.parse(text) as StoredSession;
+		if (!parsed?.sessionToken) {
+			return null;
+		}
+		return parsed;
+	} catch {
+		return null;
+	}
 }
 
 export async function saveSession(session: StoredSession): Promise<void> {
-  try {
-    const file = sessionFile();
-    if (!file.exists) file.create();
-    file.write(JSON.stringify(session));
-  } catch {
-    // best-effort: persistence is a nicety, not a requirement for the flow
-  }
+	try {
+		const file = sessionFile();
+		if (!file.exists) {
+			file.create();
+		}
+		file.write(JSON.stringify(session));
+	} catch {
+		// best-effort: persistence is a nicety, not a requirement for the flow
+	}
 }
