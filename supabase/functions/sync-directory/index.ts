@@ -148,7 +148,11 @@ Deno.serve(async (req: Request) => {
 	if (data?.status === "skipped_guard") {
 		await captureSync("failed", 0);
 	} else {
-		await captureSync("success", fetched.records.length);
+		// records_ingested = records the sync actually CHANGED (taxonomy:
+		// "records updated during the sync") — the RPC skips unchanged rows,
+		// so the full feed size would report ~184 on a no-op run
+		// (review: PR #45).
+		await captureSync("success", (data?.added ?? 0) + (data?.updated ?? 0));
 	}
 	return json(200, {
 		...data,
