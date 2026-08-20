@@ -1,10 +1,11 @@
 # Pre-commit: format+lint ONLY the staged files (ultracite = biome).
 # Hooks are installed by the package.json postinstall on `bun install`;
 # CI and EAS builds skip installation entirely (guard in that script).
+# Partially-staged files are SKIPPED by the script, never re-staged —
+# see scripts/format-staged.sh.
 pre-commit:
   parallel: true
   jobs:
     - name: ultracite
-      run: bunx ultracite fix {staged_files}
+      run: bash scripts/format-staged.sh {staged_files}
       glob: "*.{ts,tsx,js,jsx,json,md}"
-      stage_fixed: true
