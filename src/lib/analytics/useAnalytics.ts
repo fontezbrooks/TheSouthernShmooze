@@ -1,3 +1,4 @@
+import { PostHogPersistedProperty } from "posthog-react-native";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { AnalyticsContext } from "./AnalyticsProvider";
 import type {
@@ -5,6 +6,8 @@ import type {
 	AnalyticsEventName,
 	IdentifyProperties,
 } from "./events";
+
+export type AnalyticsAudience = IdentifyProperties["user_type"];
 
 export interface Analytics {
 	/**
@@ -20,6 +23,13 @@ export interface Analytics {
 	 * person, so nothing is lost.
 	 */
 	resetIdentity: () => void;
+	/**
+	 * Audience-boundary reset (review: PR #44): entering a funnel drops the
+	 * identity ONLY when the device is identified as a DIFFERENT (or
+	 * unknown) audience. Same-audience re-entry keeps the person — repeat
+	 * usage continuity is the point of identify.
+	 */
+	resetIdentityForAudience: (entering: AnalyticsAudience) => void;
 	/**
 	 * The CURRENT PostHog session id (rotates after backgrounding
 	 * inactivity), or null when capture is disabled. Session-scoped metrics
@@ -67,6 +77,13 @@ export function useAnalytics(): Analytics {
 			// distinct id alone doesn't create an `email` person property —
 			// the taxonomy's $set email (CSV row 1) must be set explicitly.
 			client.identify(id, { ...properties, email: id });
+			// Persisted super prop so resetIdentityForAudience can tell WHICH
+			// audience this device is identified as, across app restarts.
+			// reset() clears it along with the identity. Fire-and-forget —
+			// a persistence failure only costs the audience hint.
+			client.register({ user_type: properties.user_type }).catch(() => {
+				/* best effort */
+			});
 		},
 		[client]
 	);
@@ -79,11 +96,36 @@ export function useAnalytics(): Analytics {
 			client.reset();
 		}
 	}, [client]);
+	const resetIdentityForAudience = useCallback<
+		Analytics["resetIdentityForAudience"]
+	>(
+		(entering) => {
+			if (!client?.getDistinctId().includes("@")) {
+				return;
+			}
+			const props = client.getPersistedProperty<Record<string, unknown>>(
+				PostHogPersistedProperty.Props
+			);
+			// An unknown audience (identified before the register call
+			// existed, cleared storage) counts as a mismatch — resetting is
+			// the safe default for a shared device.
+			if (props?.user_type !== entering) {
+				client.reset();
+			}
+		},
+		[client]
+	);
 	const sessionKey = useCallback<Analytics["sessionKey"]>(
 		() => (client ? client.getSessionId() : null),
 		[client]
 	);
-	return { identify, resetIdentity, sessionKey, track };
+	return {
+		identify,
+		resetIdentity,
+		resetIdentityForAudience,
+		sessionKey,
+		track,
+	};
 }
 
 /**

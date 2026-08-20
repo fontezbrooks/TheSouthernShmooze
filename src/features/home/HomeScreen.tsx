@@ -19,7 +19,7 @@ import SmilyPeachLogo from "./smily-peach.svg";
 export function HomeScreen() {
 	const t = useTheme();
 	const router = useRouter();
-	const { resetIdentity, track } = useAnalytics();
+	const { resetIdentityForAudience, track } = useAnalytics();
 
 	const callBusiness = (phone: string) => openLink(`tel:${phone}`);
 
@@ -76,9 +76,10 @@ export function HomeScreen() {
 					layout="titleRow"
 					onPress={() => {
 						// Audience boundary (review: PR #44): a device identified as a
-						// previous submitter must not attribute the contractor funnel
+						// DIFFERENT audience must not attribute the contractor funnel
 						// to that person — drop to anonymous BEFORE the entry event.
-						resetIdentity();
+						// A returning contractor keeps their identity.
+						resetIdentityForAudience("contractor");
 						track("contractor_portal_started", { entry_point: "home_banner" });
 						router.push("/contractor-wizard");
 					}}

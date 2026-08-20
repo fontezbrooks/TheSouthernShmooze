@@ -20,11 +20,13 @@ function makeClient(): PostHog {
 		debug: jest.fn(),
 		getDistinctId: jest.fn().mockReturnValue("0a1b2c3d-anon-uuid"),
 		getFeatureFlag: jest.fn().mockReturnValue(true),
+		getPersistedProperty: jest.fn(),
 		getSessionId: jest.fn().mockReturnValue("ph-session-1"),
 		identify: jest.fn(),
 		onFeatureFlags: jest.fn().mockReturnValue(() => {
 			/* unsubscribe */
 		}),
+		register: jest.fn().mockResolvedValue(undefined),
 		reset: jest.fn(),
 		screen: jest.fn(),
 	} as unknown as PostHog;
@@ -197,6 +199,65 @@ describe("useAnalytics", () => {
 		});
 		idHook.result.current.resetIdentity();
 		expect(identified.reset).toHaveBeenCalledTimes(1);
+	});
+
+	test("identify registers the audience as a persisted super prop (PR #44)", async () => {
+		const client = makeClient();
+		const { result } = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(client),
+		});
+		result.current.identify("pro@example.com", { user_type: "contractor" });
+		expect(client.register).toHaveBeenCalledWith({ user_type: "contractor" });
+	});
+
+	test("resetIdentityForAudience drops only a DIFFERENT-audience identity (PR #44)", async () => {
+		const bare = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(null),
+		});
+		expect(() =>
+			bare.result.current.resetIdentityForAudience("homeowner")
+		).not.toThrow();
+
+		// Anonymous device: nothing to drop.
+		const anon = makeClient();
+		const anonHook = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(anon),
+		});
+		anonHook.result.current.resetIdentityForAudience("contractor");
+		expect(anon.reset).not.toHaveBeenCalled();
+
+		// Same audience returning: identity (and continuity) kept.
+		const same = makeClient();
+		(same.getDistinctId as jest.Mock).mockReturnValue("h@x.com");
+		(same.getPersistedProperty as jest.Mock).mockReturnValue({
+			user_type: "homeowner",
+		});
+		const sameHook = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(same),
+		});
+		sameHook.result.current.resetIdentityForAudience("homeowner");
+		expect(same.reset).not.toHaveBeenCalled();
+
+		// Cross-audience entry: dropped.
+		const cross = makeClient();
+		(cross.getDistinctId as jest.Mock).mockReturnValue("pro@x.com");
+		(cross.getPersistedProperty as jest.Mock).mockReturnValue({
+			user_type: "contractor",
+		});
+		const crossHook = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(cross),
+		});
+		crossHook.result.current.resetIdentityForAudience("homeowner");
+		expect(cross.reset).toHaveBeenCalledTimes(1);
+
+		// Unknown audience: mismatch by default — dropped.
+		const unknown = makeClient();
+		(unknown.getDistinctId as jest.Mock).mockReturnValue("who@x.com");
+		const unknownHook = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(unknown),
+		});
+		unknownHook.result.current.resetIdentityForAudience("homeowner");
+		expect(unknown.reset).toHaveBeenCalledTimes(1);
 	});
 
 	test("identify normalizes the distinct id (trim + lowercase)", async () => {

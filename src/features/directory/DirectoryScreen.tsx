@@ -34,7 +34,7 @@ import { useDirectorySearch } from "./useDirectorySearch";
 export function DirectoryScreen() {
 	const t = useTheme();
 	const router = useRouter();
-	const { resetIdentity, track } = useAnalytics();
+	const { resetIdentityForAudience, track } = useAnalytics();
 	const insets = useSafeAreaInsets();
 	const s = useDirectorySearch();
 	const { setQuery } = s;
@@ -182,7 +182,7 @@ export function DirectoryScreen() {
 								label="I run a business — Check My Fit"
 								onPress={() => {
 									// Audience boundary (review: PR #44) — see HomeScreen CTA.
-									resetIdentity();
+									resetIdentityForAudience("contractor");
 									track("contractor_portal_started", {
 										entry_point: "registry_footer",
 									});
