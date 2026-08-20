@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useRef, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zipPrefix } from "@/lib/analytics/events";
 import { useAnalytics } from "@/lib/analytics/useAnalytics";
@@ -40,18 +41,44 @@ export function useConciergeForm() {
 		resolver: zodResolver(conciergeStepTwoSchema),
 	});
 
-	const { track } = useAnalytics();
+	const { identify, resetIdentity, resetIdentityForAudience, track } =
+		useAnalytics();
 	const [step, setStep] = useState<ConciergeStep>("job");
 	const [status, setStatus] = useState<SubmitStatus>("idle");
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+	// Leaving the screen with a completion insert in flight means the person
+	// is gone — the pending continuation must NOT identify the device or set
+	// state after unmount (review: PR #44; wizard precedent PR #34).
+	const mounted = useRef(true);
+	useEffect(
+		() => () => {
+			mounted.current = false;
+		},
+		[]
+	);
+
 	// Funnel step 0 (US-2). Lives HERE, not on the screen: the tab-preserved
 	// Concierge screen never remounts, so "Submit Another Request" (reset)
 	// must emit its own initiation — one per request, not one per mount
-	// (review: PR #43).
+	// (review: PR #43). Entering the homeowner funnel while identified as a
+	// DIFFERENT audience drops that identity first, so the funnel events
+	// below never attribute to a departed contractor (review: PR #44).
 	useEffect(() => {
+		resetIdentityForAudience("homeowner");
 		track("find_my_pro_initiated", {});
-	}, [track]);
+	}, [resetIdentityForAudience, track]);
+
+	// The tab PRESERVES this hook, so the mount effect above runs once ever —
+	// re-check the audience boundary every time the tab regains focus: a
+	// contractor identified elsewhere and returning here must not have the
+	// resumed homeowner form attributed to them (review: PR #44). Initiation
+	// is NOT re-tracked — one per request, per the mount effect's rule.
+	useFocusEffect(
+		useCallback(() => {
+			resetIdentityForAudience("homeowner");
+		}, [resetIdentityForAudience])
+	);
 
 	// Stable ids across retries (see submitConcierge id contract).
 	const partialId = useRef<string | null>(null);
@@ -114,6 +141,11 @@ export function useConciergeForm() {
 			});
 			partialInFlight.current = inFlight;
 			await inFlight;
+			// Same unmount rule as the completion path (review: PR #44).
+			// biome-ignore lint/suspicious/noUnnecessaryConditions: mounted is a ref flipped in the unmount cleanup — the analyzer can't see the mutation
+			if (!mounted.current) {
+				return;
+			}
 			// After the partial settles so partial_lead_recorded is truthful (US-2).
 			track("find_my_pro_step_1_completed", {
 				partial_lead_recorded: partialRecorded,
@@ -175,9 +207,20 @@ export function useConciergeForm() {
 				savedPartialId.current,
 				cid
 			);
+			// The person left mid-flight (header back) — another human may
+			// already be in a different flow on this device. No identity
+			// claim, no event, no setState after unmount (review: PR #44).
+			// The inserted lead row remains the submission's source of truth.
+			// biome-ignore lint/suspicious/noUnnecessaryConditions: mounted is a ref flipped in the unmount cleanup — the analyzer can't see the mutation
+			if (!mounted.current) {
+				return;
+			}
 			if (result.ok) {
 				setStatus("idle");
 				setStep("success");
+				// First-party identify (B-D11): merges this device's anonymous
+				// person with the typed email — no ATT prompt needed.
+				identify(values.email, { user_type: "homeowner" });
 				// matched_pro_id omitted: the partner reveal picks the pinned
 				// provider independently (see PartnerReveal) — L4 rotation will
 				// give the submit path a real matched id.
@@ -203,6 +246,10 @@ export function useConciergeForm() {
 		setStatus("idle");
 		setErrorMessage(null);
 		setStep("job");
+		// A fresh request may belong to a DIFFERENT person on this device —
+		// drop the analytics identity so its funnel starts anonymous; the
+		// same person merges back on their next identify (review: PR #44).
+		resetIdentity();
 		// A fresh request begins without a remount — see the mount effect above.
 		track("find_my_pro_initiated", {});
 	};

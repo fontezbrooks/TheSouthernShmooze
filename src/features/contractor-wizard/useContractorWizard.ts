@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { randomUUID } from "expo-crypto";
-import { useEffect, useRef, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useAnalytics } from "@/lib/analytics/useAnalytics";
 import {
@@ -48,7 +49,18 @@ export function useContractorWizard() {
 		resolver: zodResolver(wizardSchema),
 	});
 
-	const { track } = useAnalytics();
+	const { identify, resetIdentity, resetIdentityForAudience, track } =
+		useAnalytics();
+	// Contractor audience boundary at the ROUTE (review: PR #44): a deep
+	// link straight to /contractor-wizard bypasses the CTA-handler resets,
+	// so the focus lifecycle re-checks — an identified homeowner is dropped
+	// before ScreenTracker/UtmTracker attribute anything here; a returning
+	// contractor keeps identity. Same pattern as Concierge and Swipe.
+	useFocusEffect(
+		useCallback(() => {
+			resetIdentityForAudience("contractor");
+		}, [resetIdentityForAudience])
+	);
 	const [step, setStep] = useState(1);
 	const [phase, setPhase] = useState<WizardPhase>("form");
 	const [verdict, setVerdict] = useState<FitVerdict | null>(null);
@@ -57,6 +69,12 @@ export function useContractorWizard() {
 	const placeSession = useRef<string | null>(null);
 	// True while an advance (including the final verify+submit) is running.
 	const advancing = useRef(false);
+	// Application generation: reset() bumps it, invalidating any pending
+	// fire-and-forget submit callback — a slow submitApplication settling
+	// AFTER "Start over" must not re-identify the device as the PREVIOUS
+	// applicant (or attribute its event to the new anonymous person)
+	// (review: PR #44).
+	const applicationGen = useRef(0);
 	// Leaving the screen (header back / route pop) mid-verification means the
 	// user backed out — the pending flow must NOT record the application or
 	// set state after unmount (review: PR #34).
@@ -107,8 +125,20 @@ export function useContractorWizard() {
 			// event chains on the ACTUAL persistence result (review: PR #43) so
 			// a swallowed network failure never reports a submission; the UI
 			// still advances immediately.
+			const gen = applicationGen.current;
 			void submitApplication(values, res).then((persisted) => {
-				if (persisted) {
+				// Stale guard (review: PR #44): a settle after "Start over"
+				// (generation bump) OR after the wizard unmounted (back header,
+				// another flow may have begun) must not identify the device as
+				// this applicant. The DB row is the submission's source of
+				// truth — only the analytics claim is dropped.
+				if (persisted && mounted.current && applicationGen.current === gen) {
+					// First-party identify (B-D11): the applicant typed this
+					// email into our own form — person merge, no ATT prompt.
+					identify(values.email, {
+						applicant_trade: values.trade,
+						user_type: "contractor",
+					});
 					track("contractor_qualification_submitted", {
 						applicant_trade: values.trade,
 						instant_qualification_response: OUTCOME_TO_STATUS[res.outcome],
@@ -168,11 +198,15 @@ export function useContractorWizard() {
 
 	/** Fresh application (post-result re-entry). */
 	const reset = () => {
+		applicationGen.current += 1;
 		form.reset(emptyWizard);
 		placeSession.current = null;
 		setVerdict(null);
 		setPhase("form");
 		setStep(1);
+		// A fresh application may belong to a DIFFERENT person on this
+		// device — start it anonymous (review: PR #44).
+		resetIdentity();
 	};
 
 	return {

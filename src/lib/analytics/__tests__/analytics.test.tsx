@@ -1,22 +1,47 @@
-import { render, renderHook } from "@testing-library/react-native";
+import { render, renderHook, waitFor } from "@testing-library/react-native";
 import type PostHog from "posthog-react-native";
 import type { ReactNode } from "react";
 import { Text } from "react-native";
 import { AnalyticsProvider } from "../AnalyticsProvider";
+import { audienceForPathname } from "../audience";
 import { zipPrefix } from "../events";
 import { isAnalyticsEnabled } from "../posthog";
 import { useAnalytics, useFlag } from "../useAnalytics";
+import { initialUtmProps } from "../utm";
+
+jest.mock("expo-linking", () => ({
+	getInitialURL: jest.fn().mockResolvedValue(null),
+}));
+const mockGetInitialURL = jest.requireMock("expo-linking")
+	.getInitialURL as jest.Mock;
+
+// Controls the pathname ScreenTracker sees (holder lives in the factory —
+// module-scope variables would hit the TDZ when jest hoists the mock).
+jest.mock("expo-router", () => {
+	const holder = { pathname: "/" };
+	return {
+		__pathnameHolder: holder,
+		usePathname: () => holder.pathname,
+	};
+});
+const { __pathnameHolder } = jest.requireMock("expo-router") as {
+	__pathnameHolder: { pathname: string };
+};
 
 function makeClient(): PostHog {
 	return {
 		capture: jest.fn(),
 		debug: jest.fn(),
+		getDistinctId: jest.fn().mockReturnValue("0a1b2c3d-anon-uuid"),
 		getFeatureFlag: jest.fn().mockReturnValue(true),
+		getPersistedProperty: jest.fn(),
 		getSessionId: jest.fn().mockReturnValue("ph-session-1"),
 		identify: jest.fn(),
 		onFeatureFlags: jest.fn().mockReturnValue(() => {
 			/* unsubscribe */
 		}),
+		register: jest.fn().mockResolvedValue(undefined),
+		reset: jest.fn(),
 		screen: jest.fn(),
 	} as unknown as PostHog;
 }
@@ -132,6 +157,241 @@ describe("useAnalytics", () => {
 			email: "pro@example.com",
 			user_type: "contractor",
 		});
+	});
+
+	test("identify from anonymous does NOT reset (merge handles linkage)", async () => {
+		const client = makeClient();
+		const { result } = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(client),
+		});
+		result.current.identify("a@b.com", { user_type: "homeowner" });
+		expect(client.reset).not.toHaveBeenCalled();
+	});
+
+	test("identify resets first when switching identified persons (PR #44)", async () => {
+		const client = makeClient();
+		(client.getDistinctId as jest.Mock).mockReturnValue("old@b.com");
+		const { result } = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(client),
+		});
+		result.current.identify("new@b.com", { user_type: "homeowner" });
+		expect(client.reset).toHaveBeenCalledTimes(1);
+		expect(client.identify).toHaveBeenCalledWith("new@b.com", {
+			email: "new@b.com",
+			user_type: "homeowner",
+		});
+	});
+
+	test("re-identifying the SAME email does not reset", async () => {
+		const client = makeClient();
+		(client.getDistinctId as jest.Mock).mockReturnValue("a@b.com");
+		const { result } = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(client),
+		});
+		result.current.identify("A@B.com", { user_type: "homeowner" });
+		expect(client.reset).not.toHaveBeenCalled();
+	});
+
+	test("resetIdentity drops ONLY an identified device (PR #44)", async () => {
+		const bare = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(null),
+		});
+		expect(() => bare.result.current.resetIdentity()).not.toThrow();
+
+		// Anonymous: rotating the anon id would orphan captured events.
+		const anon = makeClient();
+		const anonHook = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(anon),
+		});
+		anonHook.result.current.resetIdentity();
+		expect(anon.reset).not.toHaveBeenCalled();
+
+		const identified = makeClient();
+		(identified.getDistinctId as jest.Mock).mockReturnValue("a@b.com");
+		const idHook = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(identified),
+		});
+		idHook.result.current.resetIdentity();
+		expect(identified.reset).toHaveBeenCalledTimes(1);
+	});
+
+	test("identify registers the audience as a persisted super prop (PR #44)", async () => {
+		const client = makeClient();
+		const { result } = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(client),
+		});
+		result.current.identify("pro@example.com", { user_type: "contractor" });
+		expect(client.register).toHaveBeenCalledWith({ user_type: "contractor" });
+	});
+
+	test("resetIdentityForAudience drops only a DIFFERENT-audience identity (PR #44)", async () => {
+		const bare = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(null),
+		});
+		expect(() =>
+			bare.result.current.resetIdentityForAudience("homeowner")
+		).not.toThrow();
+
+		// Anonymous device: nothing to drop.
+		const anon = makeClient();
+		const anonHook = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(anon),
+		});
+		anonHook.result.current.resetIdentityForAudience("contractor");
+		expect(anon.reset).not.toHaveBeenCalled();
+
+		// Same audience returning: identity (and continuity) kept.
+		const same = makeClient();
+		(same.getDistinctId as jest.Mock).mockReturnValue("h@x.com");
+		(same.getPersistedProperty as jest.Mock).mockReturnValue({
+			user_type: "homeowner",
+		});
+		const sameHook = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(same),
+		});
+		sameHook.result.current.resetIdentityForAudience("homeowner");
+		expect(same.reset).not.toHaveBeenCalled();
+
+		// Cross-audience entry: dropped.
+		const cross = makeClient();
+		(cross.getDistinctId as jest.Mock).mockReturnValue("pro@x.com");
+		(cross.getPersistedProperty as jest.Mock).mockReturnValue({
+			user_type: "contractor",
+		});
+		const crossHook = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(cross),
+		});
+		crossHook.result.current.resetIdentityForAudience("homeowner");
+		expect(cross.reset).toHaveBeenCalledTimes(1);
+
+		// Unknown audience: mismatch by default — dropped.
+		const unknown = makeClient();
+		(unknown.getDistinctId as jest.Mock).mockReturnValue("who@x.com");
+		const unknownHook = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(unknown),
+		});
+		unknownHook.result.current.resetIdentityForAudience("homeowner");
+		expect(unknown.reset).toHaveBeenCalledTimes(1);
+	});
+
+	test("identify normalizes the distinct id (trim + lowercase)", async () => {
+		const client = makeClient();
+		const { result } = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(client),
+		});
+		result.current.identify("  Jane@Example.COM ", {
+			user_type: "homeowner",
+		});
+		expect(client.identify).toHaveBeenCalledWith("jane@example.com", {
+			email: "jane@example.com",
+			user_type: "homeowner",
+		});
+	});
+});
+
+describe("initialUtmProps (B-D14 deep-link UTM)", () => {
+	test("extracts only utm_* params as $initial_ props", () => {
+		expect(
+			initialUtmProps(
+				"shmooze://home?utm_source=facebook&utm_campaign=launch&foo=bar"
+			)
+		).toEqual({
+			$initial_utm_campaign: "launch",
+			$initial_utm_source: "facebook",
+		});
+	});
+
+	test("null when the URL has no query or no utm params", () => {
+		expect(initialUtmProps("shmooze://home")).toBeNull();
+		expect(initialUtmProps("shmooze://home?foo=bar")).toBeNull();
+	});
+
+	test("stops at the fragment and decodes encoded values", () => {
+		expect(
+			initialUtmProps("https://x.com/p?utm_source=qr%20flyer#utm_medium=nope")
+		).toEqual({ $initial_utm_source: "qr flyer" });
+	});
+});
+
+describe("audienceForPathname (PR #44)", () => {
+	test("maps funnel routes to their audience, neutral routes to null", () => {
+		expect(audienceForPathname("/contractor-wizard")).toBe("contractor");
+		expect(audienceForPathname("/swipe")).toBe("homeowner");
+		expect(audienceForPathname("/match-contact")).toBe("homeowner");
+		expect(audienceForPathname("/concierge")).toBe("homeowner");
+		expect(audienceForPathname("/")).toBeNull();
+		expect(audienceForPathname("/business/abc")).toBeNull();
+	});
+});
+
+describe("ScreenTracker audience boundary (PR #44)", () => {
+	afterEach(() => {
+		__pathnameHolder.pathname = "/";
+	});
+
+	test("cross-audience identity is dropped BEFORE the funnel $screen", async () => {
+		__pathnameHolder.pathname = "/contractor-wizard";
+		const client = makeClient();
+		(client.getDistinctId as jest.Mock).mockReturnValue("h@x.com");
+		(client.getPersistedProperty as jest.Mock).mockReturnValue({
+			user_type: "homeowner",
+		});
+		await render(
+			<AnalyticsProvider client={client}>
+				<Text>app</Text>
+			</AnalyticsProvider>
+		);
+		expect(client.reset).toHaveBeenCalledTimes(1);
+		expect(client.screen).toHaveBeenCalledWith("/contractor-wizard");
+		const [resetOrder] = (client.reset as jest.Mock).mock.invocationCallOrder;
+		const [screenOrder] = (client.screen as jest.Mock).mock.invocationCallOrder;
+		expect(resetOrder).toBeLessThan(screenOrder);
+	});
+
+	test("neutral routes never touch the identity", async () => {
+		__pathnameHolder.pathname = "/business/abc";
+		const client = makeClient();
+		(client.getDistinctId as jest.Mock).mockReturnValue("h@x.com");
+		(client.getPersistedProperty as jest.Mock).mockReturnValue({
+			user_type: "homeowner",
+		});
+		await render(
+			<AnalyticsProvider client={client}>
+				<Text>app</Text>
+			</AnalyticsProvider>
+		);
+		expect(client.reset).not.toHaveBeenCalled();
+		expect(client.screen).toHaveBeenCalledWith("/business/abc");
+	});
+});
+
+describe("UtmTracker (cold-start deep link)", () => {
+	test("$set_once fires when the initial URL carries utm params", async () => {
+		mockGetInitialURL.mockResolvedValueOnce(
+			"shmooze://home?utm_source=facebook"
+		);
+		const client = makeClient();
+		await render(
+			<AnalyticsProvider client={client}>
+				<Text>app</Text>
+			</AnalyticsProvider>
+		);
+		await waitFor(() => {
+			expect(client.capture).toHaveBeenCalledWith("$set", {
+				$set_once: { $initial_utm_source: "facebook" },
+			});
+		});
+	});
+
+	test("no capture when the app launched without a deep link", async () => {
+		mockGetInitialURL.mockResolvedValueOnce(null);
+		const client = makeClient();
+		await render(
+			<AnalyticsProvider client={client}>
+				<Text>app</Text>
+			</AnalyticsProvider>
+		);
+		expect(client.capture).not.toHaveBeenCalled();
 	});
 });
 

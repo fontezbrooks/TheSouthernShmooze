@@ -346,9 +346,30 @@ describe("useConciergeForm", () => {
 	});
 });
 
+// Captures the focus callback so tests can simulate the tab regaining
+// focus without a navigation container (holder lives in the factory —
+// module-scope variables would hit the TDZ when jest hoists the mock).
+jest.mock("expo-router", () => {
+	const holder: { cb?: () => void } = {};
+	return {
+		__focusHolder: holder,
+		useFocusEffect: (cb: () => void) => {
+			holder.cb = cb;
+		},
+	};
+});
+
 const mockTrack = jest.fn();
+const mockIdentify = jest.fn();
+const mockResetIdentity = jest.fn();
+const mockResetForAudience = jest.fn();
 jest.mock("@/lib/analytics/useAnalytics", () => ({
-	useAnalytics: () => ({ identify: jest.fn(), track: mockTrack }),
+	useAnalytics: () => ({
+		identify: mockIdentify,
+		resetIdentity: mockResetIdentity,
+		resetIdentityForAudience: mockResetForAudience,
+		track: mockTrack,
+	}),
 	useFlag: () => undefined,
 }));
 
@@ -387,5 +408,84 @@ describe("find-my-pro analytics (US-2)", () => {
 		await fillStepOne(result);
 		await fillStepTwo(result);
 		expect(mockTrack).not.toHaveBeenCalledWith("find_my_pro_submitted", {});
+		// Identity gates on the same completion result (P3).
+		expect(mockIdentify).not.toHaveBeenCalled();
+	});
+
+	it("identifies the homeowner by form email on completion success (P3)", async () => {
+		const { result } = await renderHook(() => useConciergeForm());
+		await fillStepOne(result);
+		await fillStepTwo(result);
+		expect(mockIdentify).toHaveBeenCalledWith("jane@example.com", {
+			user_type: "homeowner",
+		});
+	});
+
+	it("mount crosses the audience boundary BEFORE tracking initiation (PR #44)", async () => {
+		await renderHook(() => useConciergeForm());
+		expect(mockResetForAudience).toHaveBeenCalledWith("homeowner");
+		const [resetOrder] = mockResetForAudience.mock.invocationCallOrder;
+		const [trackOrder] = mockTrack.mock.invocationCallOrder;
+		expect(resetOrder).toBeLessThan(trackOrder);
+	});
+
+	it("re-checks the audience boundary on tab re-focus, without re-initiating (PR #44)", async () => {
+		const { __focusHolder } = jest.requireMock("expo-router") as {
+			__focusHolder: { cb?: () => void };
+		};
+		await renderHook(() => useConciergeForm());
+		mockResetForAudience.mockClear();
+		mockTrack.mockClear();
+		// The preserved tab regains focus after e.g. a contractor identified
+		// elsewhere on this device.
+		await act(async () => {
+			__focusHolder.cb?.();
+			await Promise.resolve();
+		});
+		expect(mockResetForAudience).toHaveBeenCalledWith("homeowner");
+		expect(mockTrack).not.toHaveBeenCalled();
+	});
+
+	it("completion settling after UNMOUNT identifies nothing (PR #44)", async () => {
+		let resolveComplete: (value: unknown) => void = () => {
+			/* replaced below */
+		};
+		mockedComplete.mockReturnValue(
+			new Promise((resolve) => {
+				resolveComplete = resolve;
+			}) as never
+		);
+		const { result, unmount } = await renderHook(() => useConciergeForm());
+		await fillStepOne(result);
+		let submitPromise: Promise<unknown> = Promise.resolve();
+		await act(async () => {
+			const form = result.current.stepTwoForm;
+			for (const [k, v] of Object.entries(stepTwo)) {
+				form.setValue(k as never, v as never);
+			}
+			submitPromise = result.current.submit();
+			await Promise.resolve();
+		});
+		// Header back pops the screen while the insert is still in flight.
+		await unmount();
+		await act(async () => {
+			resolveComplete({ data: { id: "complete-row" }, ok: true });
+			await submitPromise;
+		});
+		expect(mockIdentify).not.toHaveBeenCalled();
+		expect(mockTrack).not.toHaveBeenCalledWith("find_my_pro_submitted", {});
+	});
+
+	it("reset drops the analytics identity for the next request (PR #44)", async () => {
+		const { result } = await renderHook(() => useConciergeForm());
+		await fillStepOne(result);
+		await fillStepTwo(result);
+		expect(mockResetIdentity).not.toHaveBeenCalled();
+		await act(async () => {
+			result.current.reset();
+		});
+		expect(mockResetIdentity).toHaveBeenCalledTimes(1);
+		// The fresh (anonymous) request still records its initiation.
+		expect(mockTrack).toHaveBeenLastCalledWith("find_my_pro_initiated", {});
 	});
 });

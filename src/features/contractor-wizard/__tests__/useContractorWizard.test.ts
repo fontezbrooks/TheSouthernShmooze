@@ -246,14 +246,38 @@ describe("useContractorWizard", () => {
 	});
 });
 
+// Captures the focus callback so tests can simulate the route gaining
+// focus without a navigation container (holder lives in the factory —
+// module-scope variables would hit the TDZ when jest hoists the mock).
+jest.mock("expo-router", () => {
+	const holder: { cb?: () => void } = {};
+	return {
+		__focusHolder: holder,
+		useFocusEffect: (cb: () => void) => {
+			holder.cb = cb;
+		},
+	};
+});
+
 const mockTrack = jest.fn();
+const mockIdentify = jest.fn();
+const mockResetIdentity = jest.fn();
+const mockResetForAudience = jest.fn();
 jest.mock("@/lib/analytics/useAnalytics", () => ({
-	useAnalytics: () => ({ identify: jest.fn(), track: mockTrack }),
+	useAnalytics: () => ({
+		identify: mockIdentify,
+		resetIdentity: mockResetIdentity,
+		resetIdentityForAudience: mockResetForAudience,
+		track: mockTrack,
+	}),
 	useFlag: () => undefined,
 }));
 
 describe("qualification analytics (US-5)", () => {
-	beforeEach(() => mockTrack.mockClear());
+	beforeEach(() => {
+		mockTrack.mockClear();
+		mockIdentify.mockClear();
+	});
 
 	async function walkToSubmit(result: {
 		current: ReturnType<typeof useContractorWizard>;
@@ -279,6 +303,39 @@ describe("qualification analytics (US-5)", () => {
 		);
 	});
 
+	test("identifies the contractor by form email on persisted success (P3)", async () => {
+		const { result } = await renderHook(() => useContractorWizard());
+		await walkToSubmit(result);
+		expect(mockIdentify).toHaveBeenCalledWith("j@x.com", {
+			applicant_trade: "Plumbing",
+			user_type: "contractor",
+		});
+	});
+
+	test("route focus crosses the contractor audience boundary (PR #44)", async () => {
+		const { __focusHolder } = jest.requireMock("expo-router") as {
+			__focusHolder: { cb?: () => void };
+		};
+		mockResetForAudience.mockClear();
+		await renderHook(() => useContractorWizard());
+		// Deep link straight to /contractor-wizard: focus fires the boundary.
+		await act(async () => {
+			__focusHolder.cb?.();
+			await Promise.resolve();
+		});
+		expect(mockResetForAudience).toHaveBeenCalledWith("contractor");
+	});
+
+	test("reset drops the analytics identity for a fresh application (PR #44)", async () => {
+		mockResetIdentity.mockClear();
+		const { result } = await renderHook(() => useContractorWizard());
+		await walkToSubmit(result);
+		await act(async () => {
+			result.current.reset();
+		});
+		expect(mockResetIdentity).toHaveBeenCalledTimes(1);
+	});
+
 	test("not-yet outcome tracks flagged", async () => {
 		verifyFitMock.mockResolvedValue({ ...passVerdict, outcome: "not-yet" });
 		const { result } = await renderHook(() => useContractorWizard());
@@ -291,7 +348,10 @@ describe("qualification analytics (US-5)", () => {
 });
 
 describe("qualification analytics persistence gate (review PR #43)", () => {
-	beforeEach(() => mockTrack.mockClear());
+	beforeEach(() => {
+		mockTrack.mockClear();
+		mockIdentify.mockClear();
+	});
 
 	test("no event when the application submit fails to persist", async () => {
 		submitMock.mockResolvedValue(false);
@@ -304,6 +364,74 @@ describe("qualification analytics persistence gate (review PR #43)", () => {
 			});
 		}
 		expect(result.current.phase).toBe("result");
+		expect(mockTrack).not.toHaveBeenCalledWith(
+			"contractor_qualification_submitted",
+			expect.anything()
+		);
+		// Identity must gate on the same persistence result (P3).
+		expect(mockIdentify).not.toHaveBeenCalled();
+	});
+
+	test("stale submit settling after reset restores neither identity nor event (PR #44)", async () => {
+		let resolveSubmit: (persisted: boolean) => void = () => {
+			/* replaced below */
+		};
+		submitMock.mockReturnValue(
+			new Promise((resolve) => {
+				resolveSubmit = resolve;
+			})
+		);
+		const { result } = await renderHook(() => useContractorWizard());
+		for (let i = 0; i < stepValues.length; i += 1) {
+			// biome-ignore lint/performance/noAwaitInLoops: wizard steps must advance sequentially
+			await fillStep(result, i);
+			await act(async () => {
+				await result.current.advance();
+			});
+		}
+		expect(result.current.phase).toBe("result");
+		// "Start over" begins a fresh (anonymous) application... (RNTL v14
+		// act is async-only — the inner await keeps it awaited AND lintable.)
+		await act(async () => {
+			result.current.reset();
+			await Promise.resolve();
+		});
+		// ...then the OLD application's submit finally persists.
+		await act(async () => {
+			resolveSubmit(true);
+			await Promise.resolve();
+		});
+		expect(mockIdentify).not.toHaveBeenCalled();
+		expect(mockTrack).not.toHaveBeenCalledWith(
+			"contractor_qualification_submitted",
+			expect.anything()
+		);
+	});
+
+	test("submit settling after UNMOUNT identifies nothing (PR #44)", async () => {
+		let resolveSubmit: (persisted: boolean) => void = () => {
+			/* replaced below */
+		};
+		submitMock.mockReturnValue(
+			new Promise((resolve) => {
+				resolveSubmit = resolve;
+			})
+		);
+		const { result, unmount } = await renderHook(() => useContractorWizard());
+		for (let i = 0; i < stepValues.length; i += 1) {
+			// biome-ignore lint/performance/noAwaitInLoops: wizard steps must advance sequentially
+			await fillStep(result, i);
+			await act(async () => {
+				await result.current.advance();
+			});
+		}
+		// Back header pops the wizard; another flow may begin on this device.
+		await unmount();
+		await act(async () => {
+			resolveSubmit(true);
+			await Promise.resolve();
+		});
+		expect(mockIdentify).not.toHaveBeenCalled();
 		expect(mockTrack).not.toHaveBeenCalledWith(
 			"contractor_qualification_submitted",
 			expect.anything()
