@@ -126,6 +126,7 @@ describe("useAnalytics", () => {
 		});
 		expect(client.identify).toHaveBeenCalledWith("pro@example.com", {
 			applicant_trade: "Electrical",
+			email: "pro@example.com",
 			user_type: "contractor",
 		});
 	});

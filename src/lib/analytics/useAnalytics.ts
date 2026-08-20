@@ -33,7 +33,9 @@ export function useAnalytics(): Analytics {
 	);
 	const identify = useCallback<Analytics["identify"]>(
 		(email, properties) => {
-			client?.identify(email, { ...properties });
+			// distinct id alone doesn't create an `email` person property —
+			// the taxonomy's $set email (CSV row 1) must be set explicitly.
+			client?.identify(email, { ...properties, email });
 		},
 		[client]
 	);
