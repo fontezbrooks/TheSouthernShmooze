@@ -20,6 +20,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		eas: {
 			projectId: "d0d1c671-c2a2-4691-8e6f-943b06100833",
 		},
+		posthogHost: process.env.EXPO_PUBLIC_POSTHOG_HOST ?? "",
+		posthogKey: process.env.EXPO_PUBLIC_POSTHOG_KEY ?? "",
 		supabaseAnonKey:
 			process.env.EXPO_PUBLIC_SUPABASE_KEY ??
 			process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ??
@@ -54,6 +56,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		],
 		"@react-native-community/datetimepicker",
 		"expo-web-browser",
+		"expo-localization",
 	],
 	scheme: "shmooze",
 	slug: "thesouthernshmooze",

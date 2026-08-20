@@ -21,15 +21,16 @@ import {
 } from "@expo-google-fonts/public-sans";
 import { Shrikhand_400Regular, useFonts } from "@expo-google-fonts/shrikhand";
 import { Stack } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
+import { preventAutoHideAsync } from "expo-splash-screen";
 import { useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AnimatedSplash } from "@/features/splash/AnimatedSplash";
 import { SwipeSessionProvider } from "@/features/swipe/SwipeSessionProvider";
+import { AnalyticsProvider } from "@/lib/analytics/AnalyticsProvider";
 import { ThemeProvider } from "@/theme/ThemeProvider";
 
-SplashScreen.preventAutoHideAsync();
+preventAutoHideAsync();
 
 export default function RootLayout() {
 	const [splashDone, setSplashDone] = useState(false);
@@ -59,13 +60,15 @@ export default function RootLayout() {
 		<GestureHandlerRootView style={{ flex: 1 }}>
 			<SafeAreaProvider>
 				<ThemeProvider>
-					<SwipeSessionProvider>
-						<Stack screenOptions={{ headerShown: false }} />
-						{/* Animated splash overlays the app from first frame, then fades out. */}
-						{splashDone ? null : (
-							<AnimatedSplash onFinish={() => setSplashDone(true)} />
-						)}
-					</SwipeSessionProvider>
+					<AnalyticsProvider>
+						<SwipeSessionProvider>
+							<Stack screenOptions={{ headerShown: false }} />
+							{/* Animated splash overlays the app from first frame, then fades out. */}
+							{splashDone ? null : (
+								<AnimatedSplash onFinish={() => setSplashDone(true)} />
+							)}
+						</SwipeSessionProvider>
+					</AnalyticsProvider>
 				</ThemeProvider>
 			</SafeAreaProvider>
 		</GestureHandlerRootView>
