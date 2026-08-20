@@ -194,15 +194,18 @@ export function BusinessDetailScreen({ uid }: { uid: string }) {
 											icon={SOCIAL_ICONS[l.key] ?? "globe"}
 											key={`${l.key}:${l.url}`}
 											label={l.label}
-											onPress={() => {
+											onPress={async () => {
 												// "goo" = the Google Business link — the external
-												// trust-validation click US-3 measures.
-												if (l.key === "goo") {
+												// trust-validation click US-3 measures. Tracked only
+												// after the browser ACTUALLY opened: openLink swallows
+												// failures, and a failed open must not inflate review
+												// engagement (review: PR #43).
+												const opened = await openLink(l.url);
+												if (opened && l.key === "goo") {
 													track("external_google_reviews_opened", {
 														pro_business_id: uid,
 													});
 												}
-												openLink(l.url);
 											}}
 										/>
 									))}

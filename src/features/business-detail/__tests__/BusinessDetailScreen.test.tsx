@@ -114,6 +114,8 @@ jest.mock("@/lib/analytics/useAnalytics", () => ({
 	useFlag: () => undefined,
 }));
 
+beforeEach(() => mockOpenLink.mockResolvedValue(true));
+
 describe("profile analytics (US-3)", () => {
 	it("tracks profile_rendered_gracefully with the profile's actual assets", async () => {
 		mockFetchByUid.mockResolvedValue({ data: makeDetail(), ok: true });
@@ -172,5 +174,31 @@ describe("profile call coverage (review PR #43)", () => {
 			call_placement_source: "profile_view",
 			pro_business_id: "uid-1",
 		});
+	});
+});
+
+const mockOpenLink = jest.fn();
+jest.mock("@/lib/openLink", () => ({
+	openLink: (url: string) => mockOpenLink(url),
+}));
+
+describe("review-open success gating (review PR #43)", () => {
+	it("does not track a review open when the browser fails to open", async () => {
+		mockOpenLink.mockResolvedValue(false);
+		mockFetchByUid.mockResolvedValue({
+			data: makeDetail({
+				socials: [
+					{ key: "goo", label: "Google", url: "https://g.example.com" },
+				],
+			}),
+			ok: true,
+		});
+		const { findByText } = await renderScreen();
+		await fireEvent.press(await findByText("Google"));
+		await waitFor(() => expect(mockOpenLink).toHaveBeenCalled());
+		expect(mockTrack).not.toHaveBeenCalledWith(
+			"external_google_reviews_opened",
+			expect.anything()
+		);
 	});
 });
