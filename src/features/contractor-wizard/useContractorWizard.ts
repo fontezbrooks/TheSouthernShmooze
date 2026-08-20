@@ -115,8 +115,12 @@ export function useContractorWizard() {
 			// still advances immediately.
 			const gen = applicationGen.current;
 			void submitApplication(values, res).then((persisted) => {
-				// Stale-generation guard: see applicationGen above.
-				if (persisted && applicationGen.current === gen) {
+				// Stale guard (review: PR #44): a settle after "Start over"
+				// (generation bump) OR after the wizard unmounted (back header,
+				// another flow may have begun) must not identify the device as
+				// this applicant. The DB row is the submission's source of
+				// truth — only the analytics claim is dropped.
+				if (persisted && mounted.current && applicationGen.current === gen) {
 					// First-party identify (B-D11): the applicant typed this
 					// email into our own form — person merge, no ATT prompt.
 					identify(values.email, {

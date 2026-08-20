@@ -361,11 +361,43 @@ describe("qualification analytics persistence gate (review PR #43)", () => {
 			});
 		}
 		expect(result.current.phase).toBe("result");
-		// "Start over" begins a fresh (anonymous) application...
-		act(() => {
+		// "Start over" begins a fresh (anonymous) application... (RNTL v14
+		// act is async-only — the inner await keeps it awaited AND lintable.)
+		await act(async () => {
 			result.current.reset();
+			await Promise.resolve();
 		});
 		// ...then the OLD application's submit finally persists.
+		await act(async () => {
+			resolveSubmit(true);
+			await Promise.resolve();
+		});
+		expect(mockIdentify).not.toHaveBeenCalled();
+		expect(mockTrack).not.toHaveBeenCalledWith(
+			"contractor_qualification_submitted",
+			expect.anything()
+		);
+	});
+
+	test("submit settling after UNMOUNT identifies nothing (PR #44)", async () => {
+		let resolveSubmit: (persisted: boolean) => void = () => {
+			/* replaced below */
+		};
+		submitMock.mockReturnValue(
+			new Promise((resolve) => {
+				resolveSubmit = resolve;
+			})
+		);
+		const { result, unmount } = await renderHook(() => useContractorWizard());
+		for (let i = 0; i < stepValues.length; i += 1) {
+			// biome-ignore lint/performance/noAwaitInLoops: wizard steps must advance sequentially
+			await fillStep(result, i);
+			await act(async () => {
+				await result.current.advance();
+			});
+		}
+		// Back header pops the wizard; another flow may begin on this device.
+		await unmount();
 		await act(async () => {
 			resolveSubmit(true);
 			await Promise.resolve();

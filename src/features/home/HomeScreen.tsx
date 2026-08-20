@@ -19,7 +19,7 @@ import SmilyPeachLogo from "./smily-peach.svg";
 export function HomeScreen() {
 	const t = useTheme();
 	const router = useRouter();
-	const { track } = useAnalytics();
+	const { resetIdentity, track } = useAnalytics();
 
 	const callBusiness = (phone: string) => openLink(`tel:${phone}`);
 
@@ -75,6 +75,10 @@ export function HomeScreen() {
 					imageNode={<SmilyPeachLogo height={94} width={96} />}
 					layout="titleRow"
 					onPress={() => {
+						// Audience boundary (review: PR #44): a device identified as a
+						// previous submitter must not attribute the contractor funnel
+						// to that person — drop to anonymous BEFORE the entry event.
+						resetIdentity();
 						track("contractor_portal_started", { entry_point: "home_banner" });
 						router.push("/contractor-wizard");
 					}}

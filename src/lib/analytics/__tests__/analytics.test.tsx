@@ -176,18 +176,27 @@ describe("useAnalytics", () => {
 		expect(client.reset).not.toHaveBeenCalled();
 	});
 
-	test("resetIdentity forwards to client.reset and no-ops without one", async () => {
+	test("resetIdentity drops ONLY an identified device (PR #44)", async () => {
 		const bare = await renderHook(() => useAnalytics(), {
 			wrapper: withClient(null),
 		});
 		expect(() => bare.result.current.resetIdentity()).not.toThrow();
 
-		const client = makeClient();
-		const { result } = await renderHook(() => useAnalytics(), {
-			wrapper: withClient(client),
+		// Anonymous: rotating the anon id would orphan captured events.
+		const anon = makeClient();
+		const anonHook = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(anon),
 		});
-		result.current.resetIdentity();
-		expect(client.reset).toHaveBeenCalledTimes(1);
+		anonHook.result.current.resetIdentity();
+		expect(anon.reset).not.toHaveBeenCalled();
+
+		const identified = makeClient();
+		(identified.getDistinctId as jest.Mock).mockReturnValue("a@b.com");
+		const idHook = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(identified),
+		});
+		idHook.result.current.resetIdentity();
+		expect(identified.reset).toHaveBeenCalledTimes(1);
 	});
 
 	test("identify normalizes the distinct id (trim + lowercase)", async () => {

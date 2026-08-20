@@ -71,7 +71,13 @@ export function useAnalytics(): Analytics {
 		[client]
 	);
 	const resetIdentity = useCallback<Analytics["resetIdentity"]>(() => {
-		client?.reset();
+		// No-op while anonymous: rotating the anonymous id would ORPHAN the
+		// funnel events already captured under it — they could never merge
+		// into a later identify. Only an IDENTIFIED device needs dropping;
+		// same email-vs-UUID invariant as the identify guard (review: PR #44).
+		if (client?.getDistinctId().includes("@")) {
+			client.reset();
+		}
 	}, [client]);
 	const sessionKey = useCallback<Analytics["sessionKey"]>(
 		() => (client ? client.getSessionId() : null),
