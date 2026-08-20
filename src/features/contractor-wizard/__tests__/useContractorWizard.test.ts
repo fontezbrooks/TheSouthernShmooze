@@ -247,13 +247,17 @@ describe("useContractorWizard", () => {
 });
 
 const mockTrack = jest.fn();
+const mockIdentify = jest.fn();
 jest.mock("@/lib/analytics/useAnalytics", () => ({
-	useAnalytics: () => ({ identify: jest.fn(), track: mockTrack }),
+	useAnalytics: () => ({ identify: mockIdentify, track: mockTrack }),
 	useFlag: () => undefined,
 }));
 
 describe("qualification analytics (US-5)", () => {
-	beforeEach(() => mockTrack.mockClear());
+	beforeEach(() => {
+		mockTrack.mockClear();
+		mockIdentify.mockClear();
+	});
 
 	async function walkToSubmit(result: {
 		current: ReturnType<typeof useContractorWizard>;
@@ -279,6 +283,15 @@ describe("qualification analytics (US-5)", () => {
 		);
 	});
 
+	test("identifies the contractor by form email on persisted success (P3)", async () => {
+		const { result } = await renderHook(() => useContractorWizard());
+		await walkToSubmit(result);
+		expect(mockIdentify).toHaveBeenCalledWith("j@x.com", {
+			applicant_trade: "Plumbing",
+			user_type: "contractor",
+		});
+	});
+
 	test("not-yet outcome tracks flagged", async () => {
 		verifyFitMock.mockResolvedValue({ ...passVerdict, outcome: "not-yet" });
 		const { result } = await renderHook(() => useContractorWizard());
@@ -291,7 +304,10 @@ describe("qualification analytics (US-5)", () => {
 });
 
 describe("qualification analytics persistence gate (review PR #43)", () => {
-	beforeEach(() => mockTrack.mockClear());
+	beforeEach(() => {
+		mockTrack.mockClear();
+		mockIdentify.mockClear();
+	});
 
 	test("no event when the application submit fails to persist", async () => {
 		submitMock.mockResolvedValue(false);
@@ -308,5 +324,7 @@ describe("qualification analytics persistence gate (review PR #43)", () => {
 			"contractor_qualification_submitted",
 			expect.anything()
 		);
+		// Identity must gate on the same persistence result (P3).
+		expect(mockIdentify).not.toHaveBeenCalled();
 	});
 });

@@ -48,7 +48,7 @@ export function useContractorWizard() {
 		resolver: zodResolver(wizardSchema),
 	});
 
-	const { track } = useAnalytics();
+	const { identify, track } = useAnalytics();
 	const [step, setStep] = useState(1);
 	const [phase, setPhase] = useState<WizardPhase>("form");
 	const [verdict, setVerdict] = useState<FitVerdict | null>(null);
@@ -109,6 +109,12 @@ export function useContractorWizard() {
 			// still advances immediately.
 			void submitApplication(values, res).then((persisted) => {
 				if (persisted) {
+					// First-party identify (B-D11): the applicant typed this
+					// email into our own form — person merge, no ATT prompt.
+					identify(values.email, {
+						applicant_trade: values.trade,
+						user_type: "contractor",
+					});
 					track("contractor_qualification_submitted", {
 						applicant_trade: values.trade,
 						instant_qualification_response: OUTCOME_TO_STATUS[res.outcome],

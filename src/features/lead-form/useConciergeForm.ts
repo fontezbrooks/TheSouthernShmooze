@@ -40,7 +40,7 @@ export function useConciergeForm() {
 		resolver: zodResolver(conciergeStepTwoSchema),
 	});
 
-	const { track } = useAnalytics();
+	const { identify, track } = useAnalytics();
 	const [step, setStep] = useState<ConciergeStep>("job");
 	const [status, setStatus] = useState<SubmitStatus>("idle");
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -178,6 +178,9 @@ export function useConciergeForm() {
 			if (result.ok) {
 				setStatus("idle");
 				setStep("success");
+				// First-party identify (B-D11): merges this device's anonymous
+				// person with the typed email — no ATT prompt needed.
+				identify(values.email, { user_type: "homeowner" });
 				// matched_pro_id omitted: the partner reveal picks the pinned
 				// provider independently (see PartnerReveal) — L4 rotation will
 				// give the submit path a real matched id.

@@ -347,8 +347,9 @@ describe("useConciergeForm", () => {
 });
 
 const mockTrack = jest.fn();
+const mockIdentify = jest.fn();
 jest.mock("@/lib/analytics/useAnalytics", () => ({
-	useAnalytics: () => ({ identify: jest.fn(), track: mockTrack }),
+	useAnalytics: () => ({ identify: mockIdentify, track: mockTrack }),
 	useFlag: () => undefined,
 }));
 
@@ -387,5 +388,16 @@ describe("find-my-pro analytics (US-2)", () => {
 		await fillStepOne(result);
 		await fillStepTwo(result);
 		expect(mockTrack).not.toHaveBeenCalledWith("find_my_pro_submitted", {});
+		// Identity gates on the same completion result (P3).
+		expect(mockIdentify).not.toHaveBeenCalled();
+	});
+
+	it("identifies the homeowner by form email on completion success (P3)", async () => {
+		const { result } = await renderHook(() => useConciergeForm());
+		await fillStepOne(result);
+		await fillStepTwo(result);
+		expect(mockIdentify).toHaveBeenCalledWith("jane@example.com", {
+			user_type: "homeowner",
+		});
 	});
 });

@@ -1,4 +1,4 @@
-import { render, renderHook } from "@testing-library/react-native";
+import { render, renderHook, waitFor } from "@testing-library/react-native";
 import type PostHog from "posthog-react-native";
 import type { ReactNode } from "react";
 import { Text } from "react-native";
@@ -6,6 +6,13 @@ import { AnalyticsProvider } from "../AnalyticsProvider";
 import { zipPrefix } from "../events";
 import { isAnalyticsEnabled } from "../posthog";
 import { useAnalytics, useFlag } from "../useAnalytics";
+import { initialUtmProps } from "../utm";
+
+jest.mock("expo-linking", () => ({
+	getInitialURL: jest.fn().mockResolvedValue(null),
+}));
+const mockGetInitialURL = jest.requireMock("expo-linking")
+	.getInitialURL as jest.Mock;
 
 function makeClient(): PostHog {
 	return {
@@ -132,6 +139,74 @@ describe("useAnalytics", () => {
 			email: "pro@example.com",
 			user_type: "contractor",
 		});
+	});
+
+	test("identify normalizes the distinct id (trim + lowercase)", async () => {
+		const client = makeClient();
+		const { result } = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(client),
+		});
+		result.current.identify("  Jane@Example.COM ", {
+			user_type: "homeowner",
+		});
+		expect(client.identify).toHaveBeenCalledWith("jane@example.com", {
+			email: "jane@example.com",
+			user_type: "homeowner",
+		});
+	});
+});
+
+describe("initialUtmProps (B-D14 deep-link UTM)", () => {
+	test("extracts only utm_* params as $initial_ props", () => {
+		expect(
+			initialUtmProps(
+				"shmooze://home?utm_source=facebook&utm_campaign=launch&foo=bar"
+			)
+		).toEqual({
+			$initial_utm_campaign: "launch",
+			$initial_utm_source: "facebook",
+		});
+	});
+
+	test("null when the URL has no query or no utm params", () => {
+		expect(initialUtmProps("shmooze://home")).toBeNull();
+		expect(initialUtmProps("shmooze://home?foo=bar")).toBeNull();
+	});
+
+	test("stops at the fragment and decodes encoded values", () => {
+		expect(
+			initialUtmProps("https://x.com/p?utm_source=qr%20flyer#utm_medium=nope")
+		).toEqual({ $initial_utm_source: "qr flyer" });
+	});
+});
+
+describe("UtmTracker (cold-start deep link)", () => {
+	test("$set_once fires when the initial URL carries utm params", async () => {
+		mockGetInitialURL.mockResolvedValueOnce(
+			"shmooze://home?utm_source=facebook"
+		);
+		const client = makeClient();
+		await render(
+			<AnalyticsProvider client={client}>
+				<Text>app</Text>
+			</AnalyticsProvider>
+		);
+		await waitFor(() => {
+			expect(client.capture).toHaveBeenCalledWith("$set", {
+				$set_once: { $initial_utm_source: "facebook" },
+			});
+		});
+	});
+
+	test("no capture when the app launched without a deep link", async () => {
+		mockGetInitialURL.mockResolvedValueOnce(null);
+		const client = makeClient();
+		await render(
+			<AnalyticsProvider client={client}>
+				<Text>app</Text>
+			</AnalyticsProvider>
+		);
+		expect(client.capture).not.toHaveBeenCalled();
 	});
 });
 

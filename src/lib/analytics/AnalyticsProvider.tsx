@@ -1,8 +1,10 @@
+import { getInitialURL } from "expo-linking";
 import { usePathname } from "expo-router";
 import type PostHog from "posthog-react-native";
 import { PostHogProvider } from "posthog-react-native";
 import { createContext, type ReactNode, useEffect, useMemo } from "react";
 import { getAnalyticsClient } from "./posthog";
+import { initialUtmProps } from "./utm";
 
 /**
  * null = capture disabled (jest, dev without debug flag, missing key).
@@ -45,6 +47,7 @@ export function AnalyticsProvider({
 		<AnalyticsContext.Provider value={client}>
 			<PostHogProvider autocapture={autocapture} client={client}>
 				<ScreenTracker client={client} />
+				<UtmTracker client={client} />
 				{children}
 			</PostHogProvider>
 		</AnalyticsContext.Provider>
@@ -59,5 +62,30 @@ function ScreenTracker({ client }: { client: PostHog }) {
 			client.screen(pathname);
 		}
 	}, [client, pathname]);
+	return null;
+}
+
+/**
+ * Cold-start deep-link UTM capture (B-D14). $set_once keeps only the FIRST
+ * touch as `$initial_utm_*` person props; warm-start links are out of scope
+ * for v1. Best-effort — a failed URL read just means no attribution.
+ */
+function UtmTracker({ client }: { client: PostHog }) {
+	useEffect(() => {
+		let alive = true;
+		(async () => {
+			const url = await getInitialURL().catch(() => null);
+			if (!(alive && url)) {
+				return;
+			}
+			const setOnce = initialUtmProps(url);
+			if (setOnce) {
+				client.capture("$set", { $set_once: setOnce });
+			}
+		})();
+		return () => {
+			alive = false;
+		};
+	}, [client]);
 	return null;
 }

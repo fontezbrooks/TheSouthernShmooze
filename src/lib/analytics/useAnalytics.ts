@@ -40,9 +40,13 @@ export function useAnalytics(): Analytics {
 	);
 	const identify = useCallback<Analytics["identify"]>(
 		(email, properties) => {
+			// Case-insensitive identity: "Jane@X.com" and "jane@x.com" must
+			// merge to ONE person, so the distinct id is normalized here — the
+			// single choke point for every identify call.
+			const id = email.trim().toLowerCase();
 			// distinct id alone doesn't create an `email` person property —
 			// the taxonomy's $set email (CSV row 1) must be set explicitly.
-			client?.identify(email, { ...properties, email });
+			client?.identify(id, { ...properties, email: id });
 		},
 		[client]
 	);
