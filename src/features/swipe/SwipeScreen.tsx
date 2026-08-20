@@ -1,6 +1,6 @@
 import type { SwipeDeckRef } from "@fontezbrooks/swipedaddy";
-import { useRouter } from "expo-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
 	ActivityIndicator,
 	Pressable,
@@ -48,7 +48,16 @@ export function SwipeScreen() {
 	/** ST3 transient pass flash. */
 	const [passed, setPassed] = useState(false);
 	const [quickViewUid, setQuickViewUid] = useState<string | null>(null);
-	const { sessionKey, track } = useAnalytics();
+	const { resetIdentityForAudience, sessionKey, track } = useAnalytics();
+	// Homeowner audience boundary (review: PR #44): /swipe is entered from
+	// two CTAs and deep links — the focus lifecycle covers them all. A
+	// device identified as a CONTRACTOR must not have card/swipe events
+	// mixed into that person; an identified homeowner keeps continuity.
+	useFocusEffect(
+		useCallback(() => {
+			resetIdentityForAudience("homeowner");
+		}, [resetIdentityForAudience])
+	);
 
 	// Top card changed → it's being shown to the homeowner (US-4).
 	const { current } = deck;
