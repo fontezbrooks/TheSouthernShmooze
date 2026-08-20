@@ -342,4 +342,38 @@ describe("qualification analytics persistence gate (review PR #43)", () => {
 		// Identity must gate on the same persistence result (P3).
 		expect(mockIdentify).not.toHaveBeenCalled();
 	});
+
+	test("stale submit settling after reset restores neither identity nor event (PR #44)", async () => {
+		let resolveSubmit: (persisted: boolean) => void = () => {
+			/* replaced below */
+		};
+		submitMock.mockReturnValue(
+			new Promise((resolve) => {
+				resolveSubmit = resolve;
+			})
+		);
+		const { result } = await renderHook(() => useContractorWizard());
+		for (let i = 0; i < stepValues.length; i += 1) {
+			// biome-ignore lint/performance/noAwaitInLoops: wizard steps must advance sequentially
+			await fillStep(result, i);
+			await act(async () => {
+				await result.current.advance();
+			});
+		}
+		expect(result.current.phase).toBe("result");
+		// "Start over" begins a fresh (anonymous) application...
+		act(() => {
+			result.current.reset();
+		});
+		// ...then the OLD application's submit finally persists.
+		await act(async () => {
+			resolveSubmit(true);
+			await Promise.resolve();
+		});
+		expect(mockIdentify).not.toHaveBeenCalled();
+		expect(mockTrack).not.toHaveBeenCalledWith(
+			"contractor_qualification_submitted",
+			expect.anything()
+		);
+	});
 });

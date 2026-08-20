@@ -57,6 +57,12 @@ export function useContractorWizard() {
 	const placeSession = useRef<string | null>(null);
 	// True while an advance (including the final verify+submit) is running.
 	const advancing = useRef(false);
+	// Application generation: reset() bumps it, invalidating any pending
+	// fire-and-forget submit callback — a slow submitApplication settling
+	// AFTER "Start over" must not re-identify the device as the PREVIOUS
+	// applicant (or attribute its event to the new anonymous person)
+	// (review: PR #44).
+	const applicationGen = useRef(0);
 	// Leaving the screen (header back / route pop) mid-verification means the
 	// user backed out — the pending flow must NOT record the application or
 	// set state after unmount (review: PR #34).
@@ -107,8 +113,10 @@ export function useContractorWizard() {
 			// event chains on the ACTUAL persistence result (review: PR #43) so
 			// a swallowed network failure never reports a submission; the UI
 			// still advances immediately.
+			const gen = applicationGen.current;
 			void submitApplication(values, res).then((persisted) => {
-				if (persisted) {
+				// Stale-generation guard: see applicationGen above.
+				if (persisted && applicationGen.current === gen) {
 					// First-party identify (B-D11): the applicant typed this
 					// email into our own form — person merge, no ATT prompt.
 					identify(values.email, {
@@ -174,6 +182,7 @@ export function useContractorWizard() {
 
 	/** Fresh application (post-result re-entry). */
 	const reset = () => {
+		applicationGen.current += 1;
 		form.reset(emptyWizard);
 		placeSession.current = null;
 		setVerdict(null);
