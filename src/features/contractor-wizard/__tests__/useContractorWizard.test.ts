@@ -246,13 +246,28 @@ describe("useContractorWizard", () => {
 	});
 });
 
+// Captures the focus callback so tests can simulate the route gaining
+// focus without a navigation container (holder lives in the factory —
+// module-scope variables would hit the TDZ when jest hoists the mock).
+jest.mock("expo-router", () => {
+	const holder: { cb?: () => void } = {};
+	return {
+		__focusHolder: holder,
+		useFocusEffect: (cb: () => void) => {
+			holder.cb = cb;
+		},
+	};
+});
+
 const mockTrack = jest.fn();
 const mockIdentify = jest.fn();
 const mockResetIdentity = jest.fn();
+const mockResetForAudience = jest.fn();
 jest.mock("@/lib/analytics/useAnalytics", () => ({
 	useAnalytics: () => ({
 		identify: mockIdentify,
 		resetIdentity: mockResetIdentity,
+		resetIdentityForAudience: mockResetForAudience,
 		track: mockTrack,
 	}),
 	useFlag: () => undefined,
@@ -295,6 +310,20 @@ describe("qualification analytics (US-5)", () => {
 			applicant_trade: "Plumbing",
 			user_type: "contractor",
 		});
+	});
+
+	test("route focus crosses the contractor audience boundary (PR #44)", async () => {
+		const { __focusHolder } = jest.requireMock("expo-router") as {
+			__focusHolder: { cb?: () => void };
+		};
+		mockResetForAudience.mockClear();
+		await renderHook(() => useContractorWizard());
+		// Deep link straight to /contractor-wizard: focus fires the boundary.
+		await act(async () => {
+			__focusHolder.cb?.();
+			await Promise.resolve();
+		});
+		expect(mockResetForAudience).toHaveBeenCalledWith("contractor");
 	});
 
 	test("reset drops the analytics identity for a fresh application (PR #44)", async () => {

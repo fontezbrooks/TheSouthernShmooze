@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { randomUUID } from "expo-crypto";
-import { useEffect, useRef, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useAnalytics } from "@/lib/analytics/useAnalytics";
 import {
@@ -48,7 +49,18 @@ export function useContractorWizard() {
 		resolver: zodResolver(wizardSchema),
 	});
 
-	const { identify, resetIdentity, track } = useAnalytics();
+	const { identify, resetIdentity, resetIdentityForAudience, track } =
+		useAnalytics();
+	// Contractor audience boundary at the ROUTE (review: PR #44): a deep
+	// link straight to /contractor-wizard bypasses the CTA-handler resets,
+	// so the focus lifecycle re-checks — an identified homeowner is dropped
+	// before ScreenTracker/UtmTracker attribute anything here; a returning
+	// contractor keeps identity. Same pattern as Concierge and Swipe.
+	useFocusEffect(
+		useCallback(() => {
+			resetIdentityForAudience("contractor");
+		}, [resetIdentityForAudience])
+	);
 	const [step, setStep] = useState(1);
 	const [phase, setPhase] = useState<WizardPhase>("form");
 	const [verdict, setVerdict] = useState<FitVerdict | null>(null);
