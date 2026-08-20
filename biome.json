@@ -53,7 +53,7 @@
     {
       "includes": ["supabase/functions/**"],
       "javascript": {
-        "globals": ["Deno"]
+        "globals": ["Deno", "jest"]
       }
     }
   ],

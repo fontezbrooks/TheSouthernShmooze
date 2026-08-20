@@ -11,6 +11,7 @@
 // Auth: caller must present `X-Sync-Secret: <SYNC_TRIGGER_SECRET>` (verify_jwt = false).
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { captureServerEvent } from "../_shared/posthog-capture.ts";
 import {
 	type RawProfile,
 	transformProfile,
@@ -87,6 +88,24 @@ async function pool<T>(
 Deno.serve(async (req: Request) => {
 	const startedAt = Date.now();
 
+	// Server-side analytics (P4) — same contract as sync-directory.
+	const captureSync = (syncStatus: string, recordsIngested: number) =>
+		captureServerEvent(
+			{
+				apiKey: Deno.env.get("POSTHOG_PROJECT_KEY"),
+				host: Deno.env.get("POSTHOG_HOST"),
+			},
+			{
+				event: "registry_sync_completed",
+				properties: {
+					duration_ms: Date.now() - startedAt,
+					records_ingested: recordsIngested,
+					sync_source: "sync-profiles",
+					sync_status: syncStatus,
+				},
+			}
+		);
+
 	const expected = Deno.env.get("SYNC_TRIGGER_SECRET");
 	if (!expected || req.headers.get("X-Sync-Secret") !== expected) {
 		return json(401, { status: "unauthorized" });
@@ -124,6 +143,7 @@ Deno.serve(async (req: Request) => {
 			p_reason: `due query: ${dueErr.message}`,
 			p_status: "failed",
 		});
+		await captureSync("failed", 0);
 		return json(200, { reason: dueErr.message, status: "failed" });
 	}
 
@@ -138,6 +158,7 @@ Deno.serve(async (req: Request) => {
 			p_status: "ok",
 			p_updated: 0,
 		});
+		await captureSync("success", 0);
 		return json(200, { failed: 0, processed: 0, status: "ok", updated: 0 });
 	}
 
@@ -183,6 +204,10 @@ Deno.serve(async (req: Request) => {
 		p_updated: updated,
 	});
 
+	// Taxonomy declares sync_status as success | failed (CSV row 44) — a run
+	// with any item failures maps to failed; records_ingested still reports
+	// what DID land (review: PR #45).
+	await captureSync(failed > 0 ? "failed" : "success", updated);
 	return json(200, {
 		duration_ms: Date.now() - startedAt,
 		failed,

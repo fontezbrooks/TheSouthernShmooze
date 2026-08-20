@@ -14,6 +14,7 @@ import {
 	type DirectoryRecord,
 	prepareRecords,
 } from "../_shared/directory-transform.ts";
+import { captureServerEvent } from "../_shared/posthog-capture.ts";
 
 const DEFAULT_MW_URL =
 	"https://api.membershipworks.com/v2/directory?_rf=Members&_st=";
@@ -76,6 +77,26 @@ async function fetchDirectory(
 Deno.serve(async (req: Request) => {
 	const startedAt = Date.now();
 
+	// Server-side analytics (P4): registry_sync_completed on every run exit.
+	// Never throws; unconfigured env = silent no-op. Awaited (2s cap) because
+	// the runtime may cancel pending work once the response is returned.
+	const captureSync = (syncStatus: string, recordsIngested: number) =>
+		captureServerEvent(
+			{
+				apiKey: Deno.env.get("POSTHOG_PROJECT_KEY"),
+				host: Deno.env.get("POSTHOG_HOST"),
+			},
+			{
+				event: "registry_sync_completed",
+				properties: {
+					duration_ms: Date.now() - startedAt,
+					records_ingested: recordsIngested,
+					sync_source: "sync-directory",
+					sync_status: syncStatus,
+				},
+			}
+		);
+
 	// 1) Auth.
 	const expected = Deno.env.get("SYNC_TRIGGER_SECRET");
 	if (!expected || req.headers.get("X-Sync-Secret") !== expected) {
@@ -105,6 +126,7 @@ Deno.serve(async (req: Request) => {
 			p_reason: reason,
 			p_status: "failed",
 		});
+		await captureSync("failed", 0);
 		return json(200, { reason, status: "failed" });
 	}
 
@@ -116,9 +138,22 @@ Deno.serve(async (req: Request) => {
 	});
 
 	if (error) {
+		await captureSync("failed", 0);
 		return json(200, { reason: error.message, status: "failed" });
 	}
 
+	// The RPC's safety guard skips the apply WITHOUT an error (status
+	// "skipped_guard", zero records applied) — exactly the condition this
+	// telemetry must expose as a failure, not a success (review: PR #45).
+	if (data?.status === "skipped_guard") {
+		await captureSync("failed", 0);
+	} else {
+		// records_ingested = records the sync actually CHANGED (taxonomy:
+		// "records updated during the sync") — the RPC skips unchanged rows,
+		// so the full feed size would report ~184 on a no-op run
+		// (review: PR #45).
+		await captureSync("success", (data?.added ?? 0) + (data?.updated ?? 0));
+	}
 	return json(200, {
 		...data,
 		duration_ms: Date.now() - startedAt,
