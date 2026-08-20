@@ -18,12 +18,14 @@ function makeClient(): PostHog {
 	return {
 		capture: jest.fn(),
 		debug: jest.fn(),
+		getDistinctId: jest.fn().mockReturnValue("0a1b2c3d-anon-uuid"),
 		getFeatureFlag: jest.fn().mockReturnValue(true),
 		getSessionId: jest.fn().mockReturnValue("ph-session-1"),
 		identify: jest.fn(),
 		onFeatureFlags: jest.fn().mockReturnValue(() => {
 			/* unsubscribe */
 		}),
+		reset: jest.fn(),
 		screen: jest.fn(),
 	} as unknown as PostHog;
 }
@@ -139,6 +141,53 @@ describe("useAnalytics", () => {
 			email: "pro@example.com",
 			user_type: "contractor",
 		});
+	});
+
+	test("identify from anonymous does NOT reset (merge handles linkage)", async () => {
+		const client = makeClient();
+		const { result } = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(client),
+		});
+		result.current.identify("a@b.com", { user_type: "homeowner" });
+		expect(client.reset).not.toHaveBeenCalled();
+	});
+
+	test("identify resets first when switching identified persons (PR #44)", async () => {
+		const client = makeClient();
+		(client.getDistinctId as jest.Mock).mockReturnValue("old@b.com");
+		const { result } = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(client),
+		});
+		result.current.identify("new@b.com", { user_type: "homeowner" });
+		expect(client.reset).toHaveBeenCalledTimes(1);
+		expect(client.identify).toHaveBeenCalledWith("new@b.com", {
+			email: "new@b.com",
+			user_type: "homeowner",
+		});
+	});
+
+	test("re-identifying the SAME email does not reset", async () => {
+		const client = makeClient();
+		(client.getDistinctId as jest.Mock).mockReturnValue("a@b.com");
+		const { result } = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(client),
+		});
+		result.current.identify("A@B.com", { user_type: "homeowner" });
+		expect(client.reset).not.toHaveBeenCalled();
+	});
+
+	test("resetIdentity forwards to client.reset and no-ops without one", async () => {
+		const bare = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(null),
+		});
+		expect(() => bare.result.current.resetIdentity()).not.toThrow();
+
+		const client = makeClient();
+		const { result } = await renderHook(() => useAnalytics(), {
+			wrapper: withClient(client),
+		});
+		result.current.resetIdentity();
+		expect(client.reset).toHaveBeenCalledTimes(1);
 	});
 
 	test("identify normalizes the distinct id (trim + lowercase)", async () => {

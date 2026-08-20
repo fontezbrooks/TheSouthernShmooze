@@ -40,7 +40,7 @@ export function useConciergeForm() {
 		resolver: zodResolver(conciergeStepTwoSchema),
 	});
 
-	const { identify, track } = useAnalytics();
+	const { identify, resetIdentity, track } = useAnalytics();
 	const [step, setStep] = useState<ConciergeStep>("job");
 	const [status, setStatus] = useState<SubmitStatus>("idle");
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -206,6 +206,10 @@ export function useConciergeForm() {
 		setStatus("idle");
 		setErrorMessage(null);
 		setStep("job");
+		// A fresh request may belong to a DIFFERENT person on this device —
+		// drop the analytics identity so its funnel starts anonymous; the
+		// same person merges back on their next identify (review: PR #44).
+		resetIdentity();
 		// A fresh request begins without a remount — see the mount effect above.
 		track("find_my_pro_initiated", {});
 	};

@@ -348,8 +348,13 @@ describe("useConciergeForm", () => {
 
 const mockTrack = jest.fn();
 const mockIdentify = jest.fn();
+const mockResetIdentity = jest.fn();
 jest.mock("@/lib/analytics/useAnalytics", () => ({
-	useAnalytics: () => ({ identify: mockIdentify, track: mockTrack }),
+	useAnalytics: () => ({
+		identify: mockIdentify,
+		resetIdentity: mockResetIdentity,
+		track: mockTrack,
+	}),
 	useFlag: () => undefined,
 }));
 
@@ -399,5 +404,18 @@ describe("find-my-pro analytics (US-2)", () => {
 		expect(mockIdentify).toHaveBeenCalledWith("jane@example.com", {
 			user_type: "homeowner",
 		});
+	});
+
+	it("reset drops the analytics identity for the next request (PR #44)", async () => {
+		const { result } = await renderHook(() => useConciergeForm());
+		await fillStepOne(result);
+		await fillStepTwo(result);
+		expect(mockResetIdentity).not.toHaveBeenCalled();
+		await act(async () => {
+			result.current.reset();
+		});
+		expect(mockResetIdentity).toHaveBeenCalledTimes(1);
+		// The fresh (anonymous) request still records its initiation.
+		expect(mockTrack).toHaveBeenLastCalledWith("find_my_pro_initiated", {});
 	});
 });

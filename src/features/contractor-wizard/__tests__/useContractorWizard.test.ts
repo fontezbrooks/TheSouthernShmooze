@@ -248,8 +248,13 @@ describe("useContractorWizard", () => {
 
 const mockTrack = jest.fn();
 const mockIdentify = jest.fn();
+const mockResetIdentity = jest.fn();
 jest.mock("@/lib/analytics/useAnalytics", () => ({
-	useAnalytics: () => ({ identify: mockIdentify, track: mockTrack }),
+	useAnalytics: () => ({
+		identify: mockIdentify,
+		resetIdentity: mockResetIdentity,
+		track: mockTrack,
+	}),
 	useFlag: () => undefined,
 }));
 
@@ -290,6 +295,16 @@ describe("qualification analytics (US-5)", () => {
 			applicant_trade: "Plumbing",
 			user_type: "contractor",
 		});
+	});
+
+	test("reset drops the analytics identity for a fresh application (PR #44)", async () => {
+		mockResetIdentity.mockClear();
+		const { result } = await renderHook(() => useContractorWizard());
+		await walkToSubmit(result);
+		await act(async () => {
+			result.current.reset();
+		});
+		expect(mockResetIdentity).toHaveBeenCalledTimes(1);
 	});
 
 	test("not-yet outcome tracks flagged", async () => {

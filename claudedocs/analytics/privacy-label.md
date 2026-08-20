@@ -22,6 +22,7 @@ whenever a new event or person property lands.
 | Contact Info | Email Address | Contractor wizard submit; Find-My-Pro step 2 | App Functionality, Analytics |
 | Identifiers | User ID (PostHog distinct id = email; anonymous device id pre-identify) | SDK | Analytics |
 | Usage Data | Product Interaction (screens, swipes, form funnels, calls) | Whole app | Analytics |
+| Location | Coarse Location (user-typed 5-digit ZIP, persisted with leads — incl. partial leads saved after step 1 alone) | Find-My-Pro step 1; swipe intake | App Functionality |
 
 Notes:
 
@@ -42,8 +43,11 @@ Notes:
 
 ## Deliberately NOT collected (guardrails in code)
 
-- No precise or coarse location (zip is reduced to a 3-digit `zip_prefix`
-  event property — regional, non-identifying; typed by user, not sensed).
+- No precise location and no SENSED location (GPS/Wi-Fi never requested).
+  The user-typed ZIP the app persists for lead fulfillment IS declared as
+  Coarse Location above (review: PR #44 — the label covers all app
+  collection, not just analytics); ANALYTICS only ever sees the 3-digit
+  `zip_prefix` event property — regional, non-identifying.
 - No session replay (B-D4: replay OFF).
 - No advertising identifiers (IDFA never requested).
 - No email/phone/name fields exist in the typed event map
@@ -53,7 +57,7 @@ Notes:
 ## Answers to the App Store Connect questionnaire
 
 1. "Do you or your third-party partners collect data from this app?" — **Yes**.
-2. Data types: Email Address, Name, Phone Number (app functionality); User ID,
-   Product Interaction (analytics).
+2. Data types: Email Address, Name, Phone Number, Coarse Location (app
+   functionality); User ID, Product Interaction (analytics).
 3. "Is this data linked to the user's identity?" — **Yes** for all of the above.
 4. "Do you or your partners use data for tracking?" — **No**.

@@ -48,7 +48,7 @@ export function useContractorWizard() {
 		resolver: zodResolver(wizardSchema),
 	});
 
-	const { identify, track } = useAnalytics();
+	const { identify, resetIdentity, track } = useAnalytics();
 	const [step, setStep] = useState(1);
 	const [phase, setPhase] = useState<WizardPhase>("form");
 	const [verdict, setVerdict] = useState<FitVerdict | null>(null);
@@ -179,6 +179,9 @@ export function useContractorWizard() {
 		setVerdict(null);
 		setPhase("form");
 		setStep(1);
+		// A fresh application may belong to a DIFFERENT person on this
+		// device — start it anonymous (review: PR #44).
+		resetIdentity();
 	};
 
 	return {
