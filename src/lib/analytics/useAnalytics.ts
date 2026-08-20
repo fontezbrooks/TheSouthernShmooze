@@ -1,13 +1,13 @@
-import { PostHogPersistedProperty } from "posthog-react-native";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { AnalyticsContext } from "./AnalyticsProvider";
+import { type AnalyticsAudience, crossAudienceReset } from "./audience";
 import type {
 	AnalyticsEvent,
 	AnalyticsEventName,
 	IdentifyProperties,
 } from "./events";
 
-export type AnalyticsAudience = IdentifyProperties["user_type"];
+export type { AnalyticsAudience } from "./audience";
 
 export interface Analytics {
 	/**
@@ -100,17 +100,8 @@ export function useAnalytics(): Analytics {
 		Analytics["resetIdentityForAudience"]
 	>(
 		(entering) => {
-			if (!client?.getDistinctId().includes("@")) {
-				return;
-			}
-			const props = client.getPersistedProperty<Record<string, unknown>>(
-				PostHogPersistedProperty.Props
-			);
-			// An unknown audience (identified before the register call
-			// existed, cleared storage) counts as a mismatch — resetting is
-			// the safe default for a shared device.
-			if (props?.user_type !== entering) {
-				client.reset();
+			if (client) {
+				crossAudienceReset(client, entering);
 			}
 		},
 		[client]

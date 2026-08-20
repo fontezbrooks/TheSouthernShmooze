@@ -3,6 +3,7 @@ import { usePathname } from "expo-router";
 import type PostHog from "posthog-react-native";
 import { PostHogProvider } from "posthog-react-native";
 import { createContext, type ReactNode, useEffect, useMemo } from "react";
+import { audienceForPathname, crossAudienceReset } from "./audience";
 import { getAnalyticsClient } from "./posthog";
 import { initialUtmProps } from "./utm";
 
@@ -54,13 +55,24 @@ export function AnalyticsProvider({
 	);
 }
 
-/** Emits a $screen per expo-router pathname change (autocapture fallback). */
+/**
+ * Emits a $screen per expo-router pathname change (autocapture fallback).
+ * The audience boundary runs HERE, before the capture: this global tracker
+ * fires earlier than any route-level effect, so a funnel route's first
+ * $screen would otherwise be attributed to a departed other-audience
+ * identity (review: PR #44).
+ */
 function ScreenTracker({ client }: { client: PostHog }) {
 	const pathname = usePathname();
 	useEffect(() => {
-		if (pathname) {
-			client.screen(pathname);
+		if (!pathname) {
+			return;
 		}
+		const audience = audienceForPathname(pathname);
+		if (audience) {
+			crossAudienceReset(client, audience);
+		}
+		client.screen(pathname);
 	}, [client, pathname]);
 	return null;
 }

@@ -3,6 +3,7 @@ import type PostHog from "posthog-react-native";
 import type { ReactNode } from "react";
 import { Text } from "react-native";
 import { AnalyticsProvider } from "../AnalyticsProvider";
+import { audienceForPathname } from "../audience";
 import { zipPrefix } from "../events";
 import { isAnalyticsEnabled } from "../posthog";
 import { useAnalytics, useFlag } from "../useAnalytics";
@@ -13,6 +14,19 @@ jest.mock("expo-linking", () => ({
 }));
 const mockGetInitialURL = jest.requireMock("expo-linking")
 	.getInitialURL as jest.Mock;
+
+// Controls the pathname ScreenTracker sees (holder lives in the factory —
+// module-scope variables would hit the TDZ when jest hoists the mock).
+jest.mock("expo-router", () => {
+	const holder = { pathname: "/" };
+	return {
+		__pathnameHolder: holder,
+		usePathname: () => holder.pathname,
+	};
+});
+const { __pathnameHolder } = jest.requireMock("expo-router") as {
+	__pathnameHolder: { pathname: string };
+};
 
 function makeClient(): PostHog {
 	return {
@@ -296,6 +310,58 @@ describe("initialUtmProps (B-D14 deep-link UTM)", () => {
 		expect(
 			initialUtmProps("https://x.com/p?utm_source=qr%20flyer#utm_medium=nope")
 		).toEqual({ $initial_utm_source: "qr flyer" });
+	});
+});
+
+describe("audienceForPathname (PR #44)", () => {
+	test("maps funnel routes to their audience, neutral routes to null", () => {
+		expect(audienceForPathname("/contractor-wizard")).toBe("contractor");
+		expect(audienceForPathname("/swipe")).toBe("homeowner");
+		expect(audienceForPathname("/match-contact")).toBe("homeowner");
+		expect(audienceForPathname("/concierge")).toBe("homeowner");
+		expect(audienceForPathname("/")).toBeNull();
+		expect(audienceForPathname("/business/abc")).toBeNull();
+	});
+});
+
+describe("ScreenTracker audience boundary (PR #44)", () => {
+	afterEach(() => {
+		__pathnameHolder.pathname = "/";
+	});
+
+	test("cross-audience identity is dropped BEFORE the funnel $screen", async () => {
+		__pathnameHolder.pathname = "/contractor-wizard";
+		const client = makeClient();
+		(client.getDistinctId as jest.Mock).mockReturnValue("h@x.com");
+		(client.getPersistedProperty as jest.Mock).mockReturnValue({
+			user_type: "homeowner",
+		});
+		await render(
+			<AnalyticsProvider client={client}>
+				<Text>app</Text>
+			</AnalyticsProvider>
+		);
+		expect(client.reset).toHaveBeenCalledTimes(1);
+		expect(client.screen).toHaveBeenCalledWith("/contractor-wizard");
+		const [resetOrder] = (client.reset as jest.Mock).mock.invocationCallOrder;
+		const [screenOrder] = (client.screen as jest.Mock).mock.invocationCallOrder;
+		expect(resetOrder).toBeLessThan(screenOrder);
+	});
+
+	test("neutral routes never touch the identity", async () => {
+		__pathnameHolder.pathname = "/business/abc";
+		const client = makeClient();
+		(client.getDistinctId as jest.Mock).mockReturnValue("h@x.com");
+		(client.getPersistedProperty as jest.Mock).mockReturnValue({
+			user_type: "homeowner",
+		});
+		await render(
+			<AnalyticsProvider client={client}>
+				<Text>app</Text>
+			</AnalyticsProvider>
+		);
+		expect(client.reset).not.toHaveBeenCalled();
+		expect(client.screen).toHaveBeenCalledWith("/business/abc");
 	});
 });
 
