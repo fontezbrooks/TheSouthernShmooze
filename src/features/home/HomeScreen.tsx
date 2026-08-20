@@ -57,6 +57,7 @@ export function HomeScreen() {
             Copy: draft, owner approves at PR. */}
 				<Banner
 					cta={{ label: "Start Matching" }}
+					ctaSize="lg"
 					imageNode={<MatchCoverLogo height={86} width={120} />}
 					layout="titleRow"
 					onPress={() => router.push("/swipe")}
@@ -68,6 +69,7 @@ export function HomeScreen() {
             community banner + SmilyPeach icon per owner (polish round). */}
 				<Banner
 					cta={{ label: "Check My Fit" }}
+					ctaSize="lg"
 					imageNode={<SmilyPeachLogo height={94} width={96} />}
 					layout="titleRow"
 					onPress={() => router.push("/contractor-wizard")}
