@@ -103,14 +103,19 @@ export function BusinessDetailScreen({ uid }: { uid: string }) {
 	const primaryPhone: DetailPhone | null = detail?.phones[0] ?? null;
 	const description = detail ? (detail.aboutText ?? detail.tagline) : null;
 
-	const onCallPress = () => {
-		if (!(detail && primaryPhone)) {
-			return;
-		}
+	// Every call control on the profile funnels through this — sticky bar,
+	// body phone rows, and the multi-phone picker (review: PR #43).
+	const trackProfileCall = () =>
 		track("partner_call_button_clicked", {
 			call_placement_source: "profile_view",
 			pro_business_id: uid,
 		});
+
+	const onCallPress = () => {
+		if (!(detail && primaryPhone)) {
+			return;
+		}
+		trackProfileCall();
 		if (detail.phones.length === 1) {
 			openLink(`tel:${primaryPhone.raw}`);
 			return;
@@ -241,7 +246,10 @@ export function BusinessDetailScreen({ uid }: { uid: string }) {
 								accessibilityLabel={`Call ${detail.name} at ${p.display}`}
 								accessibilityRole="button"
 								key={p.raw}
-								onPress={() => openLink(`tel:${p.raw}`)}
+								onPress={() => {
+									trackProfileCall();
+									openLink(`tel:${p.raw}`);
+								}}
 								style={styles.phoneRow}
 							>
 								<Icon color={t.brand.colors.clay} name="phone" size={16} />

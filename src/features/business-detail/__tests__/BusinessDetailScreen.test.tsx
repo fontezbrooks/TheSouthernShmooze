@@ -160,3 +160,17 @@ describe("profile analytics (US-3)", () => {
 		});
 	});
 });
+
+describe("profile call coverage (review PR #43)", () => {
+	it("tracks calls from the body phone rows too", async () => {
+		mockFetchByUid.mockResolvedValue({ data: makeDetail(), ok: true });
+		const { findByLabelText } = await renderScreen();
+		await fireEvent.press(
+			await findByLabelText("Call Acme Roofing at 678-790-4781")
+		);
+		expect(mockTrack).toHaveBeenCalledWith("partner_call_button_clicked", {
+			call_placement_source: "profile_view",
+			pro_business_id: "uid-1",
+		});
+	});
+});

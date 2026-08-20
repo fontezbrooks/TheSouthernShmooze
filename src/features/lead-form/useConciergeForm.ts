@@ -90,7 +90,12 @@ export function useConciergeForm() {
 				savedPartialId.current = null;
 				lastPartialPayload.current = payload;
 			}
+			// THIS request's own outcome — the event flag must not read shared
+			// mutable state, which a concurrent re-advance can repoint to a
+			// different request (review: PR #43).
+			let partialRecorded = false;
 			const inFlight = submitPartialLead(values, id).then((result) => {
+				partialRecorded = result.ok;
 				// Record only if this insert is still the CURRENT partial — an
 				// edited re-advance may have superseded it while it was in flight,
 				// and a late stale resolution must not overwrite the fresh id
@@ -103,7 +108,7 @@ export function useConciergeForm() {
 			await inFlight;
 			// After the partial settles so partial_lead_recorded is truthful (US-2).
 			track("find_my_pro_step_1_completed", {
-				partial_lead_recorded: savedPartialId.current !== null,
+				partial_lead_recorded: partialRecorded,
 				requested_category: values.trade,
 				zip_prefix: zipPrefix(values.zip),
 			});

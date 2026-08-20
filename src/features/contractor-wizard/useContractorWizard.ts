@@ -103,11 +103,17 @@ export function useContractorWizard() {
 			if (!mounted.current) {
 				return;
 			}
-			// Fire-and-forget, site parity — the decision is already made.
-			void submitApplication(values, res);
-			track("contractor_qualification_submitted", {
-				applicant_trade: values.trade,
-				instant_qualification_response: OUTCOME_TO_STATUS[res.outcome],
+			// Fire-and-forget, site parity — the decision is already made. The
+			// event chains on the ACTUAL persistence result (review: PR #43) so
+			// a swallowed network failure never reports a submission; the UI
+			// still advances immediately.
+			void submitApplication(values, res).then((persisted) => {
+				if (persisted) {
+					track("contractor_qualification_submitted", {
+						applicant_trade: values.trade,
+						instant_qualification_response: OUTCOME_TO_STATUS[res.outcome],
+					});
+				}
 			});
 			setVerdict(res);
 			setPhase("result");

@@ -315,14 +315,18 @@ export function buildApplicationPayload(
 export async function submitApplication(
 	values: WizardValues,
 	verdict: FitVerdict
-): Promise<void> {
+): Promise<boolean> {
 	try {
 		await invokeWizard({
 			action: "submit",
 			application: buildApplicationPayload(values, verdict),
 		});
+		return true;
 	} catch {
-		// Instant response already shown — swallow by design.
+		// Instant response already shown — swallow by design. The boolean lets
+		// callers know whether the application actually persisted (analytics
+		// must not report submissions that never reached the backend).
+		return false;
 	}
 }
 
