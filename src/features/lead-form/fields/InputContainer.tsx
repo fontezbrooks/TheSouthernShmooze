@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View, type ViewStyle } from "react-native";
 import { FloatingLabel } from "@/components/ui/FloatingLabel";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { PaddedErrorMessage } from "@/components/ui/PaddedErrorMessage";
@@ -12,6 +12,10 @@ interface InputContainerProps {
 	error?: string;
 	/** focused || hasValue → label floats up. Forced true for multiline. */
 	floated: boolean;
+	/** Drives the clay focus ring. Callers with a real input pass their focus state. */
+	focused?: boolean;
+	/** Caption under the field when there is no error (site: phone help text). */
+	helperText?: string;
 	icon?: IconName;
 	label: string;
 	multiline?: boolean;
@@ -19,14 +23,38 @@ interface InputContainerProps {
 	trailing?: ReactNode;
 }
 
+/** Border colour by state: error wins, then focus, then rest. */
+function borderFor(
+	c: { clay: string; error: string; line: string },
+	error: string | undefined,
+	focused: boolean
+): string {
+	if (error) {
+		return c.error;
+	}
+	return focused ? c.clay : c.line;
+}
+
+/** Value-row alignment for the three shell states. */
+function contentStyle(multiline: boolean, floated: boolean): ViewStyle {
+	if (multiline) {
+		return styles.contentMultiline;
+	}
+	// Floated: value row drops to the bottom so the top-left label stands
+	// clear. Empty/unfocused: value row centred (placeholder label sits on it).
+	return floated ? styles.contentFloated : styles.contentCenter;
+}
+
 /**
- * The Figma V3 "Label Inside" input shell: a floating label (placeholder → small
- * top label), a leading icon + value row, and a padded error message below. The
- * label is pinned floated for multiline fields.
+ * Input shell on the 2026 brand tokens: white surface, `line` hairline that
+ * turns clay on focus and error-red on error, floating label, leading icon +
+ * value row, and either the padded error or a helper caption below.
  */
 export function InputContainer({
 	label,
 	floated,
+	focused = false,
+	helperText,
 	icon,
 	trailing,
 	error,
@@ -35,8 +63,9 @@ export function InputContainer({
 	children,
 }: InputContainerProps) {
 	const t = useTheme();
+	const c = t.brand.colors;
 	const isFloated = floated || multiline;
-	const borderColor = error ? t.colors.error : t.colors.inputBorder;
+	const borderColor = borderFor(c, error, focused);
 
 	return (
 		<View style={styles.wrap}>
@@ -45,23 +74,14 @@ export function InputContainer({
 					styles.box,
 					multiline ? styles.boxMultiline : styles.boxSingle,
 					{
-						backgroundColor: t.colors.surface,
+						backgroundColor: c.surface,
 						borderColor,
-						borderRadius: t.radii.input,
+						borderRadius: t.brand.radii.sm,
 						opacity: disabled ? 0.5 : 1,
 					},
 				]}
 			>
-				<View
-					style={[
-						styles.content,
-						multiline
-							? styles.contentMultiline
-							: isFloated
-								? styles.contentFloated
-								: styles.contentCenter,
-					]}
-				>
+				<View style={[styles.content, contentStyle(multiline, isFloated)]}>
 					<FloatingLabel
 						floated={isFloated}
 						hasIcon={!!icon && !multiline}
@@ -72,7 +92,7 @@ export function InputContainer({
 						style={[styles.valueRow, multiline && styles.valueRowMultiline]}
 					>
 						{icon && !multiline ? (
-							<Icon color={t.colors.muted} name={icon} size={18} />
+							<Icon color={c.textSoft} name={icon} size={18} />
 						) : null}
 						<View style={styles.valueFill}>{children}</View>
 					</View>
@@ -80,6 +100,17 @@ export function InputContainer({
 				{trailing}
 			</View>
 			{error ? <PaddedErrorMessage message={error} /> : null}
+			{!error && helperText ? (
+				<Text
+					style={[
+						t.brand.typography.caption,
+						styles.helper,
+						{ color: c.textSoft },
+					]}
+				>
+					{helperText}
+				</Text>
+			) : null}
 		</View>
 	);
 }
@@ -102,15 +133,14 @@ const styles = StyleSheet.create({
 		height: 42,
 		position: "relative",
 	},
-	// Empty/unfocused: value row centered (placeholder label sits over it).
 	contentCenter: { justifyContent: "center" },
-	// Floated: value row drops to the bottom so the top-left label stands clear.
 	contentFloated: { justifyContent: "flex-end" },
 	contentMultiline: {
 		flex: 1,
 		height: undefined,
 		justifyContent: "flex-start",
 	},
+	helper: { paddingHorizontal: 12 },
 	valueFill: { flex: 1 },
 	valueRow: {
 		alignItems: "center",

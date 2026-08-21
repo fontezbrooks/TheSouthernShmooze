@@ -281,6 +281,21 @@ describe("useConciergeForm", () => {
 		expect(partialIds[0]).not.toBe(partialIds[1]);
 	});
 
+	it("finish (Done) returns to the job step with cleared forms without starting a new request", async () => {
+		const { result } = await renderHook(() => useConciergeForm());
+		await fillStepOne(result);
+		await fillStepTwo(result);
+		expect(result.current.step).toBe("success");
+
+		await act(() => {
+			result.current.finish();
+		});
+
+		expect(result.current.step).toBe("job");
+		expect(result.current.stepOneForm.getValues("trade")).toBe("");
+		expect(result.current.stepTwoForm.getValues("email")).toBe("");
+	});
+
 	it("back is a no-op while a submission is in flight", async () => {
 		let resolveComplete!: (v: { ok: true; data: { id: string } }) => void;
 		mockedComplete.mockReturnValue(

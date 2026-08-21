@@ -1,37 +1,29 @@
 import { useRouter } from "expo-router";
 import {
-	ImageBackground,
 	KeyboardAvoidingView,
 	Platform,
 	ScrollView,
 	StyleSheet,
+	Text,
 	View,
 } from "react-native";
 import { AppHeader } from "@/components/ui/AppHeader";
-import { StrokedHeading } from "@/components/ui/StrokedHeading";
-import { StrokedText } from "@/components/ui/StrokedText";
 import { ConciergeForm } from "@/features/lead-form/ConciergeForm";
-import { daisyBackground } from "@/theme/assets";
 import { useTheme } from "@/theme/ThemeProvider";
 
-/** Concierge screen — "Concierge" brand kicker + the two-step Find My Pro flow (E3b). */
+/**
+ * Concierge screen on the 2026 brand tokens — Caveat kicker + Fraunces title
+ * (the Home hero pattern) over the two-step Find My Pro flow (E3b).
+ */
 export function ConciergeScreen() {
 	const t = useTheme();
 	const router = useRouter();
+	const goHome = () =>
+		router.canGoBack() ? router.back() : router.replace("/");
 
 	return (
-		<ImageBackground
-			resizeMode="repeat"
-			source={daisyBackground}
-			style={[styles.flex]}
-		>
-			<AppHeader
-				onBack={() =>
-					router.canGoBack() ? router.back() : router.replace("/")
-				}
-				showBack
-				surface="legacy"
-			/>
+		<View style={[styles.flex, { backgroundColor: t.brand.colors.bg }]}>
+			<AppHeader onBack={goHome} showBack />
 			<KeyboardAvoidingView
 				behavior={Platform.OS === "ios" ? "padding" : undefined}
 				style={styles.flex}
@@ -41,18 +33,28 @@ export function ConciergeScreen() {
 					keyboardShouldPersistTaps="handled"
 				>
 					<View style={styles.headingBlock}>
-						{/* Brand kicker (C1) — same overline treatment as the Home banner. */}
-						<StrokedText style={t.typography.displayXS}>Concierge</StrokedText>
-						<StrokedHeading variant="displayL">Find My Pro</StrokedHeading>
+						<Text
+							style={[
+								t.brand.typography.accent,
+								{ color: t.brand.colors.clay },
+							]}
+						>
+							Concierge
+						</Text>
+						<Text
+							accessibilityRole="header"
+							style={t.brand.typography.displayXL}
+						>
+							Find My Pro
+						</Text>
 					</View>
 					<ConciergeForm
-						onBackHome={() =>
-							router.canGoBack() ? router.back() : router.replace("/")
-						}
+						onBackHome={goHome}
+						onSeeDirectory={() => router.push("/directory")}
 					/>
 				</ScrollView>
 			</KeyboardAvoidingView>
-		</ImageBackground>
+		</View>
 	);
 }
 
@@ -64,5 +66,5 @@ const styles = StyleSheet.create({
 		paddingTop: 16,
 	},
 	flex: { flex: 1 },
-	headingBlock: { gap: 4 },
+	headingBlock: { gap: 2 },
 });

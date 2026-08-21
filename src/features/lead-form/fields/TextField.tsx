@@ -14,6 +14,8 @@ interface TextFieldProps<T extends FieldValues> {
 	autoCapitalize?: "none" | "sentences" | "words";
 	autoComplete?: "email" | "tel" | "name" | "street-address" | "off";
 	control: Control<T>;
+	/** Caption under the field when there is no error. */
+	helperText?: string;
 	icon?: IconName;
 	keyboardType?: KeyboardTypeOptions;
 	/** Floating label (placeholder when empty, small top label when filled). */
@@ -22,15 +24,16 @@ interface TextFieldProps<T extends FieldValues> {
 	name: FieldPath<T>;
 	/** Example hint shown in the value row once the label has floated. */
 	placeholder?: string;
-	/** Accepted for call-site clarity; the V3 design has no "optional" affordance. */
+	/** Accepted for call-site clarity; the design has no "optional" affordance. */
 	required?: boolean;
 }
 
-/** Controlled text input with a floating label (Figma V3) + padded error. */
+/** Controlled text input with a floating label + padded error, on `t.brand`. */
 export function TextField<T extends FieldValues>({
 	control,
 	name,
 	label,
+	helperText,
 	placeholder,
 	icon,
 	keyboardType,
@@ -51,6 +54,8 @@ export function TextField<T extends FieldValues>({
 					<InputContainer
 						error={fieldState.error?.message}
 						floated={floated}
+						focused={focused}
+						helperText={helperText}
 						icon={icon}
 						label={label}
 						multiline={multiline}
@@ -68,8 +73,12 @@ export function TextField<T extends FieldValues>({
 							onChangeText={field.onChange}
 							onFocus={() => setFocused(true)}
 							placeholder={floated ? placeholder : undefined}
-							placeholderTextColor={t.colors.muted}
-							style={[t.typography.body, multiline && styles.multiline]}
+							placeholderTextColor={t.brand.colors.textSoft}
+							style={[
+								t.brand.typography.body,
+								{ color: t.brand.colors.text },
+								multiline && styles.multiline,
+							]}
 							value={value}
 						/>
 					</InputContainer>
