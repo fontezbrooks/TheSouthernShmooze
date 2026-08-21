@@ -79,7 +79,10 @@ interface TabBarProps {
 	state: { index: number; routes: { key: string; name: string }[] };
 }
 
-/** Custom 5-tab bar (cream, rust hairline). Route tabs navigate; link tabs open external URLs; push tabs stack a screen. */
+/**
+ * Custom 5-tab bar on `t.brand` (magnolia, warm hairline, clay active tint).
+ * Route tabs navigate; link tabs open external URLs; push tabs stack a screen.
+ */
 function AppTabBar({ state, navigation }: TabBarProps) {
 	const t = useTheme();
 	const router = useRouter();
@@ -91,8 +94,8 @@ function AppTabBar({ state, navigation }: TabBarProps) {
 			style={[
 				styles.bar,
 				{
-					backgroundColor: t.colors.bg,
-					borderTopColor: t.colors.divider,
+					backgroundColor: t.brand.colors.bg,
+					borderTopColor: t.brand.colors.line,
 					paddingBottom: Math.max(insets.bottom, 8),
 				},
 			]}
@@ -100,7 +103,7 @@ function AppTabBar({ state, navigation }: TabBarProps) {
 			<View style={styles.row}>
 				{TABS.map((tab) => {
 					const focused = tab.kind === "route" && activeRoute === tab.key;
-					const tint = focused ? t.colors.rust : t.colors.neutral800;
+					const tint = focused ? t.brand.colors.clay : t.brand.colors.text;
 					const onPress = () => {
 						if (tab.kind === "link") {
 							openLink(tab.href);
@@ -134,7 +137,7 @@ function AppTabBar({ state, navigation }: TabBarProps) {
 							style={styles.item}
 						>
 							<IconCmp color={tint} height={24} width={24} />
-							<Text style={[t.typography.tab, { color: tint }]}>
+							<Text style={[t.brand.typography.tab, { color: tint }]}>
 								{tab.label}
 							</Text>
 						</Pressable>

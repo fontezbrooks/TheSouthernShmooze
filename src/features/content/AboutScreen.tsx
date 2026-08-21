@@ -34,6 +34,7 @@ export function AboutScreen() {
 					router.canGoBack() ? router.back() : router.replace("/")
 				}
 				showBack
+				surface="legacy"
 			/>
 			<ScrollView contentContainerStyle={styles.content}>
 				<View style={styles.headingBlock}>

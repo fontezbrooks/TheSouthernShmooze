@@ -184,6 +184,13 @@ export const brandTypography = {
 		letterSpacing: -0.4,
 		lineHeight: 46,
 	},
+	/** Tab bar label — Public Sans semibold at the iOS 10pt tab size. */
+	tab: {
+		color: brandColors.text,
+		fontFamily: brandFonts.bodySemi,
+		fontSize: 10,
+		lineHeight: 14,
+	},
 } satisfies Record<string, TextStyle>;
 
 export type BrandTypographyVariant = keyof typeof brandTypography;
