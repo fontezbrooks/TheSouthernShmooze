@@ -69,13 +69,16 @@ export function ConciergeHero({ onPress }: { onPress: () => void }) {
 }
 
 const styles = StyleSheet.create({
+	// Same scale as the Button primary (56h, Public Sans bold 15/20) so the
+	// page's two clay CTAs — this and the detail screen's Call — read as one
+	// control; centred under the photo rather than hanging off the left edge.
 	cta: {
 		alignItems: "center",
-		alignSelf: "flex-start",
+		alignSelf: "center",
+		height: 56,
 		justifyContent: "center",
-		marginTop: 20,
-		minHeight: 44,
-		paddingHorizontal: 24,
+		marginTop: 24,
+		paddingHorizontal: 32,
 	},
 	photoFill: { height: "100%", width: "100%" },
 	// The frame owns the ratio: a bare Image with `width: "100%"` + aspectRatio
