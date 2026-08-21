@@ -6,20 +6,30 @@ import {
 	type ViewStyle,
 } from "react-native";
 import { useTheme } from "@/theme/ThemeProvider";
+import type { BrandColors } from "@/theme/tokens";
 import { Icon, type IconName } from "./Icon";
 
 /**
- * Figma button set:
- * - `primary` → "Button Full": rust fill, 3px rustDark border, hard shadow, white label, 56h full-width (form submit).
- * - `solid`   → "Button L":     rust fill, 2px rustDark border, hard shadow, white label, 48h, hugs content (Empty State CTA).
- * - `pill`    → "Button S":     cream fill, 32h, hugs content; border/shadow per `tone` (banner CTAs, card phone).
- * - `wide`    → "Button L":     cream fill, 56h, full width, no border/shadow ("Add a File").
- * - `outline` → cream fill, 2px rustDark border, hard shadow, rustDark label, 48h — the
- *              light twin of `solid` so a pair (e.g. Pass/Match) shares one shape.
+ * Button set on the 2026 brand tokens — modelled on the live site's buttons
+ * (report.md §8.5: Public Sans 700, pill radius, clay fill with magnolia
+ * label, no shadow; secondary = outlined pill).
+ *
+ * - `primary` → clay fill, 56h, full width (form submit).
+ * - `solid`   → clay fill, 48h, hugs content (empty-state CTA, Match).
+ * - `outline` → surface, 1px clay border, clay label, 48h — the light twin of
+ *               `solid` so a pair (Pass/Match) shares one shape.
+ * - `pill`    → surface, hairline, 32h, hugs content — the LinkPill family;
+ *               `tone` picks the label colour.
+ * - `wide`    → surface, hairline, 56h, full width (secondary form action).
+ *
+ * Pressed state is a fill change, not an opacity dip: clay -> clay-dark for
+ * filled variants, surface -> porch-cream for light ones. Disabled `primary`
+ * gets an explicit peach-soft look (ink-soft label, 6.05:1); other variants
+ * dim to 50%.
  */
 export type ButtonVariant = "primary" | "solid" | "pill" | "wide" | "outline";
 
-/** Border + shadow + label color family for `pill` buttons. */
+/** Label colour family for `pill` buttons. `none` also drops the hairline. */
 export type ButtonTone = "rust" | "black" | "none";
 
 interface ButtonProps {
@@ -33,6 +43,73 @@ interface ButtonProps {
 	variant?: ButtonVariant;
 }
 
+/** Resolved colours for one variant in one state. */
+interface Look {
+	border: string;
+	borderWidth: number;
+	label: string;
+	pressed: string;
+	rest: string;
+}
+
+const HAIRLINE = StyleSheet.hairlineWidth;
+
+function resolveLook(
+	variant: ButtonVariant,
+	tone: ButtonTone,
+	disabled: boolean,
+	c: BrandColors
+): Look {
+	if (variant === "primary" && disabled) {
+		return {
+			border: "transparent",
+			borderWidth: 0,
+			label: c.textSoft,
+			pressed: c.peachSoft,
+			rest: c.peachSoft,
+		};
+	}
+	if (variant === "primary" || variant === "solid") {
+		return {
+			border: "transparent",
+			borderWidth: 0,
+			label: c.bg,
+			pressed: c.clayDark,
+			rest: c.clay,
+		};
+	}
+	if (variant === "outline") {
+		return {
+			border: c.clay,
+			borderWidth: 1,
+			label: c.clay,
+			pressed: c.porchCream,
+			rest: c.surface,
+		};
+	}
+	if (variant === "pill") {
+		const toneLabel: Record<ButtonTone, string> = {
+			black: c.black,
+			none: c.text,
+			rust: c.clay,
+		};
+		return {
+			border: c.line,
+			borderWidth: tone === "none" ? 0 : HAIRLINE,
+			label: toneLabel[tone],
+			pressed: c.porchCream,
+			rest: c.surface,
+		};
+	}
+	return {
+		border: c.line,
+		borderWidth: HAIRLINE,
+		label: c.text,
+		pressed: c.porchCream,
+		rest: c.surface,
+	};
+}
+
 export function Button({
 	label,
 	onPress,
@@ -44,64 +121,13 @@ export function Button({
 	style,
 }: ButtonProps) {
 	const t = useTheme();
-
-	const isPrimary = variant === "primary";
-	const isSolid = variant === "solid";
+	const look = resolveLook(variant, tone, disabled, t.brand.colors);
 	const isPill = variant === "pill";
-	const isOutline = variant === "outline";
-	const isRustFill = isPrimary || isSolid;
-
-	// Resolve surface, border, shadow, and label color.
-	const toneColor =
-		tone === "rust"
-			? t.colors.rust
-			: tone === "black"
-				? t.colors.black
-				: t.colors.text;
-
-	// Primary has an explicit disabled look (grey fill/border/shadow); other
-	// variants fall back to a simple opacity dim.
-	const disabledPrimary = disabled && isPrimary;
-
-	const bg = disabledPrimary
-		? t.colors.inputBorder
-		: isRustFill
-			? t.colors.rust
-			: t.colors.bg;
-	const labelColor = isRustFill
-		? t.colors.white
-		: isOutline
-			? t.colors.rustDark
-			: toneColor;
-	const labelStyle = isPill
-		? t.typography.captionSemi
-		: t.typography.bodySemibold;
-
-	const bordered = isRustFill || isOutline || (isPill && tone !== "none");
-	const borderColor = disabledPrimary
-		? t.colors.neutral500
-		: isRustFill || isOutline
-			? t.colors.rustDark
-			: tone === "black"
-				? t.colors.black
-				: t.colors.rustDark;
-	// primary 3px (2px when disabled), solid/pill/outline 2px.
-	const borderWidth = bordered
-		? isPrimary
-			? disabledPrimary
-				? 2
-				: 3
-			: 2
-		: 0;
-	const shadowed = isRustFill || isOutline || (isPill && tone !== "none");
-	const shadowStyle = disabledPrimary
-		? t.shadow.hardNeutral
-		: tone === "black"
-			? t.shadow.hardBlack
-			: t.shadow.hard;
+	// Disabled primary carries its own explicit look; everything else dims.
+	const dimmed = disabled && variant !== "primary";
 
 	const iconNode = icon ? (
-		<Icon color={labelColor} name={icon} size={isPill ? 12 : 18} />
+		<Icon color={look.label} name={icon} size={isPill ? 12 : 18} />
 	) : null;
 
 	return (
@@ -112,24 +138,26 @@ export function Button({
 			onPress={onPress}
 			style={({ pressed }) => [
 				styles.base,
-				isPrimary && styles.primary,
-				isSolid && styles.solid,
-				isPill && styles.pill,
-				isOutline && styles.outline,
-				variant === "wide" && styles.wide,
+				styles[variant],
 				{
-					backgroundColor: bg,
-					borderColor: bordered ? borderColor : "transparent",
-					borderRadius: t.radii.button,
-					borderWidth,
-					opacity: disabledPrimary ? 1 : disabled ? 0.5 : pressed ? 0.85 : 1,
+					backgroundColor: pressed && !disabled ? look.pressed : look.rest,
+					borderColor: look.border,
+					borderRadius: t.brand.radii.pill,
+					borderWidth: look.borderWidth,
+					opacity: dimmed ? 0.5 : 1,
 				},
-				shadowed && shadowStyle,
 				style,
 			]}
 		>
 			{icon && iconPosition === "leading" ? iconNode : null}
-			<Text style={[labelStyle, { color: labelColor }]}>{label}</Text>
+			<Text
+				style={[
+					isPill ? t.brand.typography.chip : t.brand.typography.button,
+					{ color: look.label },
+				]}
+			>
+				{label}
+			</Text>
 			{icon && iconPosition === "trailing" ? iconNode : null}
 		</Pressable>
 	);
@@ -145,7 +173,7 @@ const styles = StyleSheet.create({
 	outline: {
 		alignSelf: "center",
 		height: 48,
-		paddingHorizontal: 16,
+		paddingHorizontal: 20,
 	},
 	pill: {
 		alignSelf: "flex-start",
@@ -154,20 +182,17 @@ const styles = StyleSheet.create({
 	},
 	primary: {
 		height: 56,
-		paddingHorizontal: 16,
+		paddingHorizontal: 20,
 		width: "100%",
 	},
 	solid: {
 		alignSelf: "center",
 		height: 48,
-		paddingHorizontal: 16,
+		paddingHorizontal: 20,
 	},
 	wide: {
 		height: 56,
-		paddingHorizontal: 16,
+		paddingHorizontal: 20,
 		width: "100%",
 	},
 });
-
-/** Re-exported for callers that only need the View type. */
-export type { ViewStyle };
