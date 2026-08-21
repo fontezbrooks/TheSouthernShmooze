@@ -19,9 +19,13 @@ const LOGO_HEIGHT = 17;
 const SLOT = 44;
 
 /**
- * Cream top bar with the centered Shmooze wordmark (Figma horizontal logo asset)
- * and an optional back arrow with a 44×44 tap target. Extends cream up into the
- * status bar via the top safe-area inset.
+ * Magnolia top bar with the centered Shmooze wordmark (Figma horizontal logo
+ * asset) and an optional back arrow with a 44×44 tap target. Extends the page
+ * colour up into the status bar via the top safe-area inset.
+ *
+ * On `t.brand` so the bar no longer sits a shade warmer (#FFF8EA) than the
+ * magnolia page (#FFFDF8) beneath it. The wordmark SVG is the brand's logo
+ * asset and is deliberately left as-is.
  */
 export function AppHeader({ showBack = false, onBack }: AppHeaderProps) {
 	const t = useTheme();
@@ -31,8 +35,8 @@ export function AppHeader({ showBack = false, onBack }: AppHeaderProps) {
 			style={[
 				styles.bar,
 				{
-					backgroundColor: t.colors.bg,
-					borderBottomColor: t.colors.divider,
+					backgroundColor: t.brand.colors.bg,
+					borderBottomColor: t.brand.colors.line,
 					height: 60 + insets.top,
 					paddingTop: insets.top,
 				},
@@ -47,7 +51,7 @@ export function AppHeader({ showBack = false, onBack }: AppHeaderProps) {
 						onPress={onBack}
 						style={styles.backHit}
 					>
-						<Icon color={t.colors.text} name="arrowLeft" size={30} />
+						<Icon color={t.brand.colors.text} name="arrowLeft" size={30} />
 					</Pressable>
 				) : null}
 			</View>
