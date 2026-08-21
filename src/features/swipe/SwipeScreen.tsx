@@ -148,9 +148,13 @@ export function SwipeScreen() {
 	if (!session.ready) {
 		return (
 			<View
-				style={[styles.flex, styles.center, { backgroundColor: t.colors.bg }]}
+				style={[
+					styles.flex,
+					styles.center,
+					{ backgroundColor: t.brand.colors.bg },
+				]}
 			>
-				<ActivityIndicator color={t.colors.rust} />
+				<ActivityIndicator color={t.brand.colors.clay} />
 			</View>
 		);
 	}
@@ -163,7 +167,7 @@ export function SwipeScreen() {
 		<View
 			style={[
 				styles.flex,
-				{ backgroundColor: t.colors.bg, paddingTop: insets.top },
+				{ backgroundColor: t.brand.colors.bg, paddingTop: insets.top },
 			]}
 		>
 			{/* S5/S6: functional header only — chevron back + filters, no logo. */}
@@ -175,7 +179,7 @@ export function SwipeScreen() {
 					onPress={() => router.back()}
 					style={styles.navBtn}
 				>
-					<Icon color={t.colors.rust} name="chevronLeft" size={28} />
+					<Icon color={t.brand.colors.text} name="chevronLeft" size={28} />
 				</Pressable>
 				{session.task ? (
 					<Pressable
@@ -185,7 +189,7 @@ export function SwipeScreen() {
 						onPress={() => setFiltersOpen(true)}
 						style={styles.navBtn}
 					>
-						<Text style={[styles.dots, { color: t.colors.rust }]}>⋯</Text>
+						<Text style={[styles.dots, { color: t.brand.colors.text }]}>⋯</Text>
 					</Pressable>
 				) : null}
 			</View>
@@ -199,22 +203,31 @@ export function SwipeScreen() {
 					style={[
 						styles.termPill,
 						{
-							backgroundColor: t.colors.surface,
-							borderColor: t.colors.rustDark,
-							borderRadius: t.radii.pill,
+							backgroundColor: t.brand.colors.surface,
+							borderColor: t.brand.colors.line,
+							borderRadius: t.brand.radii.pill,
 						},
 					]}
 				>
-					<Icon color={t.colors.rust} name="search" size={14} />
-					<Text style={[t.typography.captionSemi, { color: t.colors.text }]}>
+					<Icon color={t.brand.colors.clay} name="search" size={14} />
+					<Text
+						style={[t.brand.typography.label, { color: t.brand.colors.text }]}
+					>
 						{session.task.keyword}
 					</Text>
 				</Pressable>
 			) : null}
 
 			{banner ? (
-				<View style={[styles.banner, { backgroundColor: t.colors.yellow200 }]}>
-					<Text style={[t.typography.captionSemi, { color: t.colors.text }]}>
+				<View
+					style={[styles.banner, { backgroundColor: t.brand.colors.peachSoft }]}
+				>
+					<Text
+						style={[
+							t.brand.typography.label,
+							{ color: t.brand.colors.clayDark },
+						]}
+					>
 						{banner}
 					</Text>
 				</View>
@@ -249,14 +262,14 @@ export function SwipeScreen() {
 					{confirmation ? (
 						// ST2 (and ST1 celebratory variant): match confirmation card.
 						<View style={[styles.flex, styles.center, styles.confirmWrap]}>
-							<Text style={[t.typography.displayXS, styles.centerText]}>
+							<Text style={[t.brand.typography.displayM, styles.centerText]}>
 								{confirmation.first ? "Your first match!" : "It’s a match!"}
 							</Text>
 							<Text
 								style={[
-									t.typography.body,
+									t.brand.typography.body,
 									styles.centerText,
-									{ color: t.colors.textSoft },
+									{ color: t.brand.colors.textSoft },
 								]}
 							>
 								Your request is in — {confirmation.name}, your Shmooze preferred
@@ -273,23 +286,23 @@ export function SwipeScreen() {
 			)}
 
 			{/* ST3: lightweight transient pass feedback — non-blocking. Styled as
-          the link-pill family: surface pill, rustDark border, hard 4px
-          offset shadow (same treatment as SearchBar/profile link pills). */}
+          the brand pill family: surface pill, line hairline, soft card shadow. */}
 			{passed ? (
 				<View pointerEvents="none" style={styles.passToast}>
 					<View
-						style={[styles.passShadow, { backgroundColor: t.colors.rustDark }]}
-					/>
-					<View
 						style={[
 							styles.passPill,
+							t.brand.shadow.card,
 							{
-								backgroundColor: t.colors.surface,
-								borderColor: t.colors.rustDark,
+								backgroundColor: t.brand.colors.surface,
+								borderColor: t.brand.colors.line,
+								borderRadius: t.brand.radii.pill,
 							},
 						]}
 					>
-						<Text style={[t.typography.captionSemi, { color: t.colors.text }]}>
+						<Text
+							style={[t.brand.typography.label, { color: t.brand.colors.text }]}
+						>
 							Passed
 						</Text>
 					</View>
@@ -342,18 +355,9 @@ const styles = StyleSheet.create({
 	hidden: { display: "none" },
 	navBtn: { paddingVertical: 6 },
 	passPill: {
-		borderRadius: 999,
-		borderWidth: 2,
+		borderWidth: StyleSheet.hairlineWidth,
 		paddingHorizontal: 16,
 		paddingVertical: 8,
-	},
-	passShadow: {
-		borderRadius: 999,
-		bottom: -4,
-		left: 4,
-		position: "absolute",
-		right: -4,
-		top: 4,
 	},
 	passToast: {
 		alignSelf: "center",
@@ -363,12 +367,12 @@ const styles = StyleSheet.create({
 	termPill: {
 		alignItems: "center",
 		alignSelf: "flex-start",
-		borderWidth: 1,
+		borderWidth: StyleSheet.hairlineWidth,
 		flexDirection: "row",
 		gap: 6,
-		height: 32,
 		marginBottom: 8,
 		marginHorizontal: 16,
+		minHeight: 32,
 		paddingHorizontal: 12,
 	},
 });

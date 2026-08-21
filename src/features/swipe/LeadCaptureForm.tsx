@@ -123,13 +123,15 @@ export function LeadCaptureForm({
 			/>
 
 			{error ? (
-				<Text style={[t.typography.caption, { color: t.colors.error }]}>
+				<Text
+					style={[t.brand.typography.caption, { color: t.brand.colors.error }]}
+				>
 					{error}
 				</Text>
 			) : null}
 
 			{busy ? (
-				<ActivityIndicator color={t.colors.rust} />
+				<ActivityIndicator color={t.brand.colors.clay} />
 			) : (
 				<Button label="Send request" onPress={submit} variant="primary" />
 			)}

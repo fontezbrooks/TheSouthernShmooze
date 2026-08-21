@@ -80,7 +80,7 @@ export function SwipeDeck({
 		return (
 			<ActivityIndicator
 				accessibilityLabel="Finding matches"
-				color={t.colors.rust}
+				color={t.brand.colors.clay}
 				style={styles.center}
 			/>
 		);
@@ -90,7 +90,11 @@ export function SwipeDeck({
 		return (
 			<View style={styles.center}>
 				<Text
-					style={[t.typography.body, styles.msg, { color: t.colors.error }]}
+					style={[
+						t.brand.typography.body,
+						styles.msg,
+						{ color: t.brand.colors.error },
+					]}
 				>
 					{error}
 				</Text>
@@ -107,11 +111,15 @@ export function SwipeDeck({
 	if (exhausted) {
 		return (
 			<View style={styles.center}>
-				<Text style={[t.typography.displayXS, styles.msg]}>
+				<Text style={[t.brand.typography.displayM, styles.msg]}>
 					That’s it for matches
 				</Text>
 				<Text
-					style={[t.typography.body, styles.msg, { color: t.colors.muted }]}
+					style={[
+						t.brand.typography.body,
+						styles.msg,
+						{ color: t.brand.colors.textSoft },
+					]}
 				>
 					Here’s the registry — more local pros are waiting there.
 				</Text>
@@ -128,9 +136,15 @@ export function SwipeDeck({
 	if (empty || cards.length === 0) {
 		return (
 			<View style={styles.center}>
-				<Text style={[t.typography.displayXS, styles.msg]}>No matches yet</Text>
+				<Text style={[t.brand.typography.displayM, styles.msg]}>
+					No matches yet
+				</Text>
 				<Text
-					style={[t.typography.body, styles.msg, { color: t.colors.muted }]}
+					style={[
+						t.brand.typography.body,
+						styles.msg,
+						{ color: t.brand.colors.textSoft },
+					]}
 				>
 					Try a different keyword to find local pros.
 				</Text>

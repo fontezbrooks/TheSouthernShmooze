@@ -17,10 +17,13 @@ export function ConfidenceBadge({
 			<View
 				style={[
 					styles.pill,
-					{ backgroundColor: t.colors.rust, borderRadius: t.radii.pill },
+					{
+						backgroundColor: t.brand.colors.clay,
+						borderRadius: t.brand.radii.pill,
+					},
 				]}
 			>
-				<Text style={[t.typography.captionSemi, { color: t.colors.white }]}>
+				<Text style={[t.brand.typography.chip, { color: t.brand.colors.bg }]}>
 					{Math.round(confidence)}% match
 				</Text>
 			</View>
@@ -28,10 +31,18 @@ export function ConfidenceBadge({
 				<View
 					style={[
 						styles.pill,
-						{ backgroundColor: t.colors.yellow200, borderRadius: t.radii.pill },
+						{
+							backgroundColor: t.brand.colors.peachSoft,
+							borderRadius: t.brand.radii.pill,
+						},
 					]}
 				>
-					<Text style={[t.typography.captionSemi, { color: t.colors.text }]}>
+					<Text
+						style={[
+							t.brand.typography.chip,
+							{ color: t.brand.colors.clayDark },
+						]}
+					>
 						Featured
 					</Text>
 				</View>

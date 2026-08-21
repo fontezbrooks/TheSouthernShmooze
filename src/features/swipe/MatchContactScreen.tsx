@@ -89,8 +89,8 @@ export function MatchContactScreen() {
 	const task = session.task;
 
 	return (
-		<View style={[styles.flex, { backgroundColor: t.colors.bg }]}>
-			<AppHeader onBack={cancel} showBack surface="legacy" />
+		<View style={[styles.flex, { backgroundColor: t.brand.colors.bg }]}>
+			<AppHeader onBack={cancel} showBack />
 			<KeyboardAvoidingView
 				behavior={Platform.OS === "ios" ? "padding" : undefined}
 				style={styles.flex}
@@ -122,14 +122,24 @@ export function MatchContactScreen() {
 					{/* CP2 — concierge-request framing (design.md §E4, Q6): a right-swipe
               IS a concierge request with this business pinned as the partner.
               Copy: draft, owner approves at PR. */}
-					<Text style={t.typography.displayS}>It’s a match!</Text>
-					<Text style={[t.typography.body, { color: t.colors.textSoft }]}>
+					<Text style={t.brand.typography.displayL}>It’s a match!</Text>
+					<Text
+						style={[
+							t.brand.typography.body,
+							{ color: t.brand.colors.textSoft },
+						]}
+					>
 						Share your details and your Shmooze preferred partner will reach out
 						to you.
 					</Text>
 
 					{sendError ? (
-						<Text style={[t.typography.caption, { color: t.colors.error }]}>
+						<Text
+							style={[
+								t.brand.typography.caption,
+								{ color: t.brand.colors.error },
+							]}
+						>
 							{sendError}
 						</Text>
 					) : null}

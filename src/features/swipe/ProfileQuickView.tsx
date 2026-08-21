@@ -69,9 +69,14 @@ export function ProfileQuickView({
 		<CenteredSheet onClose={onClose} visible={visible}>
 			<View style={styles.body}>
 				{loading ? (
-					<ActivityIndicator color={t.colors.rust} style={styles.spinner} />
+					<ActivityIndicator
+						color={t.brand.colors.clay}
+						style={styles.spinner}
+					/>
 				) : error ? (
-					<Text style={[t.typography.body, { color: t.colors.error }]}>
+					<Text
+						style={[t.brand.typography.body, { color: t.brand.colors.error }]}
+					>
 						{error}
 					</Text>
 				) : detail ? (
@@ -81,23 +86,31 @@ export function ProfileQuickView({
 								<Image
 									resizeMode="cover"
 									source={{ uri: detail.logoUrl }}
-									style={[styles.logo, { borderColor: t.colors.rustDark }]}
+									style={[styles.logo, { borderColor: t.brand.colors.line }]}
 								/>
 							) : null}
 							<View style={styles.headerCol}>
-								<Text style={t.typography.displayXS}>{detail.name}</Text>
+								<Text style={t.brand.typography.displayM}>{detail.name}</Text>
 								{detail.isCertified ? <CertifiedBadge /> : null}
 							</View>
 						</View>
 
 						{detail.tagline ? (
-							<Text style={[t.typography.body, { color: t.colors.textSoft }]}>
+							<Text
+								style={[
+									t.brand.typography.body,
+									{ color: t.brand.colors.textSoft },
+								]}
+							>
 								{detail.tagline}
 							</Text>
 						) : null}
 						{detail.address ? (
 							<Text
-								style={[t.typography.captionSemi, { color: t.colors.muted }]}
+								style={[
+									t.brand.typography.caption,
+									{ color: t.brand.colors.textSoft },
+								]}
 							>
 								{detail.address}
 							</Text>
