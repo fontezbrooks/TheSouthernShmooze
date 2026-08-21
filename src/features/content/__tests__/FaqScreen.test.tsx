@@ -8,34 +8,25 @@ jest.mock("expo-router", () => ({
 		replace: jest.fn(),
 	}),
 }));
-jest.mock("@/components/ui/AppHeader", () => ({ AppHeader: () => null }));
-jest.mock("@/components/ui/StrokedHeading", () => ({
-	StrokedHeading: () => null,
+const mockHeader = jest.fn();
+jest.mock("@/components/ui/AppHeader", () => ({
+	AppHeader: (props: Record<string, unknown>) => {
+		mockHeader(props);
+		return null;
+	},
 }));
 jest.mock("@/components/ui/Icon", () => ({ Icon: () => null }));
-jest.mock("@/theme/assets", () => ({ daisyBackground: 1 }));
-jest.mock("@/theme/ThemeProvider", () => ({
-	useTheme: () => ({
-		brand: {
-			colors: {
-				clay: "#a84",
-				clayDark: "#843",
-				line: "#eee",
-				pine: "#264",
-				surface: "#fff",
-				text: "#000",
-				textSoft: "#555",
-			},
-			radii: { md: 16, pill: 999 },
-			shadow: { card: {} },
-			typography: { body: {}, bodySemi: {}, caption: {}, chip: {} },
-		},
-		colors: { white: "#fff" },
-		typography: { displayXS: {} },
-	}),
-}));
 
 describe("FaqScreen (design.md §E6)", () => {
+	test("renders the kicker + title on a brand-surface header", async () => {
+		const s = await render(<FaqScreen />);
+		expect(s.getByText("Good to know")).toBeTruthy();
+		expect(s.getByRole("header", { name: "FAQ" })).toBeTruthy();
+		expect(mockHeader).toHaveBeenCalledWith(
+			expect.not.objectContaining({ surface: "legacy" })
+		);
+	});
+
 	test("shows homeowner topics by default", async () => {
 		const s = await render(<FaqScreen />);
 		expect(s.getByText("Finding & Hiring a Pro")).toBeTruthy();
