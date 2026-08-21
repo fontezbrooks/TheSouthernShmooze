@@ -101,7 +101,11 @@ export function CenteredSheet({
 					style={styles.centerWrap}
 				>
 					<Animated.View
-						style={[styles.card, { backgroundColor: t.colors.bg }, cardStyle]}
+						style={[
+							styles.card,
+							{ backgroundColor: t.brand.colors.bg },
+							cardStyle,
+						]}
 					>
 						{/* Only the grabber is draggable — inputs/buttons keep their touches. */}
 						<GestureDetector gesture={swipeDown}>
@@ -109,7 +113,7 @@ export function CenteredSheet({
 								<View
 									style={[
 										styles.grabber,
-										{ backgroundColor: t.colors.inputBorder },
+										{ backgroundColor: t.brand.colors.line },
 									]}
 								/>
 							</View>

@@ -30,22 +30,24 @@ export function SwipeStamps({ progress }: { progress: SharedValue<number> }) {
 				style={[
 					styles.stamp,
 					styles.stampRight,
-					{ borderColor: t.colors.rust },
+					{ borderColor: t.brand.colors.clay },
 					matchCue,
 				]}
 			>
-				<Text style={[styles.stampText, { color: t.colors.rust }]}>MATCH</Text>
+				<Text style={[styles.stampText, { color: t.brand.colors.clay }]}>
+					MATCH
+				</Text>
 			</Animated.View>
 			<Animated.View
 				pointerEvents="none"
 				style={[
 					styles.stamp,
 					styles.stampLeft,
-					{ borderColor: t.colors.neutral800 },
+					{ borderColor: t.brand.colors.text },
 					passCue,
 				]}
 			>
-				<Text style={[styles.stampText, { color: t.colors.neutral800 }]}>
+				<Text style={[styles.stampText, { color: t.brand.colors.text }]}>
 					PASS
 				</Text>
 			</Animated.View>
@@ -65,5 +67,9 @@ const styles = StyleSheet.create({
 	},
 	stampLeft: { left: 20, transform: [{ rotate: "-12deg" }] },
 	stampRight: { right: 20, transform: [{ rotate: "12deg" }] },
-	stampText: { fontSize: 28, fontWeight: "800", letterSpacing: 1 },
+	stampText: {
+		fontFamily: "PublicSans_700Bold",
+		fontSize: 28,
+		letterSpacing: 1,
+	},
 });

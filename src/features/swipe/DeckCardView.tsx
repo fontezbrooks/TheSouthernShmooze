@@ -5,7 +5,7 @@ import { useTheme } from "@/theme/ThemeProvider";
 import { ConfidenceBadge } from "./ConfidenceBadge";
 import type { DeckCard } from "./swipeTypes";
 
-/** The face of a swipe card: logo, name, tagline, confidence, distance, badges. */
+/** The face of a swipe card on `t.brand`: logo, name, tagline, confidence, distance, badges. */
 export function DeckCardView({ card }: { card: DeckCard }) {
 	const t = useTheme();
 	const distance =
@@ -16,18 +16,15 @@ export function DeckCardView({ card }: { card: DeckCard }) {
 			style={[
 				styles.card,
 				{
-					backgroundColor: t.colors.surface,
-					borderColor: t.colors.rustDark,
-					borderRadius: t.radii.card,
+					backgroundColor: t.brand.colors.surface,
+					borderColor: t.brand.colors.line,
+					borderRadius: t.brand.radii.md,
 				},
-				t.shadow.hard,
+				t.brand.shadow.card,
 			]}
 		>
 			<View
-				style={[
-					styles.imageWrap,
-					{ borderBottomColor: t.colors.imageHairline },
-				]}
+				style={[styles.imageWrap, { borderBottomColor: t.brand.colors.line }]}
 			>
 				{card.logoUrl ? (
 					<Image
@@ -40,10 +37,14 @@ export function DeckCardView({ card }: { card: DeckCard }) {
 						style={[
 							styles.imageFill,
 							styles.placeholder,
-							{ backgroundColor: t.colors.bg },
+							{ backgroundColor: t.brand.colors.porchCream },
 						]}
 					>
-						<Icon color={t.colors.rustDark} name="briefcaseFilled" size={96} />
+						<Icon
+							color={t.brand.colors.clay}
+							name="briefcaseFilled"
+							size={96}
+						/>
 					</View>
 				)}
 			</View>
@@ -53,18 +54,23 @@ export function DeckCardView({ card }: { card: DeckCard }) {
 					confidence={card.confidence}
 					isFeatured={card.isFeatured}
 				/>
-				<Text numberOfLines={2} style={t.typography.displayXS}>
+				<Text numberOfLines={2} style={t.brand.typography.displayM}>
 					{card.name}
 				</Text>
 				{card.tagline ? (
-					<Text numberOfLines={3} style={t.typography.body}>
+					<Text numberOfLines={3} style={t.brand.typography.body}>
 						{card.tagline}
 					</Text>
 				) : null}
 				<View style={styles.meta}>
 					{card.isCertified ? <CertifiedBadge label="Certified" /> : null}
 					{distance ? (
-						<Text style={[t.typography.caption, { color: t.colors.muted }]}>
+						<Text
+							style={[
+								t.brand.typography.caption,
+								{ color: t.brand.colors.textSoft },
+							]}
+						>
 							{distance}
 						</Text>
 					) : null}
@@ -76,7 +82,11 @@ export function DeckCardView({ card }: { card: DeckCard }) {
 
 const styles = StyleSheet.create({
 	body: { gap: 10, padding: 16 },
-	card: { borderWidth: 2, overflow: "hidden", width: "100%" },
+	card: {
+		borderWidth: StyleSheet.hairlineWidth,
+		overflow: "hidden",
+		width: "100%",
+	},
 	imageFill: { height: "100%", width: "100%" },
 	imageWrap: {
 		borderBottomWidth: StyleSheet.hairlineWidth,

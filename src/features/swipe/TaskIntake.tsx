@@ -50,26 +50,29 @@ export function TaskIntake({
 			contentContainerStyle={styles.content}
 			keyboardShouldPersistTaps="handled"
 		>
-			<Text style={t.typography.displayS}>{heading}</Text>
+			<Text style={t.brand.typography.displayL}>{heading}</Text>
 
 			<TextInput
 				autoCapitalize="none"
 				onChangeText={setKeyword}
 				placeholder="e.g. roofing, landscaping…"
-				placeholderTextColor={t.colors.muted}
+				placeholderTextColor={t.brand.colors.textSoft}
 				style={[
 					styles.input,
-					t.typography.body,
+					t.brand.typography.body,
 					{
-						backgroundColor: t.colors.surface,
-						borderColor: t.colors.inputBorder,
-						borderRadius: t.radii.input,
+						backgroundColor: t.brand.colors.surface,
+						borderColor: t.brand.colors.line,
+						borderRadius: t.brand.radii.sm,
+						color: t.brand.colors.text,
 					},
 				]}
 				value={keyword}
 			/>
 
-			<Text style={[t.typography.captionSemi, { color: t.colors.muted }]}>
+			<Text
+				style={[t.brand.typography.label, { color: t.brand.colors.textSoft }]}
+			>
 				Popular
 			</Text>
 			<View style={styles.chips}>
