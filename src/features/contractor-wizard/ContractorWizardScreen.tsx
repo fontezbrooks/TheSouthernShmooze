@@ -3,21 +3,18 @@ import { useEffect, useRef } from "react";
 import { Controller, useWatch } from "react-hook-form";
 import {
 	ActivityIndicator,
-	ImageBackground,
 	KeyboardAvoidingView,
 	Platform,
 	Pressable,
 	ScrollView,
 	StyleSheet,
+	Text,
 	View,
 } from "react-native";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
-import { StrokedHeading } from "@/components/ui/StrokedHeading";
-import { StrokedText } from "@/components/ui/StrokedText";
 import { TextField } from "@/features/lead-form/fields/TextField";
-import { daisyBackground } from "@/theme/assets";
 import { useTheme } from "@/theme/ThemeProvider";
 import { BusinessLookupField } from "./BusinessLookupField";
 import { FitResult } from "./FitResult";
@@ -39,7 +36,7 @@ const asRows = (opts: readonly string[]) =>
 
 /**
  * Check My Fit — native contractor qualification wizard (design.md §E5,
- * FR-7). Seven steps mirroring the site's /contractors form; instant
+ * FR-7) on the 2026 brand tokens. Seven steps mirroring the site's /contractors form; instant
  * decision at the end with a link-out join handoff (Q5).
  * Every step subtree is KEYED — see the keyed-steps gotcha: unkeyed
  * conditional steps get position-matched and RHF Controllers are reused
@@ -72,9 +69,7 @@ export function ContractorWizardScreen() {
 			case 1:
 				return (
 					<View key="step-contact" style={styles.step}>
-						<StrokedText style={stepTitleStyle(t)}>
-							First, who are you?
-						</StrokedText>
+						<Text style={stepTitleStyle(t)}>First, who are you?</Text>
 						<TextField
 							autoCapitalize="words"
 							autoComplete="name"
@@ -105,9 +100,7 @@ export function ContractorWizardScreen() {
 			case 2:
 				return (
 					<View key="step-business" style={styles.step}>
-						<StrokedText style={stepTitleStyle(t)}>
-							Find your business on Google
-						</StrokedText>
+						<Text style={stepTitleStyle(t)}>Find your business on Google</Text>
 						<BusinessLookupField
 							clearPlace={wizard.clearPlace}
 							control={form.control}
@@ -121,9 +114,7 @@ export function ContractorWizardScreen() {
 			case 3:
 				return (
 					<View key="step-trade" style={styles.step}>
-						<StrokedText style={stepTitleStyle(t)}>
-							About your trade
-						</StrokedText>
+						<Text style={stepTitleStyle(t)}>About your trade</Text>
 						<TextField
 							control={form.control}
 							label="Primary trade"
@@ -148,9 +139,7 @@ export function ContractorWizardScreen() {
 			case 4:
 				return (
 					<View key="step-area" style={styles.step}>
-						<StrokedText style={stepTitleStyle(t)}>
-							Where do you work?
-						</StrokedText>
+						<Text style={stepTitleStyle(t)}>Where do you work?</Text>
 						<TextField
 							control={form.control}
 							label="Primary Metro Atlanta service area"
@@ -192,15 +181,15 @@ export function ContractorWizardScreen() {
 											<Icon color={t.brand.colors.bg} name="check" size={12} />
 										) : null}
 									</View>
-									<StrokedText
-										containerStyle={styles.checkLabel}
+									<Text
 										style={[
+											styles.checkLabel,
 											t.brand.typography.caption,
 											{ color: t.brand.colors.textSoft },
 										]}
 									>
 										I don&apos;t have a website yet
-									</StrokedText>
+									</Text>
 								</Pressable>
 							)}
 						/>
@@ -209,9 +198,7 @@ export function ContractorWizardScreen() {
 			case 5:
 				return (
 					<View key="step-marketing" style={styles.step}>
-						<StrokedText style={stepTitleStyle(t)}>
-							How business comes in
-						</StrokedText>
+						<Text style={stepTitleStyle(t)}>How business comes in</Text>
 						<OptionRows
 							control={form.control}
 							label="How do you get most of your customers today?"
@@ -229,9 +216,7 @@ export function ContractorWizardScreen() {
 			case 6:
 				return (
 					<View key="step-reviews" style={styles.step}>
-						<StrokedText style={stepTitleStyle(t)}>
-							Reviews & what you want
-						</StrokedText>
+						<Text style={stepTitleStyle(t)}>Reviews & what you want</Text>
 						<OptionRows
 							control={form.control}
 							label="Roughly how many Google reviews do you have?"
@@ -249,17 +234,17 @@ export function ContractorWizardScreen() {
 			default:
 				return (
 					<View key="step-pains" style={styles.step}>
-						<StrokedText style={stepTitleStyle(t)}>
+						<Text style={stepTitleStyle(t)}>
 							Which of these sound like you?
-						</StrokedText>
-						<StrokedText
+						</Text>
+						<Text
 							style={[
 								t.brand.typography.caption,
 								{ color: t.brand.colors.textSoft },
 							]}
 						>
 							Optional — pick any that fit.
-						</StrokedText>
+						</Text>
 						<Controller
 							control={form.control}
 							name="painPoints"
@@ -302,15 +287,15 @@ export function ContractorWizardScreen() {
 														/>
 													) : null}
 												</View>
-												<StrokedText
-													containerStyle={styles.checkLabel}
+												<Text
 													style={[
+														styles.checkLabel,
 														t.brand.typography.body,
 														{ color: t.brand.colors.text },
 													]}
 												>
 													{p.label}
-												</StrokedText>
+												</Text>
 											</Pressable>
 										);
 									})}
@@ -327,22 +312,22 @@ export function ContractorWizardScreen() {
 			return (
 				<View accessibilityLiveRegion="polite" style={styles.analyzing}>
 					<ActivityIndicator color={t.brand.colors.clay} size="large" />
-					<StrokedText
+					<Text
 						style={[
 							t.brand.typography.bodySemi,
 							{ color: t.brand.colors.text },
 						]}
 					>
 						Checking your fit…
-					</StrokedText>
-					<StrokedText
+					</Text>
+					<Text
 						style={[
 							t.brand.typography.caption,
 							{ color: t.brand.colors.textSoft },
 						]}
 					>
 						Looking at your Google reviews and service area.
-					</StrokedText>
+					</Text>
 				</View>
 			);
 		}
@@ -359,12 +344,12 @@ export function ContractorWizardScreen() {
 		const isLast = step === stepCount;
 		return (
 			<>
-				<StrokedText
+				<Text
 					accessibilityLabel={`Step ${step} of ${stepCount}`}
 					style={[t.brand.typography.chip, { color: t.brand.colors.textSoft }]}
 				>
 					{`STEP ${step} OF ${stepCount}`}
-				</StrokedText>
+				</Text>
 				{stepBody()}
 				<View style={styles.actions}>
 					{step > 1 ? (
@@ -381,12 +366,8 @@ export function ContractorWizardScreen() {
 	};
 
 	return (
-		<ImageBackground
-			resizeMode="repeat"
-			source={daisyBackground}
-			style={styles.flex}
-		>
-			<AppHeader onBack={goBack} showBack surface="legacy" />
+		<View style={[styles.flex, { backgroundColor: t.brand.colors.bg }]}>
+			<AppHeader onBack={goBack} showBack />
 			<KeyboardAvoidingView
 				behavior={Platform.OS === "ios" ? "padding" : undefined}
 				style={styles.flex}
@@ -397,23 +378,33 @@ export function ContractorWizardScreen() {
 					ref={scrollRef}
 				>
 					<View style={styles.headingBlock}>
-						<StrokedText style={t.typography.displayXS}>
+						<Text
+							style={[
+								t.brand.typography.accent,
+								{ color: t.brand.colors.clay },
+							]}
+						>
 							For local pros
-						</StrokedText>
-						<StrokedHeading variant="displayL">Check My Fit</StrokedHeading>
-						<StrokedText
+						</Text>
+						<Text
+							accessibilityRole="header"
+							style={t.brand.typography.displayXL}
+						>
+							Check My Fit
+						</Text>
+						<Text
 							style={[
 								t.brand.typography.caption,
 								{ color: t.brand.colors.textSoft },
 							]}
 						>
 							Free, takes about 2 minutes. No card required.
-						</StrokedText>
+						</Text>
 					</View>
 					{body()}
 				</ScrollView>
 			</KeyboardAvoidingView>
-		</ImageBackground>
+		</View>
 	);
 }
 
@@ -442,7 +433,7 @@ const styles = StyleSheet.create({
 		paddingTop: 16,
 	},
 	flex: { flex: 1 },
-	headingBlock: { gap: 4 },
+	headingBlock: { gap: 2 },
 	painList: { gap: 12 },
 	step: { gap: 16 },
 });

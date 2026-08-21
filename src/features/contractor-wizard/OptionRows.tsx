@@ -5,7 +5,6 @@ import {
 	type FieldValues,
 } from "react-hook-form";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { StrokedText } from "@/components/ui/StrokedText";
 import { useTheme } from "@/theme/ThemeProvider";
 
 interface OptionRowsProps<T extends FieldValues> {
@@ -34,14 +33,14 @@ export function OptionRows<T extends FieldValues>({
 			name={name}
 			render={({ field, fieldState }) => (
 				<View style={styles.block}>
-					<StrokedText
+					<Text
 						style={[
 							t.brand.typography.bodySemi,
 							{ color: t.brand.colors.text },
 						]}
 					>
 						{label}
-					</StrokedText>
+					</Text>
 					<View style={styles.rows}>
 						{options.map((opt) => {
 							const selected = field.value === opt.value;
@@ -86,11 +85,14 @@ export function OptionRows<T extends FieldValues>({
 						})}
 					</View>
 					{fieldState.error ? (
-						<StrokedText
-							style={[t.brand.typography.caption, { color: t.colors.error }]}
+						<Text
+							style={[
+								t.brand.typography.caption,
+								{ color: t.brand.colors.error },
+							]}
 						>
 							{fieldState.error.message ?? "Required"}
-						</StrokedText>
+						</Text>
 					) : null}
 				</View>
 			)}
