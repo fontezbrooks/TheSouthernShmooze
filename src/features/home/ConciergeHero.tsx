@@ -69,13 +69,17 @@ export function ConciergeHero({ onPress }: { onPress: () => void }) {
 }
 
 const styles = StyleSheet.create({
+	// Same scale as the Button primary (56pt, Public Sans bold 15/20) and the
+	// same full width as the detail screen's Call, so the page's two clay CTAs
+	// read as one control. minHeight, not height: Dynamic Type must be able to
+	// grow the label without clipping it (review: PR #52).
 	cta: {
 		alignItems: "center",
-		alignSelf: "flex-start",
+		alignSelf: "stretch",
 		justifyContent: "center",
-		marginTop: 20,
-		minHeight: 44,
-		paddingHorizontal: 24,
+		marginTop: 24,
+		minHeight: 56,
+		paddingHorizontal: 20,
 	},
 	photoFill: { height: "100%", width: "100%" },
 	// The frame owns the ratio: a bare Image with `width: "100%"` + aspectRatio
