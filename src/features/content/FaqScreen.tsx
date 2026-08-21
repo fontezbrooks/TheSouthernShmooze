@@ -1,17 +1,8 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import {
-	ImageBackground,
-	Pressable,
-	ScrollView,
-	StyleSheet,
-	Text,
-	View,
-} from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Icon } from "@/components/ui/Icon";
-import { StrokedHeading } from "@/components/ui/StrokedHeading";
-import { daisyBackground } from "@/theme/assets";
 import { useTheme } from "@/theme/ThemeProvider";
 import { FAQ_CONTENT, type FaqAudience } from "./faqContent";
 
@@ -21,9 +12,9 @@ const AUDIENCES: readonly { key: FaqAudience; label: string }[] = [
 ];
 
 /**
- * Dual-audience FAQ (design.md §E6, site /faq parity): two tabs, five
- * collapsible topics each. One topic open at a time per audience keeps
- * the page scannable on a phone.
+ * Dual-audience FAQ (design.md §E6, site /faq parity) on the 2026 brand
+ * tokens: Caveat kicker + Fraunces title, two tabs, five collapsible topics
+ * each. One topic open at a time per audience keeps the page scannable.
  */
 export function FaqScreen() {
 	const t = useTheme();
@@ -37,23 +28,27 @@ export function FaqScreen() {
 	};
 
 	return (
-		<ImageBackground
-			resizeMode="repeat"
-			source={daisyBackground}
-			style={styles.flex}
-		>
+		<View style={[styles.flex, { backgroundColor: t.brand.colors.bg }]}>
 			<AppHeader
 				onBack={() =>
 					router.canGoBack() ? router.back() : router.replace("/")
 				}
 				showBack
-				surface="legacy"
 			/>
 			<ScrollView
 				contentContainerStyle={styles.content}
 				keyboardShouldPersistTaps="handled"
 			>
-				<StrokedHeading variant="displayL">FAQ</StrokedHeading>
+				<View style={styles.headingBlock}>
+					<Text
+						style={[t.brand.typography.accent, { color: t.brand.colors.clay }]}
+					>
+						Good to know
+					</Text>
+					<Text accessibilityRole="header" style={t.brand.typography.displayXL}>
+						FAQ
+					</Text>
+				</View>
 
 				<View accessibilityRole="tablist" style={styles.tabs}>
 					{AUDIENCES.map((a) => {
@@ -83,7 +78,7 @@ export function FaqScreen() {
 										t.brand.typography.bodySemi,
 										styles.tabLabel,
 										{
-											color: selected ? t.colors.white : t.brand.colors.text,
+											color: selected ? t.brand.colors.bg : t.brand.colors.text,
 										},
 									]}
 								>
@@ -163,7 +158,7 @@ export function FaqScreen() {
 					);
 				})}
 			</ScrollView>
-		</ImageBackground>
+		</View>
 	);
 }
 
@@ -175,6 +170,7 @@ const styles = StyleSheet.create({
 		paddingTop: 16,
 	},
 	flex: { flex: 1 },
+	headingBlock: { gap: 2, marginBottom: 4 },
 	qa: {
 		borderTopWidth: StyleSheet.hairlineWidth,
 		gap: 4,

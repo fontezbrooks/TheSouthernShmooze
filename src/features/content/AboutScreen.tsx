@@ -1,45 +1,37 @@
 import { useRouter } from "expo-router";
-import {
-	ImageBackground,
-	Pressable,
-	ScrollView,
-	StyleSheet,
-	Text,
-	View,
-} from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Icon } from "@/components/ui/Icon";
-import { StrokedHeading } from "@/components/ui/StrokedHeading";
 import { openLink } from "@/lib/openLink";
-import { daisyBackground } from "@/theme/assets";
 import { useTheme } from "@/theme/ThemeProvider";
 import { ABOUT_STORY, COMMUNITY_LINKS, PRESS_ITEMS } from "./aboutContent";
 
 /**
- * About + press + community links (design.md §E6, site /about parity).
- * All destinations are external link-outs via openLink.
+ * About + press + community links (design.md §E6, site /about parity) on
+ * the 2026 brand tokens. All destinations are external link-outs via openLink.
  */
 export function AboutScreen() {
 	const t = useTheme();
 	const router = useRouter();
 
 	return (
-		<ImageBackground
-			resizeMode="repeat"
-			source={daisyBackground}
-			style={styles.flex}
-		>
+		<View style={[styles.flex, { backgroundColor: t.brand.colors.bg }]}>
 			<AppHeader
 				onBack={() =>
 					router.canGoBack() ? router.back() : router.replace("/")
 				}
 				showBack
-				surface="legacy"
 			/>
 			<ScrollView contentContainerStyle={styles.content}>
 				<View style={styles.headingBlock}>
-					<Text style={t.typography.displayXS}>Our story</Text>
-					<StrokedHeading variant="displayL">The Shmooze</StrokedHeading>
+					<Text
+						style={[t.brand.typography.accent, { color: t.brand.colors.clay }]}
+					>
+						Our story
+					</Text>
+					<Text accessibilityRole="header" style={t.brand.typography.displayXL}>
+						The Shmooze
+					</Text>
 				</View>
 
 				<View
@@ -164,7 +156,7 @@ export function AboutScreen() {
 					</Pressable>
 				))}
 			</ScrollView>
-		</ImageBackground>
+		</View>
 	);
 }
 
@@ -181,7 +173,7 @@ const styles = StyleSheet.create({
 		paddingTop: 16,
 	},
 	flex: { flex: 1 },
-	headingBlock: { gap: 4 },
+	headingBlock: { gap: 2, marginBottom: 4 },
 	linkCol: { flex: 1, gap: 2 },
 	linkRow: {
 		alignItems: "center",
