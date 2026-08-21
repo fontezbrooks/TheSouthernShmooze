@@ -77,16 +77,17 @@ export function ConciergeForm({
 		advance,
 		back,
 		submit,
-		reset,
+		finish,
 	} = useConciergeForm();
 
 	if (step === "success") {
 		return (
 			<PartnerReveal
 				onDone={() => {
-					// Reset BEFORE leaving so the tab-preserved screen does not
-					// re-render success on the next visit.
-					reset();
+					// Clear BEFORE leaving so the tab-preserved screen does not
+					// re-render success on the next visit. `finish`, not `reset`:
+					// no phantom initiation, identity kept (review: PR #53).
+					finish();
 					onBackHome();
 				}}
 				onSeeDirectory={onSeeDirectory}

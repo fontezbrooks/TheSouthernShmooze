@@ -74,10 +74,18 @@ export function useConciergeForm() {
 	// contractor identified elsewhere and returning here must not have the
 	// resumed homeowner form attributed to them (review: PR #44). Initiation
 	// is NOT re-tracked — one per request, per the mount effect's rule.
+	// Set by `finish` (post-success Done): the NEXT visit to the tab is a new
+	// request and gets its initiation then — not at the moment of leaving
+	// (review: PR #53).
+	const pendingInitiation = useRef(false);
 	useFocusEffect(
 		useCallback(() => {
 			resetIdentityForAudience("homeowner");
-		}, [resetIdentityForAudience])
+			if (pendingInitiation.current) {
+				pendingInitiation.current = false;
+				track("find_my_pro_initiated", {});
+			}
+		}, [resetIdentityForAudience, track])
 	);
 
 	// Stable ids across retries (see submitConcierge id contract).
@@ -232,8 +240,8 @@ export function useConciergeForm() {
 		})();
 	};
 
-	/** Start a fresh request (post-success "Submit Another", tab re-entry). */
-	const reset = () => {
+	/** State-only cleanup shared by `reset` and `finish`: forms, ids, step. */
+	const clear = () => {
 		stepOneForm.reset(emptyStepOne);
 		stepTwoForm.reset(emptyStepTwo);
 		partialId.current = null;
@@ -246,6 +254,11 @@ export function useConciergeForm() {
 		setStatus("idle");
 		setErrorMessage(null);
 		setStep("job");
+	};
+
+	/** Start a fresh request right now (tab re-entry from a stale success). */
+	const reset = () => {
+		clear();
 		// A fresh request may belong to a DIFFERENT person on this device —
 		// drop the analytics identity so its funnel starts anonymous; the
 		// same person merges back on their next identify (review: PR #44).
@@ -254,10 +267,22 @@ export function useConciergeForm() {
 		track("find_my_pro_initiated", {});
 	};
 
+	/**
+	 * Leave after a successful request (the "Done" CTA). Clears the flow so the
+	 * tab-preserved screen does not re-render success, but does NOT start a
+	 * phantom funnel or drop the person's identity — their completed request
+	 * stays attributed. The next visit emits its own initiation (focus effect).
+	 */
+	const finish = () => {
+		clear();
+		pendingInitiation.current = true;
+	};
+
 	return {
 		advance,
 		back,
 		errorMessage,
+		finish,
 		reset,
 		status,
 		step,

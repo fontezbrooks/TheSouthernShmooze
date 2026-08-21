@@ -10,6 +10,11 @@ import { TextField } from "./fields/TextField";
 export const OTHER_TRADE = "Something else";
 const CHOICES = [...SUGGESTED_CATEGORIES, OTHER_TRADE] as const;
 
+/** A non-empty trade that is not one of the preset chips. */
+const isCustomTrade = (value: string): boolean =>
+	value.trim().length > 0 &&
+	!SUGGESTED_CATEGORIES.some((c) => c.toLowerCase() === value.toLowerCase());
+
 interface TradePickerProps {
 	control: Control<ConciergeStepOneValues>;
 }
@@ -22,13 +27,19 @@ interface TradePickerProps {
  */
 export function TradePicker({ control }: TradePickerProps) {
 	const t = useTheme();
-	const [isOther, setIsOther] = useState(false);
 	const { field, fieldState } = useController({ control, name: "trade" });
+	// Coming BACK from step 2 remounts this picker while RHF still holds the
+	// typed trade, so start in custom mode whenever the stored value is not
+	// one of the presets (review: PR #53).
+	const [isOther, setIsOther] = useState(() => isCustomTrade(field.value));
 
 	const onSelect = (choice: string) => {
 		if (choice === OTHER_TRADE) {
-			setIsOther(true);
-			field.onChange("");
+			// Re-tapping the chip while already in custom mode keeps the text.
+			if (!isOther) {
+				setIsOther(true);
+				field.onChange("");
+			}
 			return;
 		}
 		setIsOther(false);

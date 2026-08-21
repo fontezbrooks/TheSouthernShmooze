@@ -15,7 +15,11 @@ jest.mock("@/components/ui/FloatingLabel", () => {
 jest.mock("@/components/ui/Icon", () => ({ Icon: () => null }));
 jest.mock("../PartnerReveal", () => {
 	const { Text } = jest.requireActual("react-native");
-	return { PartnerReveal: () => <Text>partner-reveal</Text> };
+	return {
+		PartnerReveal: ({ onDone }: { onDone: () => void }) => (
+			<Text onPress={onDone}>partner-reveal</Text>
+		),
+	};
 });
 
 type Step = "job" | "contact" | "success";
@@ -24,6 +28,7 @@ const mockAdvance = jest.fn();
 const mockBack = jest.fn();
 const mockSubmit = jest.fn();
 const mockReset = jest.fn();
+const mockFinish = jest.fn();
 
 // Real RHF forms so TradePicker / TextField write-through can be asserted;
 // the hook's network + analytics behaviour is covered by its own suite.
@@ -42,6 +47,7 @@ jest.mock("../useConciergeForm", () => ({
 			advance: mockAdvance,
 			back: mockBack,
 			errorMessage: null,
+			finish: mockFinish,
 			reset: mockReset,
 			status: "idle",
 			step: mockStep,
@@ -52,8 +58,11 @@ jest.mock("../useConciergeForm", () => ({
 	},
 }));
 
+const mockBackHome = jest.fn();
 const renderForm = () =>
-	render(<ConciergeForm onBackHome={jest.fn()} onSeeDirectory={jest.fn()} />);
+	render(
+		<ConciergeForm onBackHome={mockBackHome} onSeeDirectory={jest.fn()} />
+	);
 
 beforeEach(() => {
 	jest.clearAllMocks();
@@ -114,10 +123,18 @@ describe("ConciergeForm", () => {
 		expect(mockBack).toHaveBeenCalledTimes(1);
 	});
 
-	it("success renders the partner reveal", async () => {
+	it("success renders the partner reveal; Done finishes (no phantom reset) then goes home", async () => {
 		mockStep = "success";
 		const { getByText } = await renderForm();
 
 		expect(getByText("partner-reveal")).toBeTruthy();
+		await fireEvent.press(getByText("partner-reveal"));
+
+		expect(mockFinish).toHaveBeenCalledTimes(1);
+		expect(mockReset).not.toHaveBeenCalled();
+		expect(mockBackHome).toHaveBeenCalledTimes(1);
+		expect(mockFinish.mock.invocationCallOrder[0]).toBeLessThan(
+			mockBackHome.mock.invocationCallOrder[0]
+		);
 	});
 });
