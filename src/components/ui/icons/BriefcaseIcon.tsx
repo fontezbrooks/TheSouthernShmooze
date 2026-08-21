@@ -1,5 +1,5 @@
 import Svg, { Path } from "react-native-svg";
-import { colors } from "@/theme/tokens";
+import { brandColors } from "@/theme/tokens";
 
 interface IconProps {
 	color?: string;
@@ -12,7 +12,7 @@ interface IconProps {
  */
 export function BriefcaseIcon({
 	size = 63,
-	color = colors.rustDark,
+	color = brandColors.clay,
 }: IconProps) {
 	return (
 		<Svg fill="none" height={size} viewBox="0 0 63 63" width={size}>

@@ -13,7 +13,6 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Icon } from "@/components/ui/Icon";
 import { LinkPill } from "@/components/ui/LinkPill";
-import { PhysicalPressable } from "@/components/ui/PhysicalPressable";
 import { CategoryChips } from "@/features/providers/CategoryChips";
 import { useAnalytics } from "@/lib/analytics/useAnalytics";
 import { LINKS } from "@/lib/links";
@@ -125,21 +124,22 @@ export function DirectoryScreen() {
 					</View>
 					{/* Pinned Find Your Perfect Local Match entry (D1) — interim Feather
               heart glyph per design §8. */}
-					<PhysicalPressable
+					<Pressable
 						accessibilityLabel="Find Your Perfect Local Match"
-						fullWidth={false}
+						accessibilityRole="button"
 						onPress={() => router.push("/swipe")}
-						radius={24}
-						style={[
+						style={({ pressed }) => [
 							styles.matchBtn,
+							t.brand.shadow.card,
 							{
-								backgroundColor: t.brand.colors.clay,
-								borderColor: t.brand.colors.clayDark,
+								backgroundColor: pressed
+									? t.brand.colors.clayDark
+									: t.brand.colors.clay,
 							},
 						]}
 					>
-						<Icon color={t.colors.white} name="heart" size={22} />
-					</PhysicalPressable>
+						<Icon color={t.brand.colors.bg} name="heart" size={22} />
+					</Pressable>
 				</View>
 				<CategoryChips onSelect={setQuery} selected={s.query} />
 			</View>
@@ -168,9 +168,9 @@ export function DirectoryScreen() {
 							) : s.error ? (
 								<Text
 									style={[
-										t.typography.caption,
+										t.brand.typography.caption,
 										styles.error,
-										{ color: t.colors.error },
+										{ color: t.brand.colors.error },
 									]}
 								>
 									{s.error}
@@ -210,7 +210,6 @@ const styles = StyleSheet.create({
 	matchBtn: {
 		alignItems: "center",
 		borderRadius: 24,
-		borderWidth: 2,
 		height: 48,
 		justifyContent: "center",
 		width: 48,

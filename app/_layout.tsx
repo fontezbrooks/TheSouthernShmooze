@@ -1,11 +1,6 @@
 // Must be the first import — sets up gesture-handler's native bindings.
 import "react-native-gesture-handler";
 import {
-	Bitter_400Regular,
-	Bitter_600SemiBold,
-	Bitter_800ExtraBold,
-} from "@expo-google-fonts/bitter";
-import {
 	Caveat_500Medium,
 	Caveat_600SemiBold,
 } from "@expo-google-fonts/caveat";
@@ -13,13 +8,13 @@ import {
 	Fraunces_600SemiBold,
 	Fraunces_700Bold,
 	Fraunces_900Black,
+	useFonts,
 } from "@expo-google-fonts/fraunces";
 import {
 	PublicSans_400Regular,
 	PublicSans_600SemiBold,
 	PublicSans_700Bold,
 } from "@expo-google-fonts/public-sans";
-import { Shrikhand_400Regular, useFonts } from "@expo-google-fonts/shrikhand";
 import { Stack } from "expo-router";
 import { preventAutoHideAsync } from "expo-splash-screen";
 import { useState } from "react";
@@ -35,9 +30,6 @@ preventAutoHideAsync();
 export default function RootLayout() {
 	const [splashDone, setSplashDone] = useState(false);
 	const [loaded, error] = useFonts({
-		Bitter_400Regular,
-		Bitter_600SemiBold,
-		Bitter_800ExtraBold,
 		Caveat_500Medium,
 		Caveat_600SemiBold,
 		Fraunces_600SemiBold,
@@ -46,7 +38,6 @@ export default function RootLayout() {
 		PublicSans_400Regular,
 		PublicSans_600SemiBold,
 		PublicSans_700Bold,
-		Shrikhand_400Regular,
 	});
 
 	// Gate render until fonts resolve (or fail) so headings never flash a fallback

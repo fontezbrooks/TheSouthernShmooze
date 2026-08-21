@@ -4,114 +4,6 @@
  * Figma is the source of truth (see docs/figma-refactor/README.md §3).
  */
 
-export const colors = {
-	/** Page base — warm Vanilla, sits under the daisy pattern. */
-	bg: "#FFF8EA",
-
-	black: "#000000",
-	/** AppHeader bottom divider (Figma drop-shadow 0.5px Neutral400). */
-	divider: "#CCCAC9",
-	/** Error border + warning-triangle fill (Reds/Red400). */
-	error: "#EE4145",
-	/** Provider-card image/placeholder bottom hairline (Figma #EBEBEB). */
-	imageHairline: "#EBEBEB",
-
-	/** Input hairline border (Neutral400). */
-	inputBorder: "#CCCAC9",
-	/** Mustard — community banner + "See More" card. */
-	mustard: "#C18D22",
-	/** Muted — input placeholder / inside-label (Neutral600). */
-	muted: "#757371",
-	/** Disabled button border (Neutrals/Neutral500). */
-	neutral500: "#A09F9F",
-	/** Near-black (Neutral800) — navbar inactive icon/label + tab text. */
-	neutral800: "#25201B",
-	/** Pumpkin accent. */
-	pumpkin: "#DF7C3D",
-
-	/** Brand rust — primary banner + primary button fill. */
-	rust: "#994706",
-	/** Orange600 — borders + the signature hard drop shadow. */
-	rustDark: "#602A00",
-	/** Card / input surface. */
-	surface: "#FFFFFF",
-
-	/** Primary text (Grey120). */
-	text: "#1B1B1C",
-	/** Softer text (Neutral700). */
-	textSoft: "#302B27",
-	white: "#FFFFFF",
-	/** Yellow400 — Certified chip star (Figma Yellow/Yellow400). */
-	yellow: "#EEB030",
-	/** Yellow200 — "Shmooze Certified" pill background (Figma Yellow/Yellow200). */
-	yellow200: "#FFEABE",
-} as const;
-
-/**
- * Faux text-stroke for Shrikhand display headers (RN has no text-stroke).
- * Rendered by `StrokedHeading` as offset copies behind the fill.
- * NOTE: values pending exact confirmation from the Figma node `strokes`.
- */
-export const heading = {
-	strokeColor: "#FEF8E8",
-	strokeWidth: 4,
-} as const;
-
-export const radii = {
-	button: 8,
-	card: 24,
-	input: 4,
-	pill: 100,
-} as const;
-
-/** 8px-based spacing scale. */
-export const spacing = {
-	lg: 24,
-	md: 16,
-	sm: 8,
-	xl: 32,
-	xs: 4,
-	xxl: 48,
-} as const;
-
-/**
- * Signature hard-offset shadow — NOT a blur. Figma "Button Drop Shadow":
- * color rustDark, offset (4,4), radius 0, spread 0.
- */
-export const shadow = {
-	/** Smaller 2px hard offset in mustard — the "Shmooze Certified" pill. */
-	certified: {
-		elevation: 2,
-		shadowColor: colors.mustard,
-		shadowOffset: { height: 2, width: 2 },
-		shadowOpacity: 1,
-		shadowRadius: 0,
-	},
-	hard: {
-		elevation: 4,
-		shadowColor: colors.rustDark,
-		shadowOffset: { height: 4, width: 4 },
-		shadowOpacity: 1,
-		shadowRadius: 0,
-	},
-	/** Same offset shadow in black (community banner button). */
-	hardBlack: {
-		elevation: 4,
-		shadowColor: colors.black,
-		shadowOffset: { height: 4, width: 4 },
-		shadowOpacity: 1,
-		shadowRadius: 0,
-	},
-	/** Same offset shadow in neutral grey (disabled Button Full). */
-	hardNeutral: {
-		elevation: 4,
-		shadowColor: colors.neutral500,
-		shadowOffset: { height: 4, width: 4 },
-		shadowOpacity: 1,
-		shadowRadius: 0,
-	},
-} as const;
-
 /** Motion durations (ms). */
 export const durations = {
 	instant: 75,
@@ -122,29 +14,11 @@ export const durations = {
 	xs: 100,
 } as const;
 
-/**
- * Font family keys as loaded by `@expo-google-fonts/*` (loaded family name
- * equals the imported export name). Wired in `app/_layout.tsx`.
- */
-export const fonts = {
-	/** Bitter — body. */
-	body: "Bitter_400Regular",
-	bodyBold: "Bitter_800ExtraBold",
-	bodySemi: "Bitter_600SemiBold",
-	/** Shrikhand — display/headings. */
-	display: "Shrikhand_400Regular",
-	/** Tab bar label — Bitter SemiBold per RC1 NavBar (was Open Sans). */
-	tab: "Bitter_600SemiBold",
-} as const;
-
-export type Colors = typeof colors;
-export type Fonts = typeof fonts;
-
 /* ------------------------------------------------------------------------- *
  * 2026 rebrand — tokens extracted from the live site (design truth per the
  * site-reconciliation round; see claudedocs/site-reconciliation/design.md §E1
- * and report.md §5/§8.5). Additive during migration: legacy tokens above stay
- * exported until every screen has moved over (E2–E7).
+ * and report.md §5/§8.5). The Figma-era palette/ramp was removed once every
+ * screen had migrated (Aug 2026); `t.brand.*` is the only token set.
  * ------------------------------------------------------------------------- */
 
 export const brandColors = {

@@ -58,9 +58,9 @@ function ClearButton({ onPress }: { onPress: () => void }) {
 			accessibilityRole="button"
 			hitSlop={8}
 			onPress={onPress}
-			style={[styles.clear, { backgroundColor: t.colors.neutral500 }]}
+			style={[styles.clear, { backgroundColor: t.brand.colors.textSoft }]}
 		>
-			<Icon color={t.colors.white} name="x" size={12} />
+			<Icon color={t.brand.colors.bg} name="x" size={12} />
 		</Pressable>
 	);
 }
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
 	// Center the text in the 48px pill: no default vertical padding, lineHeight
 	// tightened below the 24px body token (which sat the text low) but ABOVE the
 	// font size — a 16px line box clipped the font's ascenders at the top
-	// (device report). Listed AFTER t.typography.body so the override wins.
+	// (device report). Listed AFTER t.brand.typography.body so the override wins.
 	input: {
 		flex: 1,
 		includeFontPadding: false,

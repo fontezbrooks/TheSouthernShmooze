@@ -4,17 +4,12 @@ import {
 	brandFonts,
 	brandRadii,
 	brandShadow,
-	colors,
 	durations,
-	fonts,
-	radii,
-	shadow,
-	spacing,
 } from "./tokens";
-import { brandTypography, typography } from "./typography";
+import { brandTypography } from "./typography";
 
 const theme = {
-	/** 2026 rebrand namespace — screens migrate here in E2–E7. */
+	/** 2026 rebrand namespace — the only token set since the Aug 2026 migration. */
 	brand: {
 		colors: brandColors,
 		fonts: brandFonts,
@@ -22,13 +17,7 @@ const theme = {
 		shadow: brandShadow,
 		typography: brandTypography,
 	},
-	colors,
 	durations,
-	fonts,
-	radii,
-	shadow,
-	spacing,
-	typography,
 } as const;
 
 export type Theme = typeof theme;
