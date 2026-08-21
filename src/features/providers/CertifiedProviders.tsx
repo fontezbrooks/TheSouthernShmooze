@@ -167,9 +167,14 @@ const styles = StyleSheet.create({
 	},
 	headerText: { flex: 1 },
 	loading: { alignSelf: "flex-start", marginLeft: GUTTER, marginVertical: 12 },
-	// paddingBottom clears the cards' hard 4px offset shadow (BusinessCard is
-	// still on the legacy tokens — shared with the Directory) so the horizontal
-	// list doesn't clip it; the gutter padding lets the rail bleed off the edge.
-	row: { gap: 16, paddingBottom: 16, paddingHorizontal: GUTTER },
+	// paddingTop clears the cards' gold pin (half outside the card edge);
+	// paddingBottom clears the soft card shadow so the list doesn't clip it;
+	// the gutter padding lets the rail bleed off the edge.
+	row: {
+		gap: 16,
+		paddingBottom: 20,
+		paddingHorizontal: GUTTER,
+		paddingTop: 6,
+	},
 	section: { gap: 16 },
 });

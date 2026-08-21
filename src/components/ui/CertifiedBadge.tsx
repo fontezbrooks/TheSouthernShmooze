@@ -8,10 +8,10 @@ interface CertifiedBadgeProps {
 }
 
 /**
- * Certified pill (Figma "Business Card/Atoms/Certified"): pale-yellow fill,
- * mustard hairline + 2px mustard hard shadow, a yellow star, and a chocolate
- * label. Shared by the horizontal directory card ("Shmooze Certified") and the
- * vertical Certified-Providers card ("Certified"). Presentational only.
+ * Certified pill on the 2026 brand tokens: peach-soft fill, gold-light
+ * hairline, gold star, clay-dark label (6.16:1 on the fill). The legacy 2px
+ * mustard hard shadow is gone — a 20px chip never needed depth. Shared by the
+ * provider card, the directory row, the detail screen and the swipe deck.
  */
 export function CertifiedBadge({
 	label = "Shmooze Certified",
@@ -22,15 +22,16 @@ export function CertifiedBadge({
 			style={[
 				styles.badge,
 				{
-					backgroundColor: t.colors.yellow200,
-					borderColor: t.colors.mustard,
-					borderRadius: t.radii.pill,
+					backgroundColor: t.brand.colors.peachSoft,
+					borderColor: t.brand.colors.goldLight,
+					borderRadius: t.brand.radii.pill,
 				},
-				t.shadow.certified,
 			]}
 		>
-			<Icon color={t.colors.yellow} name="starFilled" size={12} />
-			<Text style={[t.typography.captionSemiXS, { color: t.colors.rustDark }]}>
+			<Icon color={t.brand.colors.gold} name="starFilled" size={12} />
+			<Text
+				style={[t.brand.typography.chip, { color: t.brand.colors.clayDark }]}
+			>
 				{label}
 			</Text>
 		</View>
@@ -41,7 +42,7 @@ const styles = StyleSheet.create({
 	badge: {
 		alignItems: "center",
 		alignSelf: "flex-start",
-		borderWidth: 1,
+		borderWidth: StyleSheet.hairlineWidth,
 		flexDirection: "row",
 		gap: 4,
 		height: 20,

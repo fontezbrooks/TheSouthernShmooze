@@ -2,7 +2,6 @@ import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { CardBadge } from "@/components/ui/CardBadge";
 import { CertifiedBadge } from "@/components/ui/CertifiedBadge";
 import { Icon } from "@/components/ui/Icon";
-import { PhysicalPressable } from "@/components/ui/PhysicalPressable";
 import { useTheme } from "@/theme/ThemeProvider";
 import type { DirectoryBusiness } from "./providerTypes";
 
@@ -12,13 +11,26 @@ interface BusinessCardProps {
 	onCardPress: (sourceUid: string) => void;
 }
 
-const CARD_WIDTH = 168; // 164 image + 2px border each side
-const IMAGE_SIZE = 164;
+const CARD_WIDTH = 168;
+const LOGO_SIZE = 140;
+const PIN_SIZE = 10;
+
+// Press-in only fires after this delay, so starting a SCROLL on a card no
+// longer depresses it — the FlatList claims the gesture first (SR4). Carried
+// over from the PhysicalPressable this card used to sit on.
+const PRESS_DELAY_MS = 120;
 
 /**
- * A Certified Providers card. The whole card is a physical-press tap target that
- * opens the web directory listing; the rust phone button is a separate nested tap
- * that dials. No-logo businesses show a briefcase placeholder.
+ * A Certified Providers card on the 2026 brand tokens, modelled on the site's
+ * registry card (report.md §8.5): white surface, gold hairline, a gold pin on
+ * the top edge, the logo in a framed inset, soft card shadow. The whole card is
+ * one tap target that opens the registry listing; the clay phone pill is a
+ * separate nested tap that dials. No-logo businesses show a briefcase
+ * placeholder.
+ *
+ * The legacy card pushed into a 4px hard-offset shadow via PhysicalPressable.
+ * That motion belongs to the old design language; the brand's depth is a soft
+ * blur, so press feedback is the same opacity dip the Home fork cards use.
  */
 export function BusinessCard({
 	business,
@@ -28,42 +40,56 @@ export function BusinessCard({
 	const t = useTheme();
 
 	return (
-		<PhysicalPressable
+		<Pressable
 			accessibilityLabel={`${business.name} — open registry listing`}
-			fullWidth={false}
+			accessibilityRole="button"
 			onPress={() => onCardPress(business.sourceUid)}
-			radius={t.radii.card}
-			shadowColor={t.colors.rustDark}
-			style={[
+			style={({ pressed }) => [
 				styles.card,
+				t.brand.shadow.card,
 				{
-					backgroundColor: t.colors.surface,
-					borderColor: t.colors.rustDark,
-					borderRadius: t.radii.card,
+					backgroundColor: t.brand.colors.surface,
+					borderColor: t.brand.colors.gold,
+					borderRadius: t.brand.radii.md,
 				},
+				pressed && styles.pressed,
 			]}
+			unstable_pressDelay={PRESS_DELAY_MS}
 		>
+			{/* The site's gold pin — decorative, marks "this one is on the registry". */}
+			<View
+				pointerEvents="none"
+				style={[styles.pin, { backgroundColor: t.brand.colors.gold }]}
+			/>
+
 			<View
 				style={[
-					styles.imageWrap,
-					{ borderBottomColor: t.colors.imageHairline },
+					styles.logoFrame,
+					{
+						borderColor: t.brand.colors.line,
+						borderRadius: t.brand.radii.sm,
+					},
 				]}
 			>
 				{business.logoUrl ? (
 					<Image
 						resizeMode="cover"
 						source={{ uri: business.logoUrl }}
-						style={styles.imageFill}
+						style={[styles.logoFill, { borderRadius: t.brand.radii.sm }]}
 					/>
 				) : (
 					<View
 						style={[
-							styles.imageFill,
+							styles.logoFill,
 							styles.placeholder,
-							{ backgroundColor: t.colors.bg },
+							{ backgroundColor: t.brand.colors.porchCream },
 						]}
 					>
-						<Icon color={t.colors.rustDark} name="briefcaseFilled" size={63} />
+						<Icon
+							color={t.brand.colors.pine}
+							name="briefcaseFilled"
+							size={48}
+						/>
 					</View>
 				)}
 			</View>
@@ -73,14 +99,14 @@ export function BusinessCard({
 					<Text
 						ellipsizeMode="tail"
 						numberOfLines={2}
-						style={[t.typography.cardTitle, styles.name]}
+						style={[t.brand.typography.bodySemi, styles.name]}
 					>
 						{business.name}
 					</Text>
 					<Text
 						ellipsizeMode="tail"
 						numberOfLines={2}
-						style={[t.typography.caption, styles.tagline]}
+						style={[t.brand.typography.caption, styles.tagline]}
 					>
 						{business.tagline}
 					</Text>
@@ -97,44 +123,49 @@ export function BusinessCard({
 						accessibilityLabel={`Call ${business.name}`}
 						accessibilityRole="button"
 						onPress={() => onCallPress(business.phone as string)}
-						style={[styles.phoneBtn, { backgroundColor: t.colors.rust }]}
+						style={({ pressed }) => [
+							styles.phoneBtn,
+							{
+								backgroundColor: t.brand.colors.clay,
+								borderRadius: t.brand.radii.pill,
+							},
+							pressed && styles.pressed,
+						]}
 					>
-						<Icon color={t.colors.white} name="phoneFilled" size={12} />
-						<Text style={[t.typography.captionSemi, { color: t.colors.white }]}>
+						<Icon color={t.brand.colors.bg} name="phoneFilled" size={12} />
+						<Text style={[t.brand.typography.button, styles.phoneLabel]}>
 							{business.phoneDisplay}
 						</Text>
 					</Pressable>
 				) : null}
 			</View>
-		</PhysicalPressable>
+		</Pressable>
 	);
 }
 
 const styles = StyleSheet.create({
-	body: {
-		gap: 8,
-		padding: 12,
-	},
+	body: { gap: 8, paddingHorizontal: 12, paddingVertical: 12 },
 	card: {
-		borderWidth: 2,
-		overflow: "hidden",
+		borderWidth: 1,
+		// Top padding clears the pin; the logo frame inset starts below it.
+		paddingTop: 14,
 		width: CARD_WIDTH,
 	},
 	chips: { alignItems: "center", flexDirection: "row", gap: 6 },
 	copy: { gap: 2 },
-	imageFill: { height: "100%", width: "100%" },
-	imageWrap: {
-		borderBottomWidth: StyleSheet.hairlineWidth,
-		height: IMAGE_SIZE,
-		width: "100%",
+	logoFill: { height: "100%", width: "100%" },
+	logoFrame: {
+		alignSelf: "center",
+		borderWidth: StyleSheet.hairlineWidth,
+		height: LOGO_SIZE,
+		overflow: "hidden",
+		width: LOGO_SIZE,
 	},
-	// Reserve a fixed name + description height so every card is the same size,
-	// regardless of name/description length (caption lh 18 → 2 lines = 36). Descriptions
-	// are capped at 2 lines + ellipsis so short copy doesn't leave a gap before the badge.
-	name: { minHeight: 36 },
+	// Reserve two lines of name + two of tagline so every card is the same
+	// height regardless of copy length (14/18 × 2 = 36; caption 12/18 × 2 = 36).
+	name: { fontSize: 14, lineHeight: 18, minHeight: 36 },
 	phoneBtn: {
 		alignItems: "center",
-		borderRadius: 9999,
 		flexDirection: "row",
 		gap: 6,
 		height: 32,
@@ -143,6 +174,17 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 12,
 		width: "100%",
 	},
+	phoneLabel: { fontSize: 13, lineHeight: 16 },
+	// Centred on the top edge, half outside the card like a push-pin.
+	pin: {
+		alignSelf: "center",
+		borderRadius: PIN_SIZE / 2,
+		height: PIN_SIZE,
+		position: "absolute",
+		top: -(PIN_SIZE / 2),
+		width: PIN_SIZE,
+	},
 	placeholder: { alignItems: "center", justifyContent: "center" },
+	pressed: { opacity: 0.92 },
 	tagline: { minHeight: 36 },
 });
