@@ -1,17 +1,17 @@
 import { Controller } from "react-hook-form";
-import { Pressable, StyleSheet, TextInput, View } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
-import { StrokedText } from "@/components/ui/StrokedText";
-import { CategoryChips } from "@/features/providers/CategoryChips";
-import { SUGGESTED_CATEGORIES } from "@/features/providers/categories";
 import { useTheme } from "@/theme/ThemeProvider";
 import { TextField } from "./fields/TextField";
 import { PartnerReveal } from "./PartnerReveal";
+import { StepIndicator } from "./StepIndicator";
+import { TradePicker } from "./TradePicker";
 import { useConciergeForm } from "./useConciergeForm";
 
 interface ConciergeFormProps {
 	onBackHome: () => void;
+	onSeeDirectory: () => void;
 }
 
 /**
@@ -43,14 +43,30 @@ function HoneypotField({
 	);
 }
 
+/** Step heading + sub-copy, in the site modal's words. */
+function StepHeading({ title, subtitle }: { title: string; subtitle: string }) {
+	const t = useTheme();
+	return (
+		<View style={styles.heading}>
+			<Text accessibilityRole="header" style={t.brand.typography.displayM}>
+				{title}
+			</Text>
+			<Text style={t.brand.typography.body}>{subtitle}</Text>
+		</View>
+	);
+}
+
 /**
- * Two-step "Find My Pro" flow (design.md §E3b, FR-4.1). Step 1 captures the
- * job (trade chips + zip + notes) and fires the partial lead on advance;
- * step 2 captures contact + newsletter opt-in; the confirmation reveals the
- * preferred partner. Honeypot + error-banner behavior carried over from the
- * legacy LeadForm.
+ * Two-step "Find My Pro" flow (design.md §E3b, FR-4.1) on the 2026 brand
+ * tokens with the live site's copy (concierge-brand-round/design.md §4.3).
+ * Step 1 captures the job and fires the partial lead on advance; step 2
+ * captures contact + newsletter opt-in; the confirmation reveals the
+ * preferred partner. Honeypot + error-banner behaviour carried over.
  */
-export function ConciergeForm({ onBackHome }: ConciergeFormProps) {
+export function ConciergeForm({
+	onBackHome,
+	onSeeDirectory,
+}: ConciergeFormProps) {
 	const t = useTheme();
 	const {
 		step,
@@ -65,7 +81,17 @@ export function ConciergeForm({ onBackHome }: ConciergeFormProps) {
 	} = useConciergeForm();
 
 	if (step === "success") {
-		return <PartnerReveal onBackHome={onBackHome} onSubmitAnother={reset} />;
+		return (
+			<PartnerReveal
+				onDone={() => {
+					// Reset BEFORE leaving so the tab-preserved screen does not
+					// re-render success on the next visit.
+					reset();
+					onBackHome();
+				}}
+				onSeeDirectory={onSeeDirectory}
+			/>
+		);
 	}
 
 	if (step === "job") {
@@ -75,34 +101,12 @@ export function ConciergeForm({ onBackHome }: ConciergeFormProps) {
 			// Controller doesn't survive a live control/name swap — typed text
 			// vanishes. The key forces a clean remount per step.
 			<View key="step-job" style={styles.form}>
-				<StrokedText
-					style={[t.brand.typography.bodySemi, { color: t.brand.colors.text }]}
-				>
-					What do you need done?
-				</StrokedText>
-				<Controller
-					control={stepOneForm.control}
-					name="trade"
-					render={({ field, fieldState }) => (
-						<View style={styles.tradeBlock}>
-							<CategoryChips
-								categories={SUGGESTED_CATEGORIES}
-								onSelect={field.onChange}
-								selected={field.value}
-							/>
-							{fieldState.error ? (
-								<StrokedText
-									style={[
-										t.brand.typography.caption,
-										{ color: t.colors.error },
-									]}
-								>
-									{fieldState.error.message ?? "Required"}
-								</StrokedText>
-							) : null}
-						</View>
-					)}
+				<StepIndicator step={1} total={2} />
+				<StepHeading
+					subtitle="Tell us the job and where you are. Takes about a minute."
+					title="What do you need done?"
 				/>
+				<TradePicker control={stepOneForm.control} />
 				<TextField
 					control={stepOneForm.control}
 					keyboardType="number-pad"
@@ -126,11 +130,16 @@ export function ConciergeForm({ onBackHome }: ConciergeFormProps) {
 	const submitting = status === "submitting";
 	return (
 		<View key="step-contact" style={styles.form}>
-			<StrokedText
-				style={[t.brand.typography.bodySemi, { color: t.brand.colors.text }]}
+			<StepIndicator step={2} total={2} />
+			<StepHeading
+				subtitle="How should your pro reach you?"
+				title="Almost there"
+			/>
+			<Text
+				style={[t.brand.typography.caption, { color: t.brand.colors.textSoft }]}
 			>
-				How should your pro reach you?
-			</StrokedText>
+				Your matched pro will use this to get in touch. We never sell your info.
+			</Text>
 			<TextField
 				autoCapitalize="words"
 				autoComplete="name"
@@ -158,12 +167,12 @@ export function ConciergeForm({ onBackHome }: ConciergeFormProps) {
 			<TextField
 				autoComplete="tel"
 				control={stepTwoForm.control}
+				helperText="The one pro we match you with will use this to reach you. We never sell your number."
 				keyboardType="phone-pad"
 				label="Phone"
 				name="phone"
 				required
 			/>
-
 			<Controller
 				control={stepTwoForm.control}
 				name="newsletterOptIn"
@@ -191,47 +200,50 @@ export function ConciergeForm({ onBackHome }: ConciergeFormProps) {
 								<Icon color={t.brand.colors.bg} name="check" size={12} />
 							) : null}
 						</View>
-						<StrokedText
-							containerStyle={styles.optInLabel}
+						<Text
 							style={[
 								t.brand.typography.caption,
+								styles.optInLabel,
 								{ color: t.brand.colors.textSoft },
 							]}
 						>
 							Send me occasional Shmooze tips and trusted local pro
 							recommendations. No spam, unsubscribe anytime.
-						</StrokedText>
+						</Text>
 					</Pressable>
 				)}
 			/>
-
 			<HoneypotField control={stepTwoForm.control} />
-
 			{status === "error" && errorMessage ? (
 				<View
 					accessibilityLiveRegion="assertive"
-					style={[styles.banner, { borderColor: t.brand.colors.clay }]}
+					style={[
+						styles.banner,
+						{
+							borderColor: t.brand.colors.line,
+							borderRadius: t.brand.radii.sm,
+						},
+					]}
 				>
-					<StrokedText
+					<Text
 						style={[t.brand.typography.body, { color: t.brand.colors.clay }]}
 					>
 						{errorMessage}
-					</StrokedText>
+					</Text>
 				</View>
 			) : null}
-
 			<View style={styles.actions}>
-				<Button
-					disabled={submitting}
-					label="Back"
-					onPress={back}
-					variant="wide"
-				/>
 				<Button
 					disabled={submitting}
 					label={submitting ? "Submitting…" : "See My Match"}
 					onPress={submit}
 					variant="primary"
+				/>
+				<Button
+					disabled={submitting}
+					label="← Back"
+					onPress={back}
+					variant="wide"
 				/>
 			</View>
 		</View>
@@ -240,7 +252,7 @@ export function ConciergeForm({ onBackHome }: ConciergeFormProps) {
 
 const styles = StyleSheet.create({
 	actions: { gap: 12, marginTop: 4 },
-	banner: { borderRadius: 10, borderWidth: 1, padding: 12 },
+	banner: { borderWidth: 1, padding: 12 },
 	checkbox: {
 		alignItems: "center",
 		borderRadius: 6,
@@ -250,8 +262,13 @@ const styles = StyleSheet.create({
 		width: 20,
 	},
 	form: { gap: 16 },
+	heading: { gap: 4 },
 	honeypot: { height: 1, left: -9999, position: "absolute", width: 1 },
 	optInLabel: { flex: 1 },
-	optInRow: { alignItems: "center", flexDirection: "row", gap: 10 },
-	tradeBlock: { gap: 4 },
+	optInRow: {
+		alignItems: "center",
+		flexDirection: "row",
+		gap: 10,
+		minHeight: 44,
+	},
 });
