@@ -386,7 +386,7 @@ export function ContractorWizardScreen() {
 			source={daisyBackground}
 			style={styles.flex}
 		>
-			<AppHeader onBack={goBack} showBack />
+			<AppHeader onBack={goBack} showBack surface="legacy" />
 			<KeyboardAvoidingView
 				behavior={Platform.OS === "ios" ? "padding" : undefined}
 				style={styles.flex}

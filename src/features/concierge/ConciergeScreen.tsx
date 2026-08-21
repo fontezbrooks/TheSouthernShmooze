@@ -30,6 +30,7 @@ export function ConciergeScreen() {
 					router.canGoBack() ? router.back() : router.replace("/")
 				}
 				showBack
+				surface="legacy"
 			/>
 			<KeyboardAvoidingView
 				behavior={Platform.OS === "ios" ? "padding" : undefined}

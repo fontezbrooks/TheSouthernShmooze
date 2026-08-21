@@ -90,7 +90,7 @@ export function MatchContactScreen() {
 
 	return (
 		<View style={[styles.flex, { backgroundColor: t.colors.bg }]}>
-			<AppHeader onBack={cancel} showBack />
+			<AppHeader onBack={cancel} showBack surface="legacy" />
 			<KeyboardAvoidingView
 				behavior={Platform.OS === "ios" ? "padding" : undefined}
 				style={styles.flex}

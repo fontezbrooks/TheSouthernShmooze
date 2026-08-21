@@ -1,4 +1,6 @@
 import { fireEvent, render } from "@testing-library/react-native";
+import { StyleSheet } from "react-native";
+import type { ReactTestRendererJSON } from "react-test-renderer";
 import { AppHeader } from "../AppHeader";
 
 jest.mock("react-native-safe-area-context", () => ({
@@ -19,6 +21,21 @@ jest.mock("../../../../assets/ShmoozeLogo-Horizontal.svg", () => {
 });
 
 describe("AppHeader", () => {
+	it("defaults to the brand surface and can opt into the legacy one", async () => {
+		const bgOf = (
+			tree: ReturnType<typeof render> extends Promise<infer R> ? R : never
+		) =>
+			StyleSheet.flatten((tree.toJSON() as ReactTestRendererJSON).props.style)
+				.backgroundColor;
+
+		const brand = await render(<AppHeader />);
+		expect(bgOf(brand)).toBe("#FFFDF8"); // magnolia
+		await brand.unmount();
+
+		const legacy = await render(<AppHeader surface="legacy" />);
+		expect(bgOf(legacy)).toBe("#FFF8EA"); // vanilla
+	});
+
 	it("shows the wordmark and hides the back arrow by default", async () => {
 		const { getByText, queryByLabelText } = await render(<AppHeader />);
 
