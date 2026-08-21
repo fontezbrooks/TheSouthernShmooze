@@ -23,6 +23,18 @@ interface InputContainerProps {
 	trailing?: ReactNode;
 }
 
+/** Border colour by state: error wins, then focus, then rest. */
+function borderFor(
+	c: { clay: string; error: string; line: string },
+	error: string | undefined,
+	focused: boolean
+): string {
+	if (error) {
+		return c.error;
+	}
+	return focused ? c.clay : c.line;
+}
+
 /** Value-row alignment for the three shell states. */
 function contentStyle(multiline: boolean, floated: boolean): ViewStyle {
 	if (multiline) {
@@ -53,7 +65,7 @@ export function InputContainer({
 	const t = useTheme();
 	const c = t.brand.colors;
 	const isFloated = floated || multiline;
-	const borderColor = error ? c.error : focused ? c.clay : c.line;
+	const borderColor = borderFor(c, error, focused);
 
 	return (
 		<View style={styles.wrap}>
