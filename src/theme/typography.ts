@@ -184,6 +184,13 @@ export const brandTypography = {
 		letterSpacing: -0.4,
 		lineHeight: 46,
 	},
+	/** Control label — chips, checkbox rows, field captions that must stay legible. */
+	label: {
+		color: brandColors.text,
+		fontFamily: brandFonts.bodySemi,
+		fontSize: 14,
+		lineHeight: 18,
+	},
 	/** Tab bar label — Public Sans semibold at the iOS 10pt tab size. */
 	tab: {
 		color: brandColors.text,

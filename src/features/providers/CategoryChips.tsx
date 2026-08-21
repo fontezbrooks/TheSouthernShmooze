@@ -9,11 +9,13 @@ interface CategoryChipProps {
 }
 
 /**
- * Pill chip — the visual extracted from TaskIntake's private Chip so the
- * Directory tags row, the swipe intake, and the contact page share one look.
+ * Pill chip on `t.brand` — surface + `line` hairline at rest, clay fill with a
+ * magnolia label when selected (5.74:1). Shared by the Directory tags row,
+ * the swipe intake, the contact page and the concierge trade picker.
  */
 export function CategoryChip({ label, selected, onPress }: CategoryChipProps) {
 	const t = useTheme();
+	const c = t.brand.colors;
 	return (
 		<Pressable
 			accessibilityRole="button"
@@ -22,17 +24,14 @@ export function CategoryChip({ label, selected, onPress }: CategoryChipProps) {
 			style={[
 				styles.chip,
 				{
-					backgroundColor: selected ? t.colors.rust : t.colors.surface,
-					borderColor: selected ? t.colors.rustDark : t.colors.inputBorder,
-					borderRadius: t.radii.pill,
+					backgroundColor: selected ? c.clay : c.surface,
+					borderColor: selected ? c.clay : c.line,
+					borderRadius: t.brand.radii.pill,
 				},
 			]}
 		>
 			<Text
-				style={[
-					t.typography.captionSemi,
-					{ color: selected ? t.colors.white : t.colors.text },
-				]}
+				style={[t.brand.typography.label, { color: selected ? c.bg : c.text }]}
 			>
 				{label}
 			</Text>
@@ -75,11 +74,12 @@ export function CategoryChips({
 }
 
 const styles = StyleSheet.create({
+	// minHeight, not height: the label must be able to grow under Dynamic Type.
 	chip: {
 		alignItems: "center",
-		borderWidth: 1,
-		height: 36,
+		borderWidth: StyleSheet.hairlineWidth,
 		justifyContent: "center",
+		minHeight: 36,
 		paddingHorizontal: 14,
 	},
 	row: { gap: 8, paddingRight: 16 },

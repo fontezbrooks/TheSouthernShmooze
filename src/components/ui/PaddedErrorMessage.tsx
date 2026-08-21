@@ -7,9 +7,8 @@ interface PaddedErrorMessageProps {
 }
 
 /**
- * Field error message in a padded cream box (Figma V3 32:4684) — gives the
- * warning + text breathing room beneath the input for readability. Red
- * triangle icon + black caption text on a Vanilla background.
+ * Field error message in a padded porch-cream box — gives the warning + text
+ * breathing room beneath the input. Error-red triangle, ink caption (13.69:1).
  */
 export function PaddedErrorMessage({ message }: PaddedErrorMessageProps) {
 	const t = useTheme();
@@ -18,11 +17,16 @@ export function PaddedErrorMessage({ message }: PaddedErrorMessageProps) {
 			accessibilityLiveRegion="polite"
 			style={[
 				styles.box,
-				{ backgroundColor: t.colors.bg, borderRadius: t.radii.input },
+				{
+					backgroundColor: t.brand.colors.porchCream,
+					borderRadius: t.brand.radii.sm,
+				},
 			]}
 		>
-			<Icon color={t.colors.error} name="triangleWarning" size={12} />
-			<Text style={[t.typography.caption, { color: t.colors.black }]}>
+			<Icon color={t.brand.colors.error} name="triangleWarning" size={12} />
+			<Text
+				style={[t.brand.typography.caption, { color: t.brand.colors.text }]}
+			>
 				{message}
 			</Text>
 		</View>

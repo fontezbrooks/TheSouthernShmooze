@@ -26,7 +26,7 @@ interface BudgetSelectProps<T extends FieldValues> {
 	name: FieldPath<T>;
 }
 
-/** Single-select budget dropdown (dollar icon + chevron) per Figma. */
+/** Single-select budget dropdown (dollar icon + chevron) on `t.brand`. */
 export function BudgetSelect<T extends FieldValues>({
 	control,
 	name,
@@ -58,10 +58,19 @@ export function BudgetSelect<T extends FieldValues>({
 								icon="dollar"
 								label={label}
 								trailing={
-									<Icon color={t.colors.muted} name="chevronDown" size={18} />
+									<Icon
+										color={t.brand.colors.textSoft}
+										name="chevronDown"
+										size={18}
+									/>
 								}
 							>
-								<Text style={[t.typography.body, { color: t.colors.text }]}>
+								<Text
+									style={[
+										t.brand.typography.body,
+										{ color: t.brand.colors.text },
+									]}
+								>
 									{selected ? selected.label : ""}
 								</Text>
 							</InputContainer>
@@ -75,7 +84,14 @@ export function BudgetSelect<T extends FieldValues>({
 						>
 							<Pressable onPress={() => setOpen(false)} style={styles.backdrop}>
 								<View
-									style={[styles.sheet, { backgroundColor: t.colors.surface }]}
+									style={[
+										styles.sheet,
+										t.brand.shadow.card,
+										{
+											backgroundColor: t.brand.colors.surface,
+											borderRadius: t.brand.radii.md,
+										},
+									]}
 								>
 									{BUDGET_OPTIONS.map((opt) => {
 										const isSel = opt.value === field.value;
@@ -89,8 +105,12 @@ export function BudgetSelect<T extends FieldValues>({
 											>
 												<Text
 													style={[
-														t.typography.body,
-														isSel && { color: t.colors.rust },
+														t.brand.typography.body,
+														{
+															color: isSel
+																? t.brand.colors.clay
+																: t.brand.colors.text,
+														},
 													]}
 												>
 													{opt.label}
@@ -116,11 +136,11 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 24,
 	},
 	option: {
+		justifyContent: "center",
+		minHeight: 48,
 		paddingHorizontal: 20,
-		paddingVertical: 14,
 	},
 	sheet: {
-		borderRadius: 12,
 		paddingVertical: 8,
 	},
 });

@@ -63,8 +63,8 @@ export function FloatingLabel({
 			pointerEvents="none"
 			style={[
 				styles.label,
-				t.typography.body,
-				{ color: color ?? t.colors.muted },
+				t.brand.typography.body,
+				{ color: color ?? t.brand.colors.textSoft },
 				animatedStyle,
 			]}
 		>
