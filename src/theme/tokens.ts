@@ -102,6 +102,8 @@ export const brandFonts = {
 	bodySemi: "PublicSans_600SemiBold",
 	display: "Fraunces_700Bold",
 	displayBlack: "Fraunces_900Black",
+	/** Emphasis word inside a display line — the site sets it italic + clay. */
+	displayItalic: "Fraunces_700Bold_Italic",
 	displaySemi: "Fraunces_600SemiBold",
 } as const;
 

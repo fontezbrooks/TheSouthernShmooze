@@ -7,9 +7,9 @@ import { useTheme } from "@/theme/ThemeProvider";
  * the Concierge one of six equal promos; this is the one block on the page with
  * hero weight, so the primary path is unambiguous (PRODUCT.md principle 2).
  *
- * The emphasized word is carried by colour rather than the site's italic — no
- * Fraunces italic face is loaded (app/_layout.tsx), and synthesised obliques on
- * a high-contrast serif look broken.
+ * The emphasized word follows the site's move exactly: Fraunces italic + clay
+ * (a real italic face is loaded in app/_layout.tsx — synthesised obliques on a
+ * high-contrast serif look broken, so never fall back to fontStyle).
  */
 export function ConciergeHero({ onPress }: { onPress: () => void }) {
 	const t = useTheme();
@@ -27,7 +27,16 @@ export function ConciergeHero({ onPress }: { onPress: () => void }) {
 			</Text>
 
 			<Text style={[t.brand.typography.displayXL, styles.title]}>
-				Ask the <Text style={{ color: t.brand.colors.clay }}>Concierge</Text>.
+				Ask the{" "}
+				<Text
+					style={{
+						color: t.brand.colors.clay,
+						fontFamily: t.brand.fonts.displayItalic,
+					}}
+				>
+					Concierge
+				</Text>
+				.
 			</Text>
 
 			<Text style={[t.brand.typography.body, styles.subtitle]}>

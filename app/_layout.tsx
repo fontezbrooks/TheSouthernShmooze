@@ -7,6 +7,7 @@ import {
 import {
 	Fraunces_600SemiBold,
 	Fraunces_700Bold,
+	Fraunces_700Bold_Italic,
 	Fraunces_900Black,
 	useFonts,
 } from "@expo-google-fonts/fraunces";
@@ -34,6 +35,7 @@ export default function RootLayout() {
 		Caveat_600SemiBold,
 		Fraunces_600SemiBold,
 		Fraunces_700Bold,
+		Fraunces_700Bold_Italic,
 		Fraunces_900Black,
 		PublicSans_400Regular,
 		PublicSans_600SemiBold,
