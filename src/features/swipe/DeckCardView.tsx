@@ -17,7 +17,7 @@ export function DeckCardView({ card }: { card: DeckCard }) {
 				styles.card,
 				{
 					backgroundColor: t.brand.colors.surface,
-					borderColor: t.brand.colors.line,
+					borderColor: t.brand.colors.clay,
 					borderRadius: t.brand.radii.md,
 				},
 				t.brand.shadow.card,
@@ -82,8 +82,10 @@ export function DeckCardView({ card }: { card: DeckCard }) {
 
 const styles = StyleSheet.create({
 	body: { gap: 10, padding: 16 },
+	// 1px clay — the same stroke as the outline Pass button beside it; the
+	// line hairline disappeared into the magnolia page (owner device pass).
 	card: {
-		borderWidth: StyleSheet.hairlineWidth,
+		borderWidth: 1,
 		overflow: "hidden",
 		width: "100%",
 	},
