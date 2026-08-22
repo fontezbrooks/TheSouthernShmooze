@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
 	KeyboardAvoidingView,
 	Platform,
@@ -42,10 +42,15 @@ export function MatchContactScreen() {
 	const { track } = useAnalytics();
 	const pending = session.pending;
 	const [sendError, setSendError] = useState<string | null>(null);
+	// Set the moment a send succeeds. The popped screen stays mounted through
+	// the back transition, so the guard below would otherwise re-run with
+	// pending === null and REPLACE the deck with a fresh /swipe — remounting
+	// the engine at card 0 (owner report: "Keep swiping" restarted the deck).
+	const submitted = useRef(false);
 
 	// Arrived without a pending match (deep link / stale stack) → back to the deck.
 	useEffect(() => {
-		if (!pending) {
+		if (!(pending || submitted.current)) {
 			router.replace("/swipe");
 		}
 	}, [pending, router]);
@@ -79,6 +84,7 @@ export function MatchContactScreen() {
 				name: pending.card.name,
 			});
 			session.markMatched();
+			submitted.current = true;
 			session.clearPending();
 			cancel();
 		} else {
