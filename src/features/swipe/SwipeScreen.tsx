@@ -48,6 +48,10 @@ export function SwipeScreen() {
 	/** ST3 transient pass flash. */
 	const [passed, setPassed] = useState(false);
 	const [quickViewUid, setQuickViewUid] = useState<string | null>(null);
+	// Height of the header + term pill + banner block, so the match
+	// confirmation can centre on the SCREEN rather than on the space below
+	// the chrome (owner: "awkwardly just below centre").
+	const [chromeHeight, setChromeHeight] = useState(0);
 	const { resetIdentityForAudience, sessionKey, track } = useAnalytics();
 	// Homeowner audience boundary (review: PR #44): /swipe is entered from
 	// two CTAs and deep links — the focus lifecycle covers them all. A
@@ -170,68 +174,75 @@ export function SwipeScreen() {
 				{ backgroundColor: t.brand.colors.bg, paddingTop: insets.top },
 			]}
 		>
-			{/* S5/S6: functional header only — chevron back + filters, no logo. */}
-			<View style={styles.header}>
-				<Pressable
-					accessibilityLabel="Back"
-					accessibilityRole="button"
-					hitSlop={12}
-					onPress={() => router.back()}
-					style={styles.navBtn}
-				>
-					<Icon color={t.brand.colors.text} name="chevronLeft" size={28} />
-				</Pressable>
-				{session.task ? (
+			<View onLayout={(e) => setChromeHeight(e.nativeEvent.layout.height)}>
+				{/* S5/S6: functional header only — chevron back + filters, no logo. */}
+				<View style={styles.header}>
 					<Pressable
-						accessibilityLabel="Filters"
+						accessibilityLabel="Back"
 						accessibilityRole="button"
 						hitSlop={12}
-						onPress={() => setFiltersOpen(true)}
+						onPress={() => router.back()}
 						style={styles.navBtn}
 					>
-						<Text style={[styles.dots, { color: t.brand.colors.text }]}>⋯</Text>
+						<Icon color={t.brand.colors.text} name="chevronLeft" size={28} />
 					</Pressable>
-				) : null}
-			</View>
+					{session.task ? (
+						<Pressable
+							accessibilityLabel="Filters"
+							accessibilityRole="button"
+							hitSlop={12}
+							onPress={() => setFiltersOpen(true)}
+							style={styles.navBtn}
+						>
+							<Text style={[styles.dots, { color: t.brand.colors.text }]}>
+								⋯
+							</Text>
+						</Pressable>
+					) : null}
+				</View>
 
-			{/* S4: surface the active search term; tapping it edits the search. */}
-			{session.task ? (
-				<Pressable
-					accessibilityLabel={`Searching for ${session.task.keyword}. Change search`}
-					accessibilityRole="button"
-					onPress={() => setFiltersOpen(true)}
-					style={[
-						styles.termPill,
-						{
-							backgroundColor: t.brand.colors.surface,
-							borderColor: t.brand.colors.line,
-							borderRadius: t.brand.radii.pill,
-						},
-					]}
-				>
-					<Icon color={t.brand.colors.clay} name="search" size={14} />
-					<Text
-						style={[t.brand.typography.label, { color: t.brand.colors.text }]}
-					>
-						{session.task.keyword}
-					</Text>
-				</Pressable>
-			) : null}
-
-			{banner ? (
-				<View
-					style={[styles.banner, { backgroundColor: t.brand.colors.peachSoft }]}
-				>
-					<Text
+				{/* S4: surface the active search term; tapping it edits the search. */}
+				{session.task ? (
+					<Pressable
+						accessibilityLabel={`Searching for ${session.task.keyword}. Change search`}
+						accessibilityRole="button"
+						onPress={() => setFiltersOpen(true)}
 						style={[
-							t.brand.typography.label,
-							{ color: t.brand.colors.clayDark },
+							styles.termPill,
+							{
+								backgroundColor: t.brand.colors.surface,
+								borderColor: t.brand.colors.line,
+								borderRadius: t.brand.radii.pill,
+							},
 						]}
 					>
-						{banner}
-					</Text>
-				</View>
-			) : null}
+						<Icon color={t.brand.colors.clay} name="search" size={14} />
+						<Text
+							style={[t.brand.typography.label, { color: t.brand.colors.text }]}
+						>
+							{session.task.keyword}
+						</Text>
+					</Pressable>
+				) : null}
+
+				{banner ? (
+					<View
+						style={[
+							styles.banner,
+							{ backgroundColor: t.brand.colors.peachSoft },
+						]}
+					>
+						<Text
+							style={[
+								t.brand.typography.label,
+								{ color: t.brand.colors.clayDark },
+							]}
+						>
+							{banner}
+						</Text>
+					</View>
+				) : null}
+			</View>
 
 			{intakeOpen ? (
 				// Dimmed placeholder under the intake overlay.
@@ -261,7 +272,16 @@ export function SwipeScreen() {
 					</View>
 					{confirmation ? (
 						// ST2 (and ST1 celebratory variant): match confirmation card.
-						<View style={[styles.flex, styles.center, styles.confirmWrap]}>
+						<View
+							style={[
+								styles.flex,
+								styles.center,
+								styles.confirmWrap,
+								// Root already pads insets.top; padding the same + the
+								// chrome at the bottom puts the group's centre at H/2.
+								{ paddingBottom: chromeHeight + insets.top },
+							]}
+						>
 							<Text style={[t.brand.typography.displayM, styles.centerText]}>
 								{confirmation.first ? "Your first match!" : "It’s a match!"}
 							</Text>

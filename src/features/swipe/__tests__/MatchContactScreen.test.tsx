@@ -162,6 +162,21 @@ describe("MatchContactScreen (CP1–CP3)", () => {
 		expect(mockBack).toHaveBeenCalled();
 	});
 
+	it("does not bounce to a fresh deck once the pending match clears after a send", async () => {
+		mockSession = makeSession();
+		const { getByText, rerender } = await render(<MatchContactScreen />);
+
+		await fireEvent.press(getByText("Send request"));
+		await waitFor(() => expect(mockBack).toHaveBeenCalled());
+
+		// The popped screen re-renders with pending === null during the back
+		// transition; the stale-stack guard must stay quiet (deck position kept).
+		mockSession = makeSession({ pending: null });
+		await rerender(<MatchContactScreen />);
+
+		expect(mockReplace).not.toHaveBeenCalled();
+	});
+
 	it("shows the send error and keeps the page when the lead fails", async () => {
 		mockSession = makeSession();
 		mockSubmitLead.mockResolvedValue({ error: "send failed", ok: false });
