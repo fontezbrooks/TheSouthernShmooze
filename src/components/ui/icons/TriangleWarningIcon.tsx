@@ -1,5 +1,5 @@
 import Svg, { Circle, Path, Rect } from "react-native-svg";
-import { colors } from "@/theme/tokens";
+import { brandColors } from "@/theme/tokens";
 
 interface IconProps {
 	color?: string;
@@ -13,7 +13,7 @@ interface IconProps {
  */
 export function TriangleWarningIcon({
 	size = 12,
-	color = colors.error,
+	color = brandColors.error,
 }: IconProps) {
 	return (
 		<Svg fill="none" height={size} viewBox="0 0 24 24" width={size}>
@@ -23,8 +23,15 @@ export function TriangleWarningIcon({
 				fill={color}
 				fillRule="evenodd"
 			/>
-			<Rect fill={colors.white} height="6" rx="1" width="2" x="11" y="8.5" />
-			<Circle cx="12" cy="17.5" fill={colors.white} r="1.15" />
+			<Rect
+				fill={brandColors.white}
+				height="6"
+				rx="1"
+				width="2"
+				x="11"
+				y="8.5"
+			/>
+			<Circle cx="12" cy="17.5" fill={brandColors.white} r="1.15" />
 		</Svg>
 	);
 }

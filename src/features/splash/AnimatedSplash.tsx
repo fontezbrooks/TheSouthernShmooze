@@ -9,7 +9,7 @@ import Animated, {
 	withSequence,
 	withTiming,
 } from "react-native-reanimated";
-import { daisyBackground, splashLogo } from "@/theme/assets";
+import { splashLogo } from "@/theme/assets";
 import { useTheme } from "@/theme/ThemeProvider";
 // Lives under src/ (not assets/) so the EAS uploader bundles it — see the
 // nav icons note in app/(tabs)/_layout.tsx.
@@ -21,12 +21,11 @@ interface AnimatedSplashProps {
 }
 
 /**
- * In-app animated splash. Its FIRST painted frame — mascot centered on Vanilla
- * cream — is identical to the native launch screen (`assets/splash.png` via the
- * expo-splash-screen config), so the OS-splash → JS-splash handoff is seamless
- * (no white flash / placeholder). From that matched frame it blooms the daisy
- * pattern in behind the mascot, gives the mascot a subtle pop, then fades out to
- * reveal the app.
+ * In-app animated splash. Its FIRST painted frame — mascot centered on the
+ * brand magnolia — matches the native launch screen (`assets/splash.png` via
+ * the expo-splash-screen config), so the OS-splash → JS-splash handoff is
+ * seamless (no white flash / placeholder). From that matched frame it gives the
+ * mascot a subtle pop, reveals the credit pill, then fades out to the app.
  *
  * The native splash is hidden on this component's first layout (not on font load)
  * so the JS splash is guaranteed to be painted before the native one disappears.
@@ -35,16 +34,14 @@ export function AnimatedSplash({ onFinish }: AnimatedSplashProps) {
 	const t = useTheme();
 	const { width, height } = useWindowDimensions();
 
-	// Initial values ARE the matched first frame: daisy hidden, mascot at rest.
-	const daisyOpacity = useSharedValue(0);
-	const daisyScale = useSharedValue(1.15);
+	// Initial values ARE the matched first frame: credit hidden, mascot at rest.
+	const revealOpacity = useSharedValue(0);
 	const logoScale = useSharedValue(1);
 	const containerOpacity = useSharedValue(1);
 
 	const startAnimation = useCallback(() => {
-		// Daisy pattern blooms in behind the mascot.
-		daisyOpacity.value = withDelay(120, withTiming(1, { duration: 520 }));
-		daisyScale.value = withDelay(120, withTiming(1, { duration: 650 }));
+		// Credit pill fades in under the mascot.
+		revealOpacity.value = withDelay(120, withTiming(1, { duration: 520 }));
 
 		// Mascot gives a gentle pop, then settles.
 		logoScale.value = withSequence(
@@ -61,7 +58,7 @@ export function AnimatedSplash({ onFinish }: AnimatedSplashProps) {
 				}
 			})
 		);
-	}, [containerOpacity, daisyOpacity, daisyScale, logoScale]);
+	}, [containerOpacity, logoScale, revealOpacity]);
 
 	// Hide the native splash once we've painted, then start the timeline.
 	const onLayout = useCallback(() => {
@@ -72,15 +69,10 @@ export function AnimatedSplash({ onFinish }: AnimatedSplashProps) {
 	const containerStyle = useAnimatedStyle(() => ({
 		opacity: containerOpacity.value,
 	}));
-	const daisyStyle = useAnimatedStyle(() => ({
-		opacity: daisyOpacity.value,
-		transform: [{ scale: daisyScale.value }],
-	}));
 	const logoStyle = useAnimatedStyle(() => ({
 		transform: [{ scale: logoScale.value }],
 	}));
-	// Opacity only — reusing daisyStyle would also apply its 1.15→1 zoom.
-	const adsStyle = useAnimatedStyle(() => ({ opacity: daisyOpacity.value }));
+	const adsStyle = useAnimatedStyle(() => ({ opacity: revealOpacity.value }));
 
 	const logoSize = Math.min(width * 0.6, 240);
 
@@ -91,15 +83,10 @@ export function AnimatedSplash({ onFinish }: AnimatedSplashProps) {
 			style={[
 				StyleSheet.absoluteFill,
 				styles.container,
-				{ backgroundColor: t.colors.bg },
+				{ backgroundColor: t.brand.colors.bg },
 				containerStyle,
 			]}
 		>
-			<Animated.Image
-				resizeMode="cover"
-				source={daisyBackground}
-				style={[StyleSheet.absoluteFill, { height, width }, daisyStyle]}
-			/>
 			<Animated.View style={[styles.logoWrap, logoStyle]}>
 				<Image
 					resizeMode="contain"
@@ -107,16 +94,16 @@ export function AnimatedSplash({ onFinish }: AnimatedSplashProps) {
 					style={{ height: logoSize, width: logoSize }}
 				/>
 			</Animated.View>
-			{/* App Daddy credit — white-fill SVG, so it sits on a dark rust pill for
-          legibility over the cream/daisy background. Fades in with the daisy
-          bloom, and is ABSOLUTE-positioned below the mascot: in the flex flow
+			{/* App Daddy credit — white-fill SVG, so it sits on a clayDark pill for
+          legibility over the magnolia background. Fades in after the mascot
+          pop, and is ABSOLUTE-positioned below the mascot: in the flex flow
           its (transparent) footprint would push the mascot ~38pt above the
           native splash position on the first frame (review: PR #37). */}
 			<Animated.View
 				style={[
 					styles.adsWrap,
 					{
-						backgroundColor: t.colors.rustDark,
+						backgroundColor: t.brand.colors.clayDark,
 						borderRadius: t.brand.radii.pill,
 						top: height / 2 + logoSize / 2 + 20,
 					},

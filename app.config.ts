@@ -47,9 +47,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		[
 			"expo-splash-screen",
 			{
-				backgroundColor: "#FFF8EA",
+				backgroundColor: "#FFFDF8",
 				// Native launch screen — matches the in-app AnimatedSplash's first frame
-				// (mascot on Vanilla cream) so the OS splash → JS splash handoff is seamless.
+				// (mascot on brand magnolia) so the OS splash → JS splash handoff is
+				// seamless. splash.png = splash-logo.png composited over #FFFDF8.
 				image: "./assets/splash.png",
 				imageWidth: 220,
 			},

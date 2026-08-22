@@ -17,7 +17,7 @@ const PIN_SIZE = 10;
 
 // Press-in only fires after this delay, so starting a SCROLL on a card no
 // longer depresses it — the FlatList claims the gesture first (SR4). Carried
-// over from the PhysicalPressable this card used to sit on.
+// over from the hard-offset pressable this card used to sit on.
 const PRESS_DELAY_MS = 120;
 
 /**
@@ -28,7 +28,7 @@ const PRESS_DELAY_MS = 120;
  * separate nested tap that dials. No-logo businesses show a briefcase
  * placeholder.
  *
- * The legacy card pushed into a 4px hard-offset shadow via PhysicalPressable.
+ * The legacy card pushed into a 4px hard-offset shadow.
  * That motion belongs to the old design language; the brand's depth is a soft
  * blur, so press feedback is the same opacity dip the Home fork cards use.
  */

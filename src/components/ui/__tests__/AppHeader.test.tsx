@@ -21,19 +21,12 @@ jest.mock("../../../../assets/ShmoozeLogo-Horizontal.svg", () => {
 });
 
 describe("AppHeader", () => {
-	it("defaults to the brand surface and can opt into the legacy one", async () => {
-		const bgOf = (
-			tree: ReturnType<typeof render> extends Promise<infer R> ? R : never
-		) =>
-			StyleSheet.flatten((tree.toJSON() as ReactTestRendererJSON).props.style)
-				.backgroundColor;
-
-		const brand = await render(<AppHeader />);
-		expect(bgOf(brand)).toBe("#FFFDF8"); // magnolia
-		await brand.unmount();
-
-		const legacy = await render(<AppHeader surface="legacy" />);
-		expect(bgOf(legacy)).toBe("#FFF8EA"); // vanilla
+	it("paints the brand magnolia surface", async () => {
+		const tree = await render(<AppHeader />);
+		const bg = StyleSheet.flatten(
+			(tree.toJSON() as ReactTestRendererJSON).props.style
+		).backgroundColor;
+		expect(bg).toBe("#FFFDF8"); // magnolia
 	});
 
 	it("shows the wordmark and hides the back arrow by default", async () => {

@@ -1,5 +1,5 @@
 import Svg, { Path } from "react-native-svg";
-import { colors } from "@/theme/tokens";
+import { brandColors } from "@/theme/tokens";
 
 interface IconProps {
 	color?: string;
@@ -11,7 +11,10 @@ interface IconProps {
  * used on Certified Provider cards and the concierge phone field. Single path,
  * recolorable via `color`.
  */
-export function PhoneIcon({ size = 18, color = colors.textSoft }: IconProps) {
+export function PhoneIcon({
+	size = 18,
+	color = brandColors.textSoft,
+}: IconProps) {
 	return (
 		<Svg fill="none" height={size} viewBox="0 0 24 24" width={size}>
 			<Path

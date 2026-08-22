@@ -110,6 +110,10 @@ export function Icon({ name, size = 18, color }: IconProps) {
 		return <Custom color={color} size={size} />;
 	}
 	return (
-		<Feather color={color ?? t.colors.text} name={FEATHER[name]} size={size} />
+		<Feather
+			color={color ?? t.brand.colors.text}
+			name={FEATHER[name]}
+			size={size}
+		/>
 	);
 }

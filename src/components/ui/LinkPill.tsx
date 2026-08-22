@@ -17,7 +17,7 @@ interface LinkPillProps {
 /**
  * Secondary navigation pill — the app's link-pill family (business-detail
  * LinkButton, FAQ tabs): surface fill, hairline `line` border, pill radius,
- * soft card shadow. Reads as a button over busy backgrounds (daisy) where a
+ * soft card shadow. Reads as a button over busy backgrounds (photos) where a
  * bare text link disappears (owner polish round).
  */
 export function LinkPill({

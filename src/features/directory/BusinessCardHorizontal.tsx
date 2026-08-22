@@ -66,7 +66,7 @@ export function BusinessCardHorizontal({
 					<Text
 						numberOfLines={2}
 						style={[
-							t.typography.cardTitle,
+							t.brand.typography.caption,
 							{
 								color: t.brand.colors.text,
 								fontFamily: t.brand.fonts.bodyBold,
