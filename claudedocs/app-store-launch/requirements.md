@@ -59,10 +59,12 @@ packages went in the same commit. Verified against a regenerated project: zero
 now `false` (PR #61, verified `TARGETED_DEVICE_FAMILY = "1"`), so no iPad set is
 needed. Shot list in `metadata.md` §9. Capture from the launch build.
 
-**B6. Regional content emptiness.** The registry is Middle-Tennessee businesses.
-A reviewer searching from Cupertino may land on empty states and reject under
-guideline 2.1 for incomplete content. Mitigate with App Store review notes that
-name a working ZIP and walk the concierge and swipe flows.
+**B6. Regional content emptiness.** The registry is **Metro Atlanta** — 68 of
+162 businesses serve Atlanta, then Decatur, Marietta and the surrounding metro
+(measured from `claudedocs/registry_response.json`; `PRODUCT.md:9` says the same).
+A reviewer searching from Cupertino may land on thin results and reject under
+guideline 2.1 for incomplete content. Mitigated by the review notes in
+`metadata.md`, which name ZIP 30309 and walk the concierge and swipe flows.
 
 **B7. Fresh production build + submit.** Cut from `main` after all code items
 land. `eas.json` has `submit.production: {}` — the Apple ID, team, and ASC app
@@ -78,8 +80,15 @@ system so no account-deletion requirement.
 
 **S1. Crash reporting via PostHog (D4).** Nothing reports a production crash
 today; the only signal is a user complaining. Enable PostHog error tracking in
-the existing `src/lib/analytics/` setup. No new vendor, so B1 and B2 are
-unaffected. Verify captured exceptions carry no PII per the events.ts guard.
+the existing `src/lib/analytics/` setup. Verify captured exceptions carry no PII
+per the events.ts guard.
+
+No new *vendor*, but **not** no new disclosure: crash and diagnostic data is its
+own category, and neither `privacy-label.md` nor the published policy currently
+mentions it. Both must be revisited as part of this item — B1 and B2 are
+downstream of it, not independent of it. Exception payloads can also carry stack
+frames and breadcrumbs that leak user input, so what gets captured needs a look
+before it ships, not after.
 
 **S2. No error boundary, no `+not-found` route.** A JS exception yields a white
 screen with no recovery path, and the registered `shmooze://` scheme means an

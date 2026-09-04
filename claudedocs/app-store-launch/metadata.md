@@ -34,11 +34,12 @@ words the app name does not.
 | **Find certified local pros** | 25 |
 | Certified local pros, matched | 29 |
 | Home pros, vetted and matched | 29 |
-| Middle TN's certified pros | 26 |
+| Metro Atlanta's certified pros | 30 |
 
-The last one is the most honest about coverage and the most likely to set
-correct expectations, but it also tells a browsing user outside the region to
-move on. Your call which side of that trade you want.
+The last one is the most honest about coverage — the registry is Metro Atlanta
+— and the most likely to set correct expectations, but it also tells a browsing
+user outside the region to move on. It is exactly 30 characters, no room to
+edit. Your call which side of that trade you want.
 
 **Choose:** ____________________
 
@@ -71,9 +72,9 @@ nobody reads a wall.
 ```
 Finding someone good to work on your home shouldn't feel like a gamble.
 
-The Southern Shmooze is a registry of local service businesses that have been
-vetted before they get listed — not a scraped directory, and not a bidding
-war where the loudest ad wins.
+The Southern Shmooze is a registry of Metro Atlanta service businesses that
+have been vetted before they get listed — not a scraped directory, and not a
+bidding war where the loudest ad wins.
 
 FIND MY PRO
 Tell us the kind of work you need, your ZIP, and a few details. We match you
@@ -81,11 +82,11 @@ with a certified pro and put you in touch. No phone tree, no five contractors
 calling you at dinner.
 
 SWIPE THE DECK
-Would rather choose yourself? Swipe through pros near you, see their work and
-ratings, and reach out to the one you like. Pass on the rest.
+Would rather choose yourself? Swipe through certified pros, see their work and
+what they specialize in, and reach out to the one you like. Pass on the rest.
 
 THE REGISTRY
-Browse every certified business by category. Real photos, real ratings, and a
+Browse every certified business by category. Real photos, real details, and a
 straight line to their phone number.
 
 FOR CONTRACTORS
@@ -95,6 +96,13 @@ minutes, and tell us what's holding your growth back.
 No account required. No ads. We don't sell your information, and we don't
 track you across other apps.
 ```
+
+Deliberately says nothing about ratings or reviews. The registry export carries
+`rating` and `reviewCount`, but nothing in the app renders them — not
+`DeckCardView`, not `BusinessCard`, not the detail screen — and the in-app FAQ
+says live Google ratings are "coming to profiles in the app soon". Promising
+them in the listing would be misleading metadata. Revisit when the at-launch
+profile-depth work (L2/L5) ships.
 
 **OWNER:** confirm the vetting claim ("vetted before they get listed") matches
 how the registry actually admits businesses. It is the strongest claim in the
@@ -111,10 +119,12 @@ separately and the repetition wastes the budget.
 contractor,handyman,plumber,electrician,hvac,roofer,home services,local pros,quotes,vetted
 ```
 
-90 characters, 10 to spare. Swap in a city name if you want local coverage —
-`nashville` costs 10 including the comma, so drop `quotes` to make room.
+90 characters, 10 to spare. `atlanta` costs 8 including the comma and fits
+without dropping anything — worth doing, since the registry is Metro Atlanta and
+the app name and subtitle may not carry the city.
 
-**OWNER:** decide whether to spend keyword budget on a city or a trade.
+**OWNER:** decide whether to spend the remaining budget on the city or another
+trade.
 
 ---
 
@@ -195,20 +205,23 @@ First release, so this can be a single line:
 ### App Review notes
 
 This is the field that heads off a guideline 2.1 rejection. The registry is
-regional, and a reviewer in California who searches their own ZIP may see
-empty results and conclude the app is incomplete.
+Metro Atlanta — 68 of the 162 listed businesses serve Atlanta itself, then
+Decatur, Marietta, Lawrenceville and the surrounding metro — so a reviewer
+elsewhere can land on thin results and conclude the app is incomplete.
 
 ```
 No account or sign-in is required — every feature is reachable on first launch.
 
-This app serves Middle Tennessee, so please use ZIP 37027 when a ZIP is
-requested. Searching a ZIP outside the region will correctly return no nearby
-providers.
+This app serves Metro Atlanta. Please use ZIP 30309 (Midtown Atlanta) wherever
+a ZIP is requested; the listed businesses serve Atlanta and the surrounding
+metro area.
 
 To see the main flows:
-- Find My Pro: Concierge tab -> choose a trade -> ZIP 37027 -> continue ->
-  fill in contact details -> submit. You will be matched with a provider.
-- Swipe deck: Shmoozer tab -> swipe right on a provider to request contact.
+- Find My Pro: Concierge tab -> choose a trade -> ZIP 30309 -> continue ->
+  fill in contact details -> submit. The app then reveals a Shmooze partner
+  for that request.
+- Swipe deck: Match tab (bottom right) -> swipe right on a provider to request
+  contact, then fill in the short contact form.
 - Registry: Registry tab -> browse or search certified businesses -> tap one
   for its full profile.
 - Contractor application: Home -> the contractor banner -> a short wizard.
@@ -220,8 +233,14 @@ The app collects no advertising identifier and does not track users across
 other apps or websites, so no App Tracking Transparency prompt is shown.
 ```
 
-**OWNER:** confirm 37027 (Brentwood) is a ZIP with good registry coverage, or
-replace it with one you know returns a full set of results.
+The Match tab is the fifth item in the bottom bar; it pushes the swipe deck
+over the tabs rather than switching to a tab screen, which is why it is worth
+naming its position. There is no tab called "Shmoozer".
+
+**OWNER:** 30309 is Midtown Atlanta. The concierge flow validates any 5-digit
+ZIP and reveals pinned partners rather than filtering by distance, so the ZIP
+mainly needs to look right for the region — but swap it if you have one you
+would rather reviewers see.
 
 ---
 
