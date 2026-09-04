@@ -1,4 +1,5 @@
 import { fireEvent, render } from "@testing-library/react-native";
+import { StyleSheet } from "react-native";
 import { Button, type ButtonVariant } from "../Button";
 
 jest.mock("../Icon", () => {
@@ -54,6 +55,24 @@ describe("Button", () => {
 		expect(onPress).not.toHaveBeenCalled();
 		expect(button.props.accessibilityState).toEqual({ disabled: true });
 	});
+
+	// A fixed height clips the label once the user scales text up. Pinned per
+	// variant because the regression is invisible at default type size — it
+	// only shows on a device with larger text, which no test run uses.
+	it.each(VARIANTS)(
+		"sizes the %s variant with minHeight so large text can grow the box",
+		async (variant) => {
+			const { getByRole } = await render(
+				<Button label={`Go ${variant}`} onPress={jest.fn()} variant={variant} />
+			);
+			const style = StyleSheet.flatten(
+				getByRole("button", { name: `Go ${variant}` }).props.style
+			);
+
+			expect(style.minHeight).toBeGreaterThan(0);
+			expect(style.height).toBeUndefined();
+		}
+	);
 
 	it("renders the icon on the requested side of the label", async () => {
 		const leading = await render(

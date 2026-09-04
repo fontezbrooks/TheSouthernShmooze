@@ -163,6 +163,16 @@ export function Button({
 	);
 }
 
+/**
+ * Sizes are `minHeight` + vertical padding, never a fixed `height`. A fixed
+ * height clips the label at large Dynamic Type sizes — the same defect Codex
+ * flagged on the home hero CTA in PR #52, which this file still had in five
+ * places.
+ *
+ * The padding is set so the intrinsic height at default type stays exactly
+ * what it was (button label is 15/20, chip 11/14), so nothing moves for most
+ * users; the box only grows once the text genuinely needs the room.
+ */
 const styles = StyleSheet.create({
 	base: {
 		alignItems: "center",
@@ -172,27 +182,32 @@ const styles = StyleSheet.create({
 	},
 	outline: {
 		alignSelf: "center",
-		height: 48,
+		minHeight: 48,
 		paddingHorizontal: 20,
+		paddingVertical: 12,
 	},
 	pill: {
 		alignSelf: "flex-start",
-		height: 32,
+		minHeight: 32,
 		paddingHorizontal: 12,
+		paddingVertical: 6,
 	},
 	primary: {
-		height: 56,
+		minHeight: 56,
 		paddingHorizontal: 20,
+		paddingVertical: 16,
 		width: "100%",
 	},
 	solid: {
 		alignSelf: "center",
-		height: 48,
+		minHeight: 48,
 		paddingHorizontal: 20,
+		paddingVertical: 12,
 	},
 	wide: {
-		height: 56,
+		minHeight: 56,
 		paddingHorizontal: 20,
+		paddingVertical: 16,
 		width: "100%",
 	},
 });
