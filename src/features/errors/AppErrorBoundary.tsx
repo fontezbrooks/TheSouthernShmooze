@@ -1,4 +1,6 @@
 import type { ErrorBoundaryProps } from "expo-router";
+import { useEffect } from "react";
+import { getAnalyticsClient } from "@/lib/analytics/posthog";
 import { ErrorStateScreen } from "./ErrorStateScreen";
 
 /**
@@ -11,7 +13,15 @@ import { ErrorStateScreen } from "./ErrorStateScreen";
  * deliberately not shown — a stack trace tells a homeowner nothing, and the
  * crash reporting that makes it actionable for us reports it separately.
  */
-export function AppErrorBoundary({ retry }: ErrorBoundaryProps) {
+export function AppErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+	// A React error boundary CATCHES the render error, so the SDK's uncaught
+	// handler never sees it — without this, the crashes users actually hit are
+	// the ones that go unreported. Read the singleton rather than the context:
+	// this renders in place of the layout, so the provider above may be gone.
+	useEffect(() => {
+		getAnalyticsClient()?.captureException(error);
+	}, [error]);
+
 	return (
 		<ErrorStateScreen
 			actionLabel="Try again"

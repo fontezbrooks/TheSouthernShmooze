@@ -4,14 +4,20 @@ import { AppErrorBoundary } from "../AppErrorBoundary";
 import { ErrorStateScreen } from "../ErrorStateScreen";
 
 const mockReplace = jest.fn();
+const mockCaptureException = jest.fn();
 const RAW_ERROR_TEXT = /TypeError: undefined is not an object/;
 
 jest.mock("expo-router", () => ({
 	useRouter: () => ({ replace: mockReplace }),
 }));
 
+jest.mock("@/lib/analytics/posthog", () => ({
+	getAnalyticsClient: () => ({ captureException: mockCaptureException }),
+}));
+
 beforeEach(() => {
 	mockReplace.mockClear();
+	mockCaptureException.mockClear();
 });
 
 describe("ErrorStateScreen", () => {
@@ -71,6 +77,14 @@ describe("AppErrorBoundary", () => {
 		fireEvent.press(getByRole("button", { name: "Try again" }));
 
 		expect(retry).toHaveBeenCalledTimes(1);
+	});
+
+	it("reports the caught error, which the SDK's uncaught handler never sees", async () => {
+		const error = new Error("boom");
+
+		await render(<AppErrorBoundary error={error} retry={jest.fn()} />);
+
+		expect(mockCaptureException).toHaveBeenCalledWith(error);
 	});
 
 	it("never shows the raw error to the user", async () => {

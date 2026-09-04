@@ -84,11 +84,12 @@ the existing `src/lib/analytics/` setup. Verify captured exceptions carry no PII
 per the events.ts guard.
 
 No new *vendor*, but **not** no new disclosure: crash and diagnostic data is its
-own category, and neither `privacy-label.md` nor the published policy currently
-mentions it. Both must be revisited as part of this item — B1 and B2 are
-downstream of it, not independent of it. Exception payloads can also carry stack
-frames and breadcrumbs that leak user input, so what gets captured needs a look
-before it ships, not after.
+own category. `privacy-label.md` now declares Diagnostics › Crash Data, and the
+policy page gains the same disclosure in PR #60, which owns that file.
+
+Console autocapture is off. It would ship arbitrary log strings and route around
+the type-level PII guard in `events.ts` — the one guard that cannot be forgotten,
+because the compiler enforces it.
 
 **S2. No error boundary, no `+not-found` route.** A JS exception yields a white
 screen with no recovery path, and the registered `shmooze://` scheme means an

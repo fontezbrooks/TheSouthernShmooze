@@ -62,6 +62,28 @@ export function getAnalyticsClient(): PostHog | null {
 	client = enabled
 		? new PostHog(apiKey, {
 				captureAppLifecycleEvents: true,
+				/**
+				 * Crash reporting (S1). Uncaught errors and unhandled rejections
+				 * are captured; `console` autocapture is deliberately OFF.
+				 *
+				 * The PII guard in events.ts is enforced by TYPE — no free-text
+				 * field exists in the event map. Console autocapture would route
+				 * around that entirely by shipping arbitrary log strings, which
+				 * is exactly where a typed email or ZIP ends up in practice.
+				 *
+				 * `nativeCrashes` stays off too: it needs
+				 * `@posthog/react-native-plugin`, and a native package changes
+				 * the fingerprint runtime version, so adding it is a decision to
+				 * make deliberately alongside a build, not a side effect here.
+				 */
+				errorTracking: {
+					autocapture: {
+						console: false,
+						nativeCrashes: false,
+						uncaughtExceptions: true,
+						unhandledRejections: true,
+					},
+				},
 				featureFlagsRequestTimeoutMs: FLAGS_REQUEST_TIMEOUT_MS,
 				host,
 			})

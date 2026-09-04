@@ -26,6 +26,7 @@ whenever a new event or person property lands.
 | Location | Coarse Location (user-typed 5-digit ZIP, persisted with leads — incl. partial leads saved after step 1 alone; contractor's typed service area) | Find-My-Pro step 1; swipe intake; contractor wizard | App Functionality |
 | User Content | Other User Content (free-form text: swipe project details, optional concierge job notes — persisted with the lead, never sent to analytics) | Swipe match form; Find-My-Pro step 1 | App Functionality |
 | Contact Info | Physical Address (business address of the applicant's selected Google listing, sent with the application) | Contractor wizard | App Functionality |
+| Diagnostics | Crash Data (uncaught exceptions, unhandled rejections, and errors caught by the root boundary — message, stack, app/OS version) | Whole app, via PostHog error tracking | App Functionality, Analytics |
 
 Notes:
 
@@ -52,6 +53,13 @@ Notes:
   collection, not just analytics); ANALYTICS only ever sees the 3-digit
   `zip_prefix` event property — regional, non-identifying.
 - No session replay (B-D4: replay OFF).
+- No CONSOLE autocapture. PostHog error tracking captures uncaught exceptions
+  and unhandled rejections only; `console: false` in `posthog.ts`. Console
+  autocapture would ship arbitrary log strings and route straight around the
+  type-level PII guard in `events.ts`.
+- No native crash capture (`nativeCrashes: false`) — it needs
+  `@posthog/react-native-plugin`, a native package, so it is a build-time
+  decision rather than a config flip.
 - No advertising identifiers (IDFA never requested).
 - No email/phone/name fields exist in the typed event map
   (`src/lib/analytics/events.ts`) — compile-time PII guard; email travels only
@@ -61,7 +69,7 @@ Notes:
 
 1. "Do you or your third-party partners collect data from this app?" — **Yes**.
 2. Data types: Email Address, Name, Phone Number, Physical Address
-   (contractor business listing), Coarse Location, Other User Content
-   (app functionality); User ID, Device ID, Product Interaction (analytics).
+   (contractor business listing), Coarse Location (app functionality);
+   User ID, Device ID, Product Interaction, Crash Data (analytics).
 3. "Is this data linked to the user's identity?" — **Yes** for all of the above.
 4. "Do you or your partners use data for tracking?" — **No**.
