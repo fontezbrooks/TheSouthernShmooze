@@ -133,6 +133,17 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 					],
 					NSPrivacyCollectedDataTypeTracking: false,
 				},
+				// Free-form text the user writes: swipe project details and the
+				// optional concierge job notes, both persisted with the lead.
+				{
+					NSPrivacyCollectedDataType:
+						"NSPrivacyCollectedDataTypeOtherUserContent",
+					NSPrivacyCollectedDataTypeLinked: true,
+					NSPrivacyCollectedDataTypePurposes: [
+						"NSPrivacyCollectedDataTypePurposeAppFunctionality",
+					],
+					NSPrivacyCollectedDataTypeTracking: false,
+				},
 				{
 					NSPrivacyCollectedDataType:
 						"NSPrivacyCollectedDataTypeProductInteraction",

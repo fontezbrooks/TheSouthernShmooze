@@ -24,6 +24,7 @@ whenever a new event or person property lands.
 | Identifiers | Device ID (SDK-generated installation id: the anonymous distinct id pre-identify + the persistent device id used for flag bucketing — not IDFA) | SDK | Analytics |
 | Usage Data | Product Interaction (screens, swipes, form funnels, calls) | Whole app | Analytics |
 | Location | Coarse Location (user-typed 5-digit ZIP, persisted with leads — incl. partial leads saved after step 1 alone; contractor's typed service area) | Find-My-Pro step 1; swipe intake; contractor wizard | App Functionality |
+| User Content | Other User Content (free-form text: swipe project details, optional concierge job notes — persisted with the lead, never sent to analytics) | Swipe match form; Find-My-Pro step 1 | App Functionality |
 | Contact Info | Physical Address (business address of the applicant's selected Google listing, sent with the application) | Contractor wizard | App Functionality |
 
 Notes:
@@ -60,7 +61,7 @@ Notes:
 
 1. "Do you or your third-party partners collect data from this app?" — **Yes**.
 2. Data types: Email Address, Name, Phone Number, Physical Address
-   (contractor business listing), Coarse Location (app functionality);
-   User ID, Device ID, Product Interaction (analytics).
+   (contractor business listing), Coarse Location, Other User Content
+   (app functionality); User ID, Device ID, Product Interaction (analytics).
 3. "Is this data linked to the user's identity?" — **Yes** for all of the above.
 4. "Do you or your partners use data for tracking?" — **No**.
