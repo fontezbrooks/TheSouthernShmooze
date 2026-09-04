@@ -16,11 +16,13 @@ import {
 	PublicSans_600SemiBold,
 	PublicSans_700Bold,
 } from "@expo-google-fonts/public-sans";
+import type { ErrorBoundaryProps } from "expo-router";
 import { Stack } from "expo-router";
 import { preventAutoHideAsync } from "expo-splash-screen";
 import { useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { AppErrorBoundary } from "@/features/errors/AppErrorBoundary";
 import { AnimatedSplash } from "@/features/splash/AnimatedSplash";
 import { SwipeSessionProvider } from "@/features/swipe/SwipeSessionProvider";
 import { AnalyticsProvider } from "@/lib/analytics/AnalyticsProvider";
@@ -31,9 +33,12 @@ preventAutoHideAsync();
 /**
  * expo-router renders this instead of the tree when a render throws. The name
  * is fixed by the router — it looks for an `ErrorBoundary` export on the route
- * file, so this cannot be renamed or moved into the component below.
+ * file, so this cannot be renamed. It wraps rather than re-exports because a
+ * bare `export ... from` reads as a barrel file to the linter.
  */
-export { AppErrorBoundary as ErrorBoundary } from "@/features/errors/AppErrorBoundary";
+export function ErrorBoundary(props: ErrorBoundaryProps) {
+	return <AppErrorBoundary {...props} />;
+}
 
 export default function RootLayout() {
 	const [splashDone, setSplashDone] = useState(false);
