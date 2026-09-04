@@ -124,10 +124,20 @@
 			<p>
 				We use this to connect you with a provider, to follow up about your
 				request, and — for applications — to evaluate whether a business is a
-				fit for the registry. Requests are stored in our database, hosted by
-				Supabase in the United States, and a notification email is sent to our
-				team through Resend so a person can act on it.
+				fit for the registry. Where it goes depends on which form you used:
 			</p>
+			<ul>
+				<li>
+					<strong>Find My Pro requests and swipe-deck matches</strong> are stored in
+					our database, hosted by Supabase in the United States, and a notification
+					email goes to our team through Resend so a person can act on it.
+				</li>
+				<li>
+					<strong>Contractor applications</strong> are not stored in that database.
+					They are passed straight through to our application service, which runs on
+					Cloudflare Workers, and are retained there and by the team who reviews them.
+				</li>
+			</ul>
 
 			<h2>What the app records automatically</h2>
 			<ul>
@@ -160,10 +170,12 @@
 				</li>
 			</ul>
 			<p>
-				Analytics is anonymous until you submit one of our forms. After that,
-				the email address you typed becomes the identifier on your analytics
-				record, and earlier activity from that device is joined to it. Your
-				name, phone number, and full ZIP code are never sent to analytics.
+				Analytics is anonymous unless you complete a Find My Pro request or submit a
+				contractor application. In those two cases the email address you typed
+				becomes the identifier on your analytics record, and earlier activity from
+				that device is joined to it. Requesting contact with a provider from the
+				swipe deck does not identify you. Your name, phone number, and full ZIP code
+				are never sent to analytics.
 			</p>
 
 			<h2>What we do not do</h2>
@@ -209,8 +221,12 @@
 				</li>
 				<li>
 					<strong>Resend</strong>
-					delivers the notification email that tells our team a new request or
-					application arrived.
+					delivers the notification email that tells our team a new request arrived.
+				</li>
+				<li>
+					<strong>Cloudflare</strong>
+					runs the service that receives contractor applications and serves the
+					registry data the app reads.
 				</li>
 				<li>
 					<strong>Expo</strong>
