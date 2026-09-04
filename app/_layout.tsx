@@ -28,6 +28,13 @@ import { ThemeProvider } from "@/theme/ThemeProvider";
 
 preventAutoHideAsync();
 
+/**
+ * expo-router renders this instead of the tree when a render throws. The name
+ * is fixed by the router — it looks for an `ErrorBoundary` export on the route
+ * file, so this cannot be renamed or moved into the component below.
+ */
+export { AppErrorBoundary as ErrorBoundary } from "@/features/errors/AppErrorBoundary";
+
 export default function RootLayout() {
 	const [splashDone, setSplashDone] = useState(false);
 	const [loaded, error] = useFonts({
