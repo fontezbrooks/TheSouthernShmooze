@@ -181,8 +181,30 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		"expo-web-browser",
 		"expo-localization",
 	],
+	/**
+	 * Fingerprint policy: the runtime version is derived from the native
+	 * fingerprint, so an update is only ever offered to a binary whose native
+	 * layer actually matches it. `nativeVersion`/`appVersion` would happily
+	 * serve JS built against different native code — the exact failure OTA is
+	 * most likely to cause. Native changes (a new package, a config-plugin
+	 * edit) change the fingerprint and correctly require a new build.
+	 */
+	runtimeVersion: {
+		policy: "fingerprint",
+	},
 	scheme: "shmooze",
 	slug: "thesouthernshmooze",
+	/**
+	 * `fallbackToCacheTimeout: 0` means launch never waits on the network: the
+	 * app starts on the bundle it already has, downloads any update in the
+	 * background, and applies it on the next launch. A non-zero timeout would
+	 * trade a guaranteed-fast start for a slightly fresher first paint, which
+	 * is the wrong trade for an app people open with a problem in hand.
+	 */
+	updates: {
+		fallbackToCacheTimeout: 0,
+		url: "https://u.expo.dev/d0d1c671-c2a2-4691-8e6f-943b06100833",
+	},
 	userInterfaceStyle: "light",
 	version: "1.0.0",
 	web: {
