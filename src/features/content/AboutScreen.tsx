@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { AppHeader } from "@/components/ui/AppHeader";
 import { Icon } from "@/components/ui/Icon";
+import { LINKS } from "@/lib/links";
 import { openLink } from "@/lib/openLink";
 import { useTheme } from "@/theme/ThemeProvider";
 import { ABOUT_STORY, COMMUNITY_LINKS, PRESS_ITEMS } from "./aboutContent";
@@ -155,6 +156,18 @@ export function AboutScreen() {
 						<Icon color={t.brand.colors.clay} name="arrowRight" size={18} />
 					</Pressable>
 				))}
+
+				<Pressable
+					accessibilityRole="link"
+					onPress={() => openLink(LINKS.privacyPolicy)}
+					style={styles.footerLink}
+				>
+					<Text
+						style={[t.brand.typography.caption, { color: t.brand.colors.clay }]}
+					>
+						Privacy policy
+					</Text>
+				</Pressable>
 			</ScrollView>
 		</View>
 	);
@@ -173,6 +186,13 @@ const styles = StyleSheet.create({
 		paddingTop: 16,
 	},
 	flex: { flex: 1 },
+	footerLink: {
+		alignSelf: "center",
+		justifyContent: "center",
+		marginTop: 12,
+		minHeight: 44,
+		paddingHorizontal: 16,
+	},
 	headingBlock: { gap: 2, marginBottom: 4 },
 	linkCol: { flex: 1, gap: 2 },
 	linkRow: {
