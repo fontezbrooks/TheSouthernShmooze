@@ -11,6 +11,27 @@ import type { ConfigContext, ExpoConfig } from "expo/config";
 export default ({ config }: ConfigContext): ExpoConfig => ({
 	...config,
 	android: {
+		/**
+		 * Without an adaptive icon Android masks the square legacy icon into a
+		 * circle/squircle and crops the crest. The foreground is the same crest
+		 * as `icon.png` on a transparent canvas, scaled so it sits inside the
+		 * 66% safe zone; the background is brand magnolia to match the splash.
+		 */
+		adaptiveIcon: {
+			backgroundColor: "#FFFDF8",
+			foregroundImage: "./assets/adaptive-icon.png",
+		},
+		/**
+		 * Expo's template declares these by default. Nothing in the app uses
+		 * them: SYSTEM_ALERT_WINDOW only serves the dev-mode error overlay, and
+		 * the storage pair has zero call sites (no pickers, no file writes).
+		 * Same principle as stripping the iOS usage strings for launch.
+		 */
+		blockedPermissions: [
+			"android.permission.SYSTEM_ALERT_WINDOW",
+			"android.permission.READ_EXTERNAL_STORAGE",
+			"android.permission.WRITE_EXTERNAL_STORAGE",
+		],
 		package: "com.thesouthernshmooze.app",
 	},
 	experiments: {
