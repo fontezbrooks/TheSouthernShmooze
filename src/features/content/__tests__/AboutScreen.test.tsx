@@ -42,4 +42,14 @@ describe("AboutScreen (design.md §E6)", () => {
 		await fireEvent.press(links[0]);
 		expect(mockOpenLink).toHaveBeenCalledWith(expect.stringMatching(HTTP_URL));
 	});
+
+	// Google Play User Data policy: the privacy policy must be reachable in-app.
+	test("footer links out to the hosted privacy policy", async () => {
+		const s = await render(<AboutScreen />);
+		const link = s.getByRole("link", { name: "Privacy policy" });
+		await fireEvent.press(link);
+		expect(mockOpenLink).toHaveBeenCalledWith(
+			"https://fontezbrooks.github.io/TheSouthernShmooze/privacy/"
+		);
+	});
 });
