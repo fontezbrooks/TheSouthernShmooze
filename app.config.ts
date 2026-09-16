@@ -14,8 +14,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		/**
 		 * Without an adaptive icon Android masks the square legacy icon into a
 		 * circle/squircle and crops the crest. The foreground is the same crest
-		 * as `icon.png` on a transparent canvas, scaled so it sits inside the
-		 * 66% safe zone; the background is brand magnolia to match the splash.
+		 * as `icon.png` on a transparent canvas. Android only guarantees a
+		 * 66 dp-diameter circle inside the 108 dp layer (radius ≈313 px on this
+		 * 1024 px canvas), so the crest is scaled to 585 px — the largest size
+		 * with zero opaque pixels outside that circle. Background is brand
+		 * magnolia to match the splash.
 		 */
 		adaptiveIcon: {
 			backgroundColor: "#FFFDF8",
