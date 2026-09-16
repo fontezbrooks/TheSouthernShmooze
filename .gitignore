@@ -167,6 +167,9 @@ assets/*
 !assets/NewImage.png
 !assets/np1.jpg
 
+# Google Play Developer API key for `eas submit -p android`. Never commit.
+google-play-service-account.json
+
 # OS / tooling artifacts
 .DS_Store
 **/.DS_Store
