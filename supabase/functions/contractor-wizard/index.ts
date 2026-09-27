@@ -13,9 +13,28 @@
 // Auth: standard anon-key JWT (supabase.functions.invoke default). No
 // secrets flow through; the worker endpoints are public CORS * anyway —
 // this proxy exists for URL indirection, not privilege.
+//
+// Secrets (optional): CONTRACTOR_NOTIFY=1 enables a Resend copy of each submitted
+// application to LEAD_NOTIFY_TO/BCC from LEAD_NOTIFY_FROM (see notify-config.ts).
+// Off by default because the site's worker may already email the owner.
+// Migration 0022 rate-limits notifications to 30/hour globally and 3/day per
+// applicant. The limiter fails closed, while the worker response remains unchanged.
+
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+	applicantEmail,
+	buildContractorHtml,
+	buildContractorSubject,
+	type ContractorApplication,
+	contractorNotifyBucket,
+} from "../_shared/contractor-email.ts";
+import { resolveNotifyRecipients } from "../_shared/notify-config.ts";
+import { sendResendEmail } from "../_shared/resend.ts";
 
 const DEFAULT_WORKER_BASE = "https://shmooze-worker.jonah-eda.workers.dev";
+const NOTIFY_TIMEOUT_MS = 5000;
 const UPSTREAM_TIMEOUT_MS = 10_000;
+const TRAILING_SLASH = /\/$/;
 
 // Browser targets (Expo web) preflight functions.invoke — without these
 // headers every response is blocked client-side (review: PR #34).
@@ -35,7 +54,7 @@ function json(status: number, body: unknown): Response {
 
 function workerBase(): string {
 	return (Deno.env.get("WORKER_API_BASE") ?? DEFAULT_WORKER_BASE).replace(
-		/\/$/,
+		TRAILING_SLASH,
 		""
 	);
 }
@@ -53,6 +72,80 @@ async function proxyFetch(url: string, init?: RequestInit): Promise<Response> {
 	} finally {
 		clearTimeout(timer);
 	}
+}
+
+async function notifyContractor(
+	application: ContractorApplication
+): Promise<void> {
+	const resendKey = Deno.env.get("RESEND_API_KEY");
+	if (!resendKey) {
+		throw new Error("RESEND_API_KEY is not set");
+	}
+	const recipients = resolveNotifyRecipients((name) => Deno.env.get(name));
+	const replyTo = applicantEmail(application);
+	const result = await sendResendEmail(
+		resendKey,
+		{
+			from: recipients.from,
+			to: recipients.to,
+			...(recipients.bcc ? { bcc: recipients.bcc } : {}),
+			...(replyTo ? { reply_to: replyTo } : {}),
+			html: buildContractorHtml(application),
+			subject: buildContractorSubject(application),
+		},
+		{ signal: AbortSignal.timeout(NOTIFY_TIMEOUT_MS) }
+	);
+	if (!result.ok) {
+		throw new Error(`Resend send failed: ${result.status} ${result.reason}`);
+	}
+}
+
+async function allowContractorNotify(bucket: string): Promise<boolean> {
+	const url = Deno.env.get("SUPABASE_URL");
+	const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+	if (!(url && key)) {
+		console.error("contractor notify rate-limit configuration is missing");
+		return false;
+	}
+	const supabase = createClient(url, key, {
+		auth: { autoRefreshToken: false, persistSession: false },
+	});
+	const { data, error } = await supabase.rpc("contractor_notify_allow", {
+		p_bucket: bucket,
+	});
+	if (error) {
+		console.error("contractor notify rate-limit check failed:", error.message);
+		return false;
+	}
+	if (data !== true) {
+		console.warn("contractor notify rate-limited:", bucket);
+		return false;
+	}
+	return true;
+}
+
+async function submitApplication(
+	base: string,
+	application: ContractorApplication
+): Promise<Response> {
+	const upstream = await proxyFetch(`${base}/api/submit-application`, {
+		body: JSON.stringify({ application }),
+		headers: { "Content-Type": "application/json" },
+		method: "POST",
+	});
+	if (upstream.ok && Deno.env.get("CONTRACTOR_NOTIFY") === "1") {
+		try {
+			if (await allowContractorNotify(contractorNotifyBucket(application))) {
+				await notifyContractor(application);
+			}
+		} catch (e) {
+			console.error(
+				"contractor notify failed:",
+				e instanceof Error ? e.message : e
+			);
+		}
+	}
+	return upstream;
 }
 
 Deno.serve(async (req) => {
@@ -96,11 +189,10 @@ Deno.serve(async (req) => {
 				if (typeof body.application !== "object" || body.application === null) {
 					return json(400, { error: "application required" });
 				}
-				return await proxyFetch(`${base}/api/submit-application`, {
-					body: JSON.stringify({ application: body.application }),
-					headers: { "Content-Type": "application/json" },
-					method: "POST",
-				});
+				return await submitApplication(
+					base,
+					body.application as ContractorApplication
+				);
 			}
 			default:
 				return json(400, { error: "Unknown action" });

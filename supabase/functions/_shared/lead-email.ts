@@ -28,6 +28,15 @@ export interface LeadRecord {
 	zip?: string | null;
 }
 
+export const EMAIL_WRAPPER_OPEN = `<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#1b1b1c;line-height:1.5">`;
+
+/** One labelled paragraph; empty value → "" so the row disappears. */
+export function htmlRow(label: string, value: string): string {
+	return value
+		? `<p style="margin:0 0 12px"><strong>${label}:</strong> ${value}</p>`
+		: "";
+}
+
 /** Budget enum value → human label (mirrors the app's BUDGET_OPTIONS / Figma). */
 const BUDGET_LABELS: Record<string, string> = {
 	"1000_5000": "$1,000 – $5,000",
@@ -49,6 +58,14 @@ const MONTHS = [
 	"November",
 	"December",
 ];
+const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})/;
+
+function newsletterLabel(optedIn: boolean | undefined): string {
+	if (optedIn === undefined) {
+		return "";
+	}
+	return optedIn ? "Yes" : "No";
+}
 
 /** First budget value → label (empty string when unset). */
 export function budgetLabel(budget: string[] | null | undefined): string {
@@ -64,7 +81,7 @@ export function formatStartDate(iso: string | null | undefined): string {
 	if (!iso) {
 		return "";
 	}
-	const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+	const match = ISO_DATE.exec(iso);
 	if (!match) {
 		return iso;
 	}
@@ -103,7 +120,7 @@ export function buildLeadEmailHtml(
 	lead: LeadRecord,
 	fileUrl: string | null
 ): string {
-	const row = (label: string, value: string) =>
+	const alwaysRenderRow = (label: string, value: string) =>
 		`<p style="margin:0 0 12px"><strong>${label}:</strong> ${value}</p>`;
 
 	const name = escapeHtml(
@@ -113,29 +130,22 @@ export function buildLeadEmailHtml(
 	const file = fileUrl ? `<a href="${fileUrl}">Download file</a>` : "";
 
 	return [
-		`<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#1b1b1c;line-height:1.5">`,
+		EMAIL_WRAPPER_OPEN,
 		`<p style="margin:0 0 16px">Sent via form submission from The Southern Shmooze</p>`,
-		row("Name", name),
-		row("Email", escapeHtml(lead.email ?? "")),
-		row("Phone", escapeHtml(lead.phone ?? "")),
-		row("Trade", escapeHtml(lead.trade ?? "")),
-		row("Zip", escapeHtml(lead.zip ?? "")),
-		row("Address", escapeHtml(lead.address ?? "")),
-		row(
-			"Newsletter",
-			lead.newsletter_opt_in === undefined
-				? ""
-				: lead.newsletter_opt_in
-					? "Yes"
-					: "No"
-		),
-		row("Budget", escapeHtml(budgetLabel(lead.budget))),
-		row(
+		alwaysRenderRow("Name", name),
+		alwaysRenderRow("Email", escapeHtml(lead.email ?? "")),
+		alwaysRenderRow("Phone", escapeHtml(lead.phone ?? "")),
+		alwaysRenderRow("Trade", escapeHtml(lead.trade ?? "")),
+		alwaysRenderRow("Zip", escapeHtml(lead.zip ?? "")),
+		alwaysRenderRow("Address", escapeHtml(lead.address ?? "")),
+		alwaysRenderRow("Newsletter", newsletterLabel(lead.newsletter_opt_in)),
+		alwaysRenderRow("Budget", escapeHtml(budgetLabel(lead.budget))),
+		alwaysRenderRow(
 			"Project start date",
 			escapeHtml(formatStartDate(lead.project_start_date))
 		),
-		row("Project Details", details),
-		row("File Upload", file),
+		alwaysRenderRow("Project Details", details),
+		alwaysRenderRow("File Upload", file),
 		"</div>",
 	].join("");
 }

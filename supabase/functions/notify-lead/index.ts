@@ -11,7 +11,9 @@
 // Auth: `X-Sync-Secret` must equal `SYNC_TRIGGER_SECRET` (verify_jwt = false). Reuses
 // the existing shared trigger secret so no new secret is required for auth.
 //
-// Secrets: RESEND_API_KEY (required). Optional: LEAD_NOTIFY_TO, LEAD_NOTIFY_FROM.
+// Secrets: RESEND_API_KEY, LEAD_NOTIFY_TO (comma-separated), LEAD_NOTIFY_FROM (must
+// be on a Resend-verified domain) — all required. Optional: LEAD_NOTIFY_BCC
+// (comma-separated).
 // Auto-provided by the runtime: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -20,13 +22,11 @@ import {
 	buildSubject,
 	type LeadRecord,
 } from "../_shared/lead-email.ts";
+import { loadNotifyRecipients } from "../_shared/notify-config.ts";
+import { sendResendEmail } from "../_shared/resend.ts";
 
-const RESEND_ENDPOINT = "https://api.resend.com/emails";
 const BUCKET = "lead-uploads";
 const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24 * 7; // 7 days
-
-const DEFAULT_TO = "hi@appdaddystudios.com";
-const DEFAULT_FROM = "The Southern Shmooze <onboarding@resend.dev>";
 
 function json(status: number, body: unknown): Response {
 	return new Response(JSON.stringify(body), {
@@ -70,6 +70,10 @@ Deno.serve(async (req: Request) => {
 		console.error("RESEND_API_KEY is not set");
 		return json(500, { reason: "email not configured", status: "error" });
 	}
+	const recipients = loadNotifyRecipients((name) => Deno.env.get(name));
+	if (!recipients) {
+		return json(500, { reason: "email not configured", status: "error" });
+	}
 
 	// 2) Parse the trigger payload.
 	let payload: { record?: LeadRecord };
@@ -85,32 +89,23 @@ Deno.serve(async (req: Request) => {
 
 	// 3) Sign the uploaded file (if any), then build + send the email.
 	const fileUrl = await signFileUrl(lead.file_path);
-	const to = Deno.env.get("LEAD_NOTIFY_TO") ?? DEFAULT_TO;
-	const from = Deno.env.get("LEAD_NOTIFY_FROM") ?? DEFAULT_FROM;
-
-	const res = await fetch(RESEND_ENDPOINT, {
-		body: JSON.stringify({
-			from,
+	const result = await sendResendEmail(
+		resendKey,
+		{
+			from: recipients.from,
 			html: buildLeadEmailHtml(lead, fileUrl),
 			reply_to: lead.email,
 			subject: buildSubject(lead),
-			to: [to],
-		}),
-		headers: {
-			Authorization: `Bearer ${resendKey}`,
-			"Content-Type": "application/json",
-			// One email per lead even if the trigger fires twice.
-			"Idempotency-Key": `lead-${lead.id}`,
+			to: recipients.to,
+			...(recipients.bcc ? { bcc: recipients.bcc } : {}),
 		},
-		method: "POST",
-	});
+		// One email per lead even if the trigger fires twice.
+		{ idempotencyKey: `lead-${lead.id}` }
+	);
 
-	if (!res.ok) {
-		const reason = await res.text().catch(() => res.statusText);
-		console.error("Resend send failed:", res.status, reason);
-		return json(502, { reason, status: "error" });
+	if (!result.ok) {
+		return json(502, { reason: result.reason, status: "error" });
 	}
 
-	const sent = await res.json().catch(() => ({}));
-	return json(200, { id: sent.id ?? null, status: "sent" });
+	return json(200, { id: result.id, status: "sent" });
 });

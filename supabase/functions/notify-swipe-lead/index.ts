@@ -7,17 +7,17 @@
 // failed email NEVER blocks the swipe. reply_to = the Seeker's email.
 //
 // Auth: `X-Sync-Secret` must equal `SYNC_TRIGGER_SECRET` (verify_jwt = false).
-// Secrets: RESEND_API_KEY (required). Optional: LEAD_NOTIFY_TO, LEAD_NOTIFY_FROM.
+// Secrets: RESEND_API_KEY, LEAD_NOTIFY_TO (comma-separated), LEAD_NOTIFY_FROM (must
+// be on a Resend-verified domain) — all required. Optional: LEAD_NOTIFY_BCC
+// (comma-separated).
 
+import { loadNotifyRecipients } from "../_shared/notify-config.ts";
+import { sendResendEmail } from "../_shared/resend.ts";
 import {
 	buildSwipeLeadHtml,
 	buildSwipeLeadSubject,
 	type SwipeLeadRecord,
 } from "../_shared/swipe-email.ts";
-
-const RESEND_ENDPOINT = "https://api.resend.com/emails";
-const DEFAULT_TO = "hi@appdaddystudios.com";
-const DEFAULT_FROM = "The Southern Shmooze <onboarding@resend.dev>";
 
 function json(status: number, body: unknown): Response {
 	return new Response(JSON.stringify(body), {
@@ -37,6 +37,10 @@ Deno.serve(async (req: Request) => {
 		console.error("RESEND_API_KEY is not set");
 		return json(500, { reason: "email not configured", status: "error" });
 	}
+	const recipients = loadNotifyRecipients((name) => Deno.env.get(name));
+	if (!recipients) {
+		return json(500, { reason: "email not configured", status: "error" });
+	}
 
 	let payload: { record?: SwipeLeadRecord };
 	try {
@@ -49,32 +53,23 @@ Deno.serve(async (req: Request) => {
 		return json(400, { reason: "missing lead record", status: "error" });
 	}
 
-	const to = Deno.env.get("LEAD_NOTIFY_TO") ?? DEFAULT_TO;
-	const from = Deno.env.get("LEAD_NOTIFY_FROM") ?? DEFAULT_FROM;
-
-	const res = await fetch(RESEND_ENDPOINT, {
-		body: JSON.stringify({
-			from,
-			to: [to],
+	const result = await sendResendEmail(
+		resendKey,
+		{
+			from: recipients.from,
+			to: recipients.to,
+			...(recipients.bcc ? { bcc: recipients.bcc } : {}),
 			...(lead.contact_email ? { reply_to: lead.contact_email } : {}),
 			html: buildSwipeLeadHtml(lead),
 			subject: buildSwipeLeadSubject(lead),
-		}),
-		headers: {
-			Authorization: `Bearer ${resendKey}`,
-			"Content-Type": "application/json",
-			// One email per lead even if the trigger fires twice.
-			"Idempotency-Key": `swipe-lead-${lead.lead_id}`,
 		},
-		method: "POST",
-	});
+		// One email per lead even if the trigger fires twice.
+		{ idempotencyKey: `swipe-lead-${lead.lead_id}` }
+	);
 
-	if (!res.ok) {
-		const reason = await res.text().catch(() => res.statusText);
-		console.error("Resend send failed:", res.status, reason);
-		return json(502, { reason, status: "error" });
+	if (!result.ok) {
+		return json(502, { reason: result.reason, status: "error" });
 	}
 
-	const sent = await res.json().catch(() => ({}));
-	return json(200, { id: sent.id ?? null, status: "sent" });
+	return json(200, { id: result.id, status: "sent" });
 });
