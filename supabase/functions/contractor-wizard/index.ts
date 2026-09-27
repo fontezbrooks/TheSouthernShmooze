@@ -24,12 +24,11 @@ import {
 	buildContractorSubject,
 	type ContractorApplication,
 } from "../_shared/contractor-email.ts";
-import {
-	RESEND_ENDPOINT,
-	resolveNotifyRecipients,
-} from "../_shared/notify-config.ts";
+import { resolveNotifyRecipients } from "../_shared/notify-config.ts";
+import { sendResendEmail } from "../_shared/resend.ts";
 
 const DEFAULT_WORKER_BASE = "https://shmooze-worker.jonah-eda.workers.dev";
+const NOTIFY_TIMEOUT_MS = 5000;
 const UPSTREAM_TIMEOUT_MS = 10_000;
 const TRAILING_SLASH = /\/$/;
 
@@ -80,24 +79,20 @@ async function notifyContractor(
 	}
 	const recipients = resolveNotifyRecipients((name) => Deno.env.get(name));
 	const replyTo = applicantEmail(application);
-	const res = await fetch(RESEND_ENDPOINT, {
-		body: JSON.stringify({
+	const result = await sendResendEmail(
+		resendKey,
+		{
 			from: recipients.from,
 			to: recipients.to,
 			...(recipients.bcc ? { bcc: recipients.bcc } : {}),
 			...(replyTo ? { reply_to: replyTo } : {}),
 			html: buildContractorHtml(application),
 			subject: buildContractorSubject(application),
-		}),
-		headers: {
-			Authorization: `Bearer ${resendKey}`,
-			"Content-Type": "application/json",
 		},
-		method: "POST",
-	});
-	if (!res.ok) {
-		const reason = await res.text().catch(() => res.statusText);
-		throw new Error(`Resend send failed: ${res.status} ${reason}`);
+		{ signal: AbortSignal.timeout(NOTIFY_TIMEOUT_MS) }
+	);
+	if (!result.ok) {
+		throw new Error(`Resend send failed: ${result.status} ${result.reason}`);
 	}
 }
 

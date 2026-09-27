@@ -1,4 +1,8 @@
-import { parseAddressList, resolveNotifyRecipients } from "../notify-config";
+import {
+	loadNotifyRecipients,
+	parseAddressList,
+	resolveNotifyRecipients,
+} from "../notify-config";
 
 const FROM_ERROR = /LEAD_NOTIFY_FROM/;
 const TO_ERROR = /LEAD_NOTIFY_TO/;
@@ -92,5 +96,37 @@ describe("resolveNotifyRecipients", () => {
 		expect(() =>
 			resolveNotifyRecipients(reader({ LEAD_NOTIFY_TO: "one@example.com" }))
 		).toThrow(FROM_ERROR);
+	});
+});
+
+describe("loadNotifyRecipients", () => {
+	const reader = (values: Record<string, string>) => (name: string) =>
+		values[name];
+
+	it("returns recipients for a valid environment", () => {
+		expect(
+			loadNotifyRecipients(
+				reader({
+					LEAD_NOTIFY_FROM: "sender@example.com",
+					LEAD_NOTIFY_TO: "one@example.com",
+				})
+			)
+		).toEqual({
+			from: "sender@example.com",
+			to: ["one@example.com"],
+		});
+	});
+
+	it("logs and returns null when to is missing", () => {
+		const errorSpy = jest.spyOn(console, "error").mockImplementation();
+
+		try {
+			expect(
+				loadNotifyRecipients(reader({ LEAD_NOTIFY_FROM: "sender@example.com" }))
+			).toBeNull();
+			expect(errorSpy).toHaveBeenCalledWith("LEAD_NOTIFY_TO is not set");
+		} finally {
+			errorSpy.mockRestore();
+		}
 	});
 });

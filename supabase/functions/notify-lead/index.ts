@@ -22,11 +22,8 @@ import {
 	buildSubject,
 	type LeadRecord,
 } from "../_shared/lead-email.ts";
-import {
-	type NotifyRecipients,
-	RESEND_ENDPOINT,
-	resolveNotifyRecipients,
-} from "../_shared/notify-config.ts";
+import { loadNotifyRecipients } from "../_shared/notify-config.ts";
+import { sendResendEmail } from "../_shared/resend.ts";
 
 const BUCKET = "lead-uploads";
 const SIGNED_URL_TTL_SECONDS = 60 * 60 * 24 * 7; // 7 days
@@ -73,11 +70,8 @@ Deno.serve(async (req: Request) => {
 		console.error("RESEND_API_KEY is not set");
 		return json(500, { reason: "email not configured", status: "error" });
 	}
-	let recipients: NotifyRecipients;
-	try {
-		recipients = resolveNotifyRecipients((name) => Deno.env.get(name));
-	} catch (e) {
-		console.error(e instanceof Error ? e.message : e);
+	const recipients = loadNotifyRecipients((name) => Deno.env.get(name));
+	if (!recipients) {
 		return json(500, { reason: "email not configured", status: "error" });
 	}
 
@@ -95,30 +89,23 @@ Deno.serve(async (req: Request) => {
 
 	// 3) Sign the uploaded file (if any), then build + send the email.
 	const fileUrl = await signFileUrl(lead.file_path);
-	const res = await fetch(RESEND_ENDPOINT, {
-		body: JSON.stringify({
+	const result = await sendResendEmail(
+		resendKey,
+		{
 			from: recipients.from,
 			html: buildLeadEmailHtml(lead, fileUrl),
 			reply_to: lead.email,
 			subject: buildSubject(lead),
 			to: recipients.to,
 			...(recipients.bcc ? { bcc: recipients.bcc } : {}),
-		}),
-		headers: {
-			Authorization: `Bearer ${resendKey}`,
-			"Content-Type": "application/json",
-			// One email per lead even if the trigger fires twice.
-			"Idempotency-Key": `lead-${lead.id}`,
 		},
-		method: "POST",
-	});
+		// One email per lead even if the trigger fires twice.
+		{ idempotencyKey: `lead-${lead.id}` }
+	);
 
-	if (!res.ok) {
-		const reason = await res.text().catch(() => res.statusText);
-		console.error("Resend send failed:", res.status, reason);
-		return json(502, { reason, status: "error" });
+	if (!result.ok) {
+		return json(502, { reason: result.reason, status: "error" });
 	}
 
-	const sent = await res.json().catch(() => ({}));
-	return json(200, { id: sent.id ?? null, status: "sent" });
+	return json(200, { id: result.id, status: "sent" });
 });

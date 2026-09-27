@@ -2,7 +2,12 @@
 // imports so this module is unit-testable under jest while the `notify-swipe-lead` Edge
 // Function imports it at runtime. Reuses the escape/budget helpers from the Concierge email.
 
-import { budgetLabel, escapeHtml } from "./lead-email.ts";
+import {
+	budgetLabel,
+	EMAIL_WRAPPER_OPEN,
+	escapeHtml,
+	htmlRow,
+} from "./lead-email.ts";
 
 /** The assembled swipe-lead payload delivered by the AFTER INSERT trigger (migrations 0016/0017). */
 export interface SwipeLeadRecord {
@@ -54,26 +59,26 @@ export function buildSwipeLeadSubject(lead: SwipeLeadRecord): string {
  * the Edge Function so a reply reaches them directly.
  */
 export function buildSwipeLeadHtml(lead: SwipeLeadRecord): string {
-	const row = (label: string, value: string) =>
-		value
-			? `<p style="margin:0 0 12px"><strong>${label}:</strong> ${value}</p>`
+	const confidence =
+		typeof lead.confidence === "number"
+			? `${Math.round(lead.confidence)}% match`
 			: "";
 
-	const confidence =
-		lead.confidence == null ? "" : `${Math.round(lead.confidence)}% match`;
-
 	return [
-		`<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#1b1b1c;line-height:1.5">`,
+		EMAIL_WRAPPER_OPEN,
 		`<p style="margin:0 0 16px">New lead from The Shmoozer (swipe match)</p>`,
-		row("Provider", escapeHtml(lead.business_name ?? lead.business_uid)),
-		row("Looking for", escapeHtml(lead.keyword ?? "")),
-		row("Match confidence", escapeHtml(confidence)),
-		row("Budget", escapeHtml(budgetLabel(lead.budget ? [lead.budget] : null))),
-		row("Timing", escapeHtml(timingLabel(lead.timing))),
-		row("Details", escapeHtml(lead.details ?? "").replace(/\n/g, "<br>")),
-		row("Contact", escapeHtml(lead.contact_name ?? "")),
-		row("Email", escapeHtml(lead.contact_email ?? "")),
-		row("Phone", escapeHtml(lead.contact_phone ?? "")),
+		htmlRow("Provider", escapeHtml(lead.business_name ?? lead.business_uid)),
+		htmlRow("Looking for", escapeHtml(lead.keyword ?? "")),
+		htmlRow("Match confidence", escapeHtml(confidence)),
+		htmlRow(
+			"Budget",
+			escapeHtml(budgetLabel(lead.budget ? [lead.budget] : null))
+		),
+		htmlRow("Timing", escapeHtml(timingLabel(lead.timing))),
+		htmlRow("Details", escapeHtml(lead.details ?? "").replace(/\n/g, "<br>")),
+		htmlRow("Contact", escapeHtml(lead.contact_name ?? "")),
+		htmlRow("Email", escapeHtml(lead.contact_email ?? "")),
+		htmlRow("Phone", escapeHtml(lead.contact_phone ?? "")),
 		"</div>",
 	]
 		.filter(Boolean)

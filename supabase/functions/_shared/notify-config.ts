@@ -6,8 +6,6 @@ export interface NotifyRecipients {
 
 export type EnvReader = (name: string) => string | undefined;
 
-export const RESEND_ENDPOINT = "https://api.resend.com/emails";
-
 export function parseAddressList(raw: string | undefined): string[] {
 	return (raw ?? "")
 		.split(",")
@@ -32,4 +30,14 @@ export function resolveNotifyRecipients(env: EnvReader): NotifyRecipients {
 		to,
 		...(bcc.length > 0 ? { bcc } : {}),
 	};
+}
+
+/** resolveNotifyRecipients, but logs and returns null instead of throwing (edge handlers turn null into a 500). */
+export function loadNotifyRecipients(env: EnvReader): NotifyRecipients | null {
+	try {
+		return resolveNotifyRecipients(env);
+	} catch (error) {
+		console.error(error instanceof Error ? error.message : error);
+		return null;
+	}
 }
