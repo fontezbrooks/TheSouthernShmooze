@@ -7,17 +7,20 @@
 // failed email NEVER blocks the swipe. reply_to = the Seeker's email.
 //
 // Auth: `X-Sync-Secret` must equal `SYNC_TRIGGER_SECRET` (verify_jwt = false).
-// Secrets: RESEND_API_KEY (required). Optional: LEAD_NOTIFY_TO, LEAD_NOTIFY_FROM.
+// Secrets: RESEND_API_KEY, LEAD_NOTIFY_TO (comma-separated), LEAD_NOTIFY_FROM (must
+// be on a Resend-verified domain) — all required. Optional: LEAD_NOTIFY_BCC
+// (comma-separated).
 
+import {
+	type NotifyRecipients,
+	RESEND_ENDPOINT,
+	resolveNotifyRecipients,
+} from "../_shared/notify-config.ts";
 import {
 	buildSwipeLeadHtml,
 	buildSwipeLeadSubject,
 	type SwipeLeadRecord,
 } from "../_shared/swipe-email.ts";
-
-const RESEND_ENDPOINT = "https://api.resend.com/emails";
-const DEFAULT_TO = "hi@appdaddystudios.com";
-const DEFAULT_FROM = "The Southern Shmooze <onboarding@resend.dev>";
 
 function json(status: number, body: unknown): Response {
 	return new Response(JSON.stringify(body), {
@@ -37,6 +40,13 @@ Deno.serve(async (req: Request) => {
 		console.error("RESEND_API_KEY is not set");
 		return json(500, { reason: "email not configured", status: "error" });
 	}
+	let recipients: NotifyRecipients;
+	try {
+		recipients = resolveNotifyRecipients((name) => Deno.env.get(name));
+	} catch (e) {
+		console.error(e instanceof Error ? e.message : e);
+		return json(500, { reason: "email not configured", status: "error" });
+	}
 
 	let payload: { record?: SwipeLeadRecord };
 	try {
@@ -49,13 +59,11 @@ Deno.serve(async (req: Request) => {
 		return json(400, { reason: "missing lead record", status: "error" });
 	}
 
-	const to = Deno.env.get("LEAD_NOTIFY_TO") ?? DEFAULT_TO;
-	const from = Deno.env.get("LEAD_NOTIFY_FROM") ?? DEFAULT_FROM;
-
 	const res = await fetch(RESEND_ENDPOINT, {
 		body: JSON.stringify({
-			from,
-			to: [to],
+			from: recipients.from,
+			to: recipients.to,
+			...(recipients.bcc ? { bcc: recipients.bcc } : {}),
 			...(lead.contact_email ? { reply_to: lead.contact_email } : {}),
 			html: buildSwipeLeadHtml(lead),
 			subject: buildSwipeLeadSubject(lead),

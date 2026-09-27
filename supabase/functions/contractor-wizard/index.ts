@@ -13,9 +13,25 @@
 // Auth: standard anon-key JWT (supabase.functions.invoke default). No
 // secrets flow through; the worker endpoints are public CORS * anyway —
 // this proxy exists for URL indirection, not privilege.
+//
+// Secrets (optional): CONTRACTOR_NOTIFY=1 enables a Resend copy of each submitted
+// application to LEAD_NOTIFY_TO/BCC from LEAD_NOTIFY_FROM (see notify-config.ts).
+// Off by default because the site's worker may already email the owner.
+
+import {
+	applicantEmail,
+	buildContractorHtml,
+	buildContractorSubject,
+	type ContractorApplication,
+} from "../_shared/contractor-email.ts";
+import {
+	RESEND_ENDPOINT,
+	resolveNotifyRecipients,
+} from "../_shared/notify-config.ts";
 
 const DEFAULT_WORKER_BASE = "https://shmooze-worker.jonah-eda.workers.dev";
 const UPSTREAM_TIMEOUT_MS = 10_000;
+const TRAILING_SLASH = /\/$/;
 
 // Browser targets (Expo web) preflight functions.invoke — without these
 // headers every response is blocked client-side (review: PR #34).
@@ -35,7 +51,7 @@ function json(status: number, body: unknown): Response {
 
 function workerBase(): string {
 	return (Deno.env.get("WORKER_API_BASE") ?? DEFAULT_WORKER_BASE).replace(
-		/\/$/,
+		TRAILING_SLASH,
 		""
 	);
 }
@@ -53,6 +69,58 @@ async function proxyFetch(url: string, init?: RequestInit): Promise<Response> {
 	} finally {
 		clearTimeout(timer);
 	}
+}
+
+async function notifyContractor(
+	application: ContractorApplication
+): Promise<void> {
+	const resendKey = Deno.env.get("RESEND_API_KEY");
+	if (!resendKey) {
+		throw new Error("RESEND_API_KEY is not set");
+	}
+	const recipients = resolveNotifyRecipients((name) => Deno.env.get(name));
+	const replyTo = applicantEmail(application);
+	const res = await fetch(RESEND_ENDPOINT, {
+		body: JSON.stringify({
+			from: recipients.from,
+			to: recipients.to,
+			...(recipients.bcc ? { bcc: recipients.bcc } : {}),
+			...(replyTo ? { reply_to: replyTo } : {}),
+			html: buildContractorHtml(application),
+			subject: buildContractorSubject(application),
+		}),
+		headers: {
+			Authorization: `Bearer ${resendKey}`,
+			"Content-Type": "application/json",
+		},
+		method: "POST",
+	});
+	if (!res.ok) {
+		const reason = await res.text().catch(() => res.statusText);
+		throw new Error(`Resend send failed: ${res.status} ${reason}`);
+	}
+}
+
+async function submitApplication(
+	base: string,
+	application: ContractorApplication
+): Promise<Response> {
+	const upstream = await proxyFetch(`${base}/api/submit-application`, {
+		body: JSON.stringify({ application }),
+		headers: { "Content-Type": "application/json" },
+		method: "POST",
+	});
+	if (upstream.ok && Deno.env.get("CONTRACTOR_NOTIFY") === "1") {
+		try {
+			await notifyContractor(application);
+		} catch (e) {
+			console.error(
+				"contractor notify failed:",
+				e instanceof Error ? e.message : e
+			);
+		}
+	}
+	return upstream;
 }
 
 Deno.serve(async (req) => {
@@ -96,11 +164,10 @@ Deno.serve(async (req) => {
 				if (typeof body.application !== "object" || body.application === null) {
 					return json(400, { error: "application required" });
 				}
-				return await proxyFetch(`${base}/api/submit-application`, {
-					body: JSON.stringify({ application: body.application }),
-					headers: { "Content-Type": "application/json" },
-					method: "POST",
-				});
+				return await submitApplication(
+					base,
+					body.application as ContractorApplication
+				);
 			}
 			default:
 				return json(400, { error: "Unknown action" });
