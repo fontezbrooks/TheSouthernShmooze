@@ -71,3 +71,13 @@ export function applicantEmail(app: ContractorApplication): string | null {
 	const email = str(app, "email");
 	return email.includes("@") ? email : null;
 }
+
+/** Rate-limit bucket for a submission: applicant email (lowercased), else verified/plain place id, else "anonymous". */
+export function contractorNotifyBucket(app: ContractorApplication): string {
+	return (
+		applicantEmail(app)?.toLowerCase() ||
+		str(app, "verifiedPlaceId") ||
+		str(app, "placeId") ||
+		"anonymous"
+	);
+}

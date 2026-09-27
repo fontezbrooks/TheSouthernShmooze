@@ -81,7 +81,9 @@ resubmission. Change is entirely server-side.
   `CONTRACTOR_NOTIFY=1`; when unset, behaviour is exactly today's proxy.
   Email failure never changes the response to the app (proxy result wins).
   Toggle exists because the worker may already email the client; duplicate
-  vs. none is the client's call after they check their inbox.
+  vs. none is the client's call after they check their inbox. Migration 0022
+  rate-limits sends to 30/hour globally and 3/day per applicant; notification
+  fails closed when the limiter is unavailable.
 - **R8 Docs.** Header comments in all three functions list the secrets.
   Privacy label and Play Data safety stay valid: recipient is still the app
   operator's inbox, BCC is the developer already named as a processor.
@@ -103,7 +105,9 @@ resubmission. Change is entirely server-side.
   Reply-To = seeker.
 - **AC2** Swipe match lead → same.
 - **AC3** Contractor application with `CONTRACTOR_NOTIFY=1` → same, Reply-To =
-  applicant; with it unset → no email, response unchanged.
+  applicant; with it unset → no email, response unchanged. Replaying the same
+  accepted payload 4× in a day yields 3 emails; the 4th is logged as
+  rate-limited and the app still gets the worker's 2xx.
 - **AC4** `git diff main -- app.config.ts eas.json package.json bun.lock` empty;
   `npx expo-updates fingerprint:generate --platform ios` unchanged.
 - **AC5** Resend dashboard shows each test as Delivered, not bounced/rejected.
@@ -130,10 +134,11 @@ resubmission. Change is entirely server-side.
 ## Rollout (no build)
 
 1. Merge edge-function PR;
-   `supabase functions deploy notify-lead notify-swipe-lead contractor-wizard`.
-2. `supabase secrets set LEAD_NOTIFY_TO=... LEAD_NOTIFY_FROM=... LEAD_NOTIFY_BCC=...`.
-3. One real submission for concierge + swipe; confirm AC1/AC2/AC5.
-4. Ask client whether site/app contractor applications already reach them.
+   `supabase db push` (applies migration 0022).
+2. `supabase functions deploy notify-lead notify-swipe-lead contractor-wizard`.
+3. `supabase secrets set LEAD_NOTIFY_TO=... LEAD_NOTIFY_FROM=... LEAD_NOTIFY_BCC=...`.
+4. One real submission for concierge + swipe; confirm AC1/AC2/AC5.
+5. Ask client whether site/app contractor applications already reach them.
    Set `CONTRACTOR_NOTIFY=1` if not; test AC3.
 
 Related: `claudedocs/google-play-launch/data-safety-answers.md` §"Shared".

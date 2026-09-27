@@ -17,12 +17,16 @@
 // Secrets (optional): CONTRACTOR_NOTIFY=1 enables a Resend copy of each submitted
 // application to LEAD_NOTIFY_TO/BCC from LEAD_NOTIFY_FROM (see notify-config.ts).
 // Off by default because the site's worker may already email the owner.
+// Migration 0022 rate-limits notifications to 30/hour globally and 3/day per
+// applicant. The limiter fails closed, while the worker response remains unchanged.
 
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import {
 	applicantEmail,
 	buildContractorHtml,
 	buildContractorSubject,
 	type ContractorApplication,
+	contractorNotifyBucket,
 } from "../_shared/contractor-email.ts";
 import { resolveNotifyRecipients } from "../_shared/notify-config.ts";
 import { sendResendEmail } from "../_shared/resend.ts";
@@ -96,6 +100,30 @@ async function notifyContractor(
 	}
 }
 
+async function allowContractorNotify(bucket: string): Promise<boolean> {
+	const url = Deno.env.get("SUPABASE_URL");
+	const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+	if (!(url && key)) {
+		console.error("contractor notify rate-limit configuration is missing");
+		return false;
+	}
+	const supabase = createClient(url, key, {
+		auth: { autoRefreshToken: false, persistSession: false },
+	});
+	const { data, error } = await supabase.rpc("contractor_notify_allow", {
+		p_bucket: bucket,
+	});
+	if (error) {
+		console.error("contractor notify rate-limit check failed:", error.message);
+		return false;
+	}
+	if (data !== true) {
+		console.warn("contractor notify rate-limited:", bucket);
+		return false;
+	}
+	return true;
+}
+
 async function submitApplication(
 	base: string,
 	application: ContractorApplication
@@ -107,7 +135,9 @@ async function submitApplication(
 	});
 	if (upstream.ok && Deno.env.get("CONTRACTOR_NOTIFY") === "1") {
 		try {
-			await notifyContractor(application);
+			if (await allowContractorNotify(contractorNotifyBucket(application))) {
+				await notifyContractor(application);
+			}
 		} catch (e) {
 			console.error(
 				"contractor notify failed:",

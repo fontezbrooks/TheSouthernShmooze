@@ -2,6 +2,7 @@ import {
 	applicantEmail,
 	buildContractorHtml,
 	buildContractorSubject,
+	contractorNotifyBucket,
 } from "../contractor-email";
 
 describe("buildContractorSubject", () => {
@@ -66,5 +67,36 @@ describe("applicantEmail", () => {
 
 	it("returns null when email lacks an at sign", () => {
 		expect(applicantEmail({ email: "not-an-email" })).toBeNull();
+	});
+});
+
+describe("contractorNotifyBucket", () => {
+	it("prefers the applicant email and lowercases it", () => {
+		expect(
+			contractorNotifyBucket({
+				email: " Applicant@Example.COM ",
+				placeId: "plain-place",
+				verifiedPlaceId: "verified-place",
+			})
+		).toBe("applicant@example.com");
+	});
+
+	it("falls back to the verified place id", () => {
+		expect(
+			contractorNotifyBucket({
+				placeId: "plain-place",
+				verifiedPlaceId: "verified-place",
+			})
+		).toBe("verified-place");
+	});
+
+	it("falls back to the plain place id", () => {
+		expect(contractorNotifyBucket({ placeId: "plain-place" })).toBe(
+			"plain-place"
+		);
+	});
+
+	it('uses "anonymous" when no identifier is present', () => {
+		expect(contractorNotifyBucket({})).toBe("anonymous");
 	});
 });
